@@ -1,0 +1,37 @@
+version: '2.4'
+services:
+  postgres:
+    image: tommilehtisaari/digiroad-db:5_2019_uusimaa_2
+    environment:
+      POSTGRES_PASSWORD: superSecret
+      POSTGRES_DB: 'dr_r'
+    healthcheck:
+      test: pg_isready -h 127.0.0.1
+
+  asset-matcher:
+    image: tommilehtisaari/digiroad-asset-matcher:sha-76da7f3
+    environment:
+      POSTGRES_PASSWORD: superSecret
+      POSTGRES_DB: 'dr_r'
+      PG_HOST: 'postgres'
+      PG_PORT: 5432
+      PG_USER: 'postgres'
+      PG_PASSWORD: superSecret
+      PG_DATABASE: 'dr_r'
+    ports:
+      - 3000:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  municipality-api:
+    build:
+      context: .
+      target: test
+    environment:
+      PG_PASSWORD: superSecret
+      PG_HOST: postgres
+      ASSET_MATCHER_URL: http://asset-matcher:3000
+    depends_on:
+      postgres:
+        condition: service_healthy

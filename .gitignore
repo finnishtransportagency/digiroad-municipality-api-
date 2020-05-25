@@ -1,0 +1,36 @@
+# OS X
+.DS_Store*
+Icon?
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.directory
+*~
+
+# Build
+build
+dist
+
+# npm
+node_modules
+package-lock.json
+*.log
+*.gz
+
+# yarn
+yarn.lock
+yarn-error.log
+
+# environmentvariables
+.env
+
+# Coveralls
+coverage
+
+# Benchmarking
+benchmarks/graphs
