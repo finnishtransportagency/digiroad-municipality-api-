@@ -1,44 +1,30 @@
 {
-  "name": "express-api",
+  "name": "digiroad-municipality-api",
   "version": "1.0.0",
-  "license": "MIT",
-  "main": "src/index.ts",
+  "description": "Serverless aws-nodejs-typescript template",
+  "main": "serverless.ts",
   "scripts": {
-    "start": "nodemon src/index.ts",
-    "build": "tsc -p .",
-    "test": "export AUTH_OFF=off && NODE_ENV=test jest --verbose --runInBand --forceExit",
-    "test:win": "SET AUTH_OFF=off && NODE_ENV=test jest --verbose --runInBand --forceExit",
-    "ci:test": "export AUTH_OFF=off && NODE_ENV=test jest --verbose --runInBand --forceExit --detectOpenHandles"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": ">=14.15.0"
   },
   "dependencies": {
-    "@hapi/joi": "^17.1.1",
-    "aws-amplify": "^3.0.11",
-    "express": "^4.17.1",
-    "jsonwebtoken": "^8.5.1",
-    "jwk-to-pem": "^2.0.3",
-    "node-fetch": "^2.6.0",
-    "pg": "^8.2.1",
-    "ts-node": "^8.10.1",
-    "typescript": "^3.9.2",
-    "yup": "^0.28.5"
+    "@middy/core": "^2.5.3",
+    "@middy/http-json-body-parser": "^2.5.3"
   },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.9.0",
-    "@types/express": "^4.17.6",
-    "@types/geojson": "^7946.0.7",
-    "@types/hapi__joi": "^17.1.0",
-    "@types/jest": "^25.2.3",
-    "@types/jsonwebtoken": "^8.5.0",
-    "@types/jwk-to-pem": "^2.0.0",
-    "@types/node": "^14.0.1",
-    "@types/node-fetch": "^2.5.7",
-    "@types/pg": "^7.14.3",
-    "@types/supertest": "^2.0.9",
-    "@types/yup": "^0.28.3",
-    "@typescript-eslint/eslint-plugin": "^2.34.0",
-    "jest": "^26.0.1",
-    "nodemon": "^2.0.4",
-    "supertest": "^4.0.2",
-    "ts-jest": "^26.0.0"
-  }
+    "@serverless/typescript": "^3.0.0",
+    "@types/aws-lambda": "^8.10.71",
+    "@types/node": "^14.14.25",
+    "esbuild": "^0.14.11",
+    "json-schema-to-ts": "^1.5.0",
+    "serverless": "^3.0.0",
+    "serverless-esbuild": "^1.23.3",
+    "ts-node": "^10.4.0",
+    "tsconfig-paths": "^3.9.0",
+    "typescript": "^4.1.3"
+  },
+  "author": "The serverless webpack authors (https://github.com/elastic-coders/serverless-webpack)",
+  "license": "MIT"
 }
