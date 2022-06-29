@@ -1,95 +1,95 @@
-# Digiroad Municipality API
+# Serverless - AWS Node.js Typescript
 
-This is a quick istructions on how to run this application. API Reference can be found on Väylä's Wiki page. Although this is pretty simpple project and having only few endpoints.
+This project has been generated using the `aws-nodejs-typescript` template from the [Serverless framework](https://www.serverless.com/).
 
+For detailed instructions, please refer to the [documentation](https://www.serverless.com/framework/docs/providers/aws/).
 
-## Prerequisite
+## Installation/deployment instructions
 
-This is a [Node.js](https://nodejs.org/en/) project. You need a Node.js installation and NPM or Yarn packagemanagers. This has been developped with version 13 of Node.js.
+Depending on your preferred package manager, follow the instructions below to deploy your project.
 
-Also Docker and Docker-Compose is highly recommended but not neccessary.
+> **Requirements**: NodeJS `lts/fermium (v.14.15.0)`. If you're using [nvm](https://github.com/nvm-sh/nvm), run `nvm use` to ensure you're using the same Node version in local and in your lambda's runtime.
 
-## Environment Variables
+### Using NPM
 
-PostgreSQL Database connections:
+- Run `npm i` to install the project dependencies
+- Run `npx sls deploy` to deploy this stack to AWS
+
+### Using Yarn
+
+- Run `yarn` to install the project dependencies
+- Run `yarn sls deploy` to deploy this stack to AWS
+
+## Test your service
+
+This template contains a single lambda function triggered by an HTTP request made on the provisioned API Gateway REST API `/calculateDelta` route with `POST` method. The request body must be provided as `application/json`. The body structure is tested by API Gateway against `src/functions/calculateDelta/schema.ts` JSON-Schema definition: it must contain the `name` property.
+
+- requesting any other path than `/calculateDelta` with any other method than `POST` will result in API Gateway returning a `403` HTTP error code
+- sending a `POST` request to `/calculateDelta` with a payload **not** containing a string property named `name` will result in API Gateway returning a `400` HTTP error code
+- sending a `POST` request to `/calculateDelta` with a payload containing a string property named `name` will result in API Gateway returning a `200` HTTP status code with a message saluting the provided name and the detailed event processed by the lambda
+
+> :warning: As is, this template, once deployed, opens a **public** endpoint within your AWS account resources. Anybody with the URL can actively execute the API Gateway endpoint and the corresponding lambda. You should protect this endpoint with the authentication method of your choice.
+
+### Locally
+
+In order to test the calculateDelta function locally, run the following command:
+
+- `npx sls invoke local -f calculateDelta --path src/functions/calculateDelta/mock.json` if you're using NPM
+- `yarn sls invoke local -f calculateDelta --path src/functions/calculateDelta/mock.json` if you're using Yarn
+
+Check the [sls invoke local command documentation](https://www.serverless.com/framework/docs/providers/aws/cli-reference/invoke-local/) for more information.
+
+### Remotely
+
+Copy and replace your `url` - found in Serverless `deploy` command output - and `name` parameter in the following `curl` command in your terminal or in Postman to test your newly deployed application.
 
 ```
-PG_HOST:        (defaults => 'postgres')
-PG_PORT:        (defaluts => 5432)
-PG_USER:        (defaluts =>'postgres')
-PG_PASSWORD:    required
-PG_DATABASE:    (defalts => 'dr_r')
+curl --location --request POST 'https://myApiEndpoint/dev/calculateDelta' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "Frederic"
+}'
 ```
 
-This uses another microservice called [Assetmatcher](https://github.com/finnishtransportagency/digiroad-municipality-assetmatcher). This can be started with docker-compose:
+## Template features
+
+### Project structure
+
+The project code base is mainly located within the `src` folder. This folder is divided in:
+
+- `functions` - containing code base and configuration for your lambda functions
+- `libs` - containing shared code base between your lambdas
 
 ```
-ASSET_MATCHER_URL: (defaults => http://localhost:3000)
+.
+├── src
+│   ├── functions               # Lambda configuration and source code folder
+│   │   ├── calculateDelta
+│   │   │   ├── handler.ts      # `calculateDelta` lambda source code
+│   │   │   ├── index.ts        # `calculateDelta` lambda Serverless configuration
+│   │   │   ├── mock.json       # `calculateDelta` lambda input parameter, if any, for local invocation
+│   │   │   └── schema.ts       # `calculateDelta` lambda input event JSON-Schema
+│   │   │
+│   │   └── index.ts            # Import/export of all lambda configurations
+│   │
+│   └── libs                    # Lambda shared code
+│       └── apiGateway.ts       # API Gateway specific helpers
+│       └── handlerResolver.ts  # Sharable library for resolving lambda handlers
+│       └── lambda.ts           # Lambda middleware
+│
+├── package.json
+├── serverless.ts               # Serverless service file
+├── tsconfig.json               # Typescript compiler configuration
+├── tsconfig.paths.json         # Typescript paths
+└── webpack.config.js           # Webpack configuration
 ```
 
-Port can be defined in default Node.js way:
+### 3rd party libraries
 
-```
- PORT:    (defaults => 5000)
-```
-The authentication uses AWS Cognito These parameters hasto be configured always:
+- [json-schema-to-ts](https://github.com/ThomasAribart/json-schema-to-ts) - uses JSON-Schema definitions used by API Gateway for HTTP request validation to statically generate TypeScript types in your lambda's handler code base
+- [middy](https://github.com/middyjs/middy) - middleware engine for Node.Js lambda. This template uses [http-json-body-parser](https://github.com/middyjs/middy/tree/master/packages/http-json-body-parser) to convert API Gateway `event.body` property, originally passed as a stringified JSON, to its corresponding parsed object
+- [@serverless/typescript](https://github.com/serverless/typescript) - provides up-to-date TypeScript definitions for your `serverless.ts` service file
 
-```
-USER_POOL_REGION: ${USER_POOL_REGION}
-USER_POOL_ID: ${USER_POOL_ID}
-USER_POOL_CLIENT_ID: ${USER_POOL_CLIENT_ID}
-```
-Alternatively if you want to just try out the API without authentication you can turn authentication off. This will use default user. This is also been used in itegration tests.
+### Advanced usage
 
-```
-AUTH=off
-```
-
-## Setting up the development database
-
-The most simple and recommended way to set up development database is via Docker-Compose. If you want more indepth quide on setting up the database, check out Väylä's wiki or README.md of `digiroad-municipality-api` (related projet to asset matcher). This project needs a database related to municipality-api which has PGRouting, PostGIS and OSSP-UUID extensions already configured with Digiroad topology.
-
-```bash
-# This will start the database and assetmatcher (on localhost:3000)
-docker-compose up -d
-```
-
-
-## Run development environment
-
-Install packages:
-
-```bash
-yarn install
-```
-
-```bash
-yarn start
-```
-You should get something similar to this:
-
-```bash
-$ yarn start
-yarn run v1.22.4
-$ nodemon ./src/index.js
-[nodemon] 2.0.4
-[nodemon] to restart at any time, enter `rs`
-[nodemon] watching path(s): *.*
-[nodemon] watching extensions: js,mjs,json
-[nodemon] starting `node ./src/index.js`
-Express Running on port: 3000 🚀
-Postgres connected: localhost:5432
-```
-
-
-## Continuous Integration
-
-Currently this project is using GitHub Actions to perform automated testing with docker-compose and shipps images to registery. This pipeline is triggered when you make a `pull_request` or `push` to development branch. This can be configured later to respond other branches as well. A new Image is shipped with a tag representing 8 digits of commit sha.
-
-Suggestion: In future version tagged `v0.0.1` release branches could be merged into master which triggers a production build on and tags it with github tag. This tag can be later used in continuous delivery systems (Flux) later with regex to determinene production deployments.
-
-## GeoJSON
-
-GeoJSON is a very intuitive format and most of the modern GIS tools are able to handle transform their native data to GeoJSON and vice versa. If you are developing GeoJSON yourself at some point in your data pipeline you can reference [RFC-7946](https://tools.ietf.org/html/rfc7946) specification which is the official specification.
-
-There is also an old specification which is now obsolete but it's more comprehensive and can also be used to getting started. You can access it [here](https://geojson.org/geojson-spec.html).
+Any tsconfig.json can be used, but if you do, set the environment variable `TS_NODE_CONFIG` for building the application, eg `TS_NODE_CONFIG=./tsconfig.app.json npx serverless webpack`
