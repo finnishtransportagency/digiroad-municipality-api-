@@ -9,5 +9,5 @@ phases:
       - npm install
   build:
     commands:
-      - serverless package
+      - serverless deploy
   
