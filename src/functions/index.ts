@@ -1,2 +1,2 @@
-export { default as hello } from './hello';
-export { default as importData } from './importData';
+export { default as calculateDelta } from './calculateDelta';
+export { default as storeMunicipalityData } from './storeMunicipalityData';

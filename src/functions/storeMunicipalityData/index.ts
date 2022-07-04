@@ -7,7 +7,7 @@ export default {
     {
       http: {
         method: 'post',
-        path: 'hello',
+        path: 'calculateDelta',
         request: {
           schemas: {
             'application/json': schema,

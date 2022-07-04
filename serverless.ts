@@ -1,7 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
-import hello from '@functions/hello';
-import importData from '@functions/importData';
+import calculateDelta from '@functions/calculateDelta';
+import storeMunicipalityData from '@functions/storeMunicipalityData';
 
 const serverlessConfiguration: AWS = {
   service: 'digiroad-municipality-api',
@@ -10,6 +10,7 @@ const serverlessConfiguration: AWS = {
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
+    region: 'eu-west-1',
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -20,7 +21,17 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { hello, importData },
+  functions: { calculateDelta, storeMunicipalityData },
+  resources: {
+    Resources: {
+      geoJsonBucket: {
+        Type: 'AWS::S3::Bucket',
+        Properties: {
+          BucketName: 'geojson-bucket'
+        }
+      }
+    }
+  },
   package: { individually: true },
   custom: {
     esbuild: {
