@@ -15,7 +15,7 @@ const calculateDelta: ValidatedEventAPIGatewayProxyEvent<
   const url: string = s3.getSignedUrl(
     "putObject",
     {
-      Bucket: "geojsonbucket",
+      Bucket: "drKuntaDevBucket",
       Expires: 60 * 60,
       Key: "municipalityX/dateX",
     }

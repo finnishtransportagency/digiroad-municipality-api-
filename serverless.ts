@@ -31,7 +31,7 @@ const serverlessConfiguration: AWS = {
   functions: { calculateDelta, storeMunicipalityData },
   resources: {
     Resources: {
-      geoJsonBucket: {
+      drKuntaDevBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
           BucketName: 'geojson-bucket'
