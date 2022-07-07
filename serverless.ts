@@ -35,7 +35,13 @@ const serverlessConfiguration: AWS = {
               's3:PutObjectAcl'
             ],
             Resource: "arn:aws:s3:::dr-kunta-dev-bucket/*"
-        }]
+            },{
+              Effect: 'Allow',
+              Action: [
+                'lambda:InvokeFunction'
+              ],
+              Resource: 'arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-dev-calculateDelta'
+      }]
       }
     }
   },

@@ -5,19 +5,21 @@ import * as aws from "aws-sdk";
 
 import schema from "./schema";
 
-const calculateDelta: ValidatedEventAPIGatewayProxyEvent<
+const storeMunicipalityData: ValidatedEventAPIGatewayProxyEvent<
   typeof schema
 > = async () => {
   
   const s3 = new aws.S3();
-  
+  const now = new Date().getDate();
+  const municipality = 'espoo'
+
   try {
   const url: string = s3.getSignedUrl(
     "putObject",
     {
       Bucket: "dr-kunta-dev-bucket",
       Expires: 60 * 60,
-      Key: "municipalityX/dateX",
+      Key: `${municipality}/${now}.json`,
     }
   );
   return formatJSONResponse({
@@ -31,4 +33,4 @@ const calculateDelta: ValidatedEventAPIGatewayProxyEvent<
 }
 };
 
-export const main = middyfy(calculateDelta);
+export const main = middyfy(storeMunicipalityData);
