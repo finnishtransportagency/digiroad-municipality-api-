@@ -25,6 +25,18 @@ const serverlessConfiguration: AWS = {
         process.env.SUBNETAID,
         process.env.SUBNETBID
       ]
+    }, 
+    iam: {
+      role: {
+        statements: [{
+            Effect: 'Allow',
+            Action: [
+              's3:PutObject',
+              's3:PutObjectAcl'
+            ],
+            Resource: "arn:aws:s3:::dr-kunta-dev-bucket/*"
+        }]
+      }
     }
   },
   // import the function via paths
