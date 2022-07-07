@@ -34,7 +34,7 @@ const serverlessConfiguration: AWS = {
       drKuntaDevBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
-          BucketName: 'geojson-bucket'
+          BucketName: 'dr-kunta-dev-bucket'
         }
       }
     }
