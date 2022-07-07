@@ -11,6 +11,13 @@ const serverlessConfiguration: AWS = {
     name: 'aws',
     runtime: 'nodejs14.x',
     region: 'eu-west-1',
+    vpc: {
+      securityGroupIds: [process.env.SECURITYGROUPID],
+      subnetIds: [
+        process.env.SUBNETAID,
+        process.env.SUBNETBID
+      ]
+    },
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
