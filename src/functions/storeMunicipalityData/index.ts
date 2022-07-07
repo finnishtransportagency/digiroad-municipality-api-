@@ -7,7 +7,7 @@ export default {
     {
       http: {
         method: 'post',
-        path: 'upload/:municipality',
+        path: 'upload',
         request: {
           schemas: {
             'application/json': schema,
