@@ -15,7 +15,7 @@ const storeMunicipalityData: ValidatedEventAPIGatewayProxyEvent<
   const url: string = s3.getSignedUrl(
     "putObject",
     {
-      Bucket: "geojsonbucket",
+      Bucket: "dr-kunta-dev-bucket",
       Expires: 60 * 60,
       Key: "municipalityX/dateX",
     }
