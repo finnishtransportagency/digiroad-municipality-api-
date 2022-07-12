@@ -1,6 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
 import storeMunicipalityData from '@functions/storeMunicipalityData';
+import calculateDelta from '@functions/calculateDelta';
 
 const serverlessConfiguration: AWS = {
   service: 'digiroad-municipality-api',
@@ -32,21 +33,30 @@ const serverlessConfiguration: AWS = {
             Effect: 'Allow',
             Action: [
               's3:PutObject',
-              's3:PutObjectAcl'
+              's3:PutObjectAcl',
+              's3:ListBucket',
+              's3:GetObject'
             ],
             Resource: "arn:aws:s3:::dr-kunta-dev-bucket/*"
             },{
-              Effect: 'Allow',
-              Action: [
-                'lambda:InvokeFunction'
-              ],
-              Resource: 'arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-dev-calculateDelta'
+            Effect: 'Allow',
+            Action: [
+              's3:ListBucket'
+            ],
+            Resource: 'arn:aws:s3:::dr-kunta-dev-bucket'
+            },{
+            
+            Effect: 'Allow',
+            Action: [
+              'lambda:InvokeFunction'
+            ],
+            Resource: 'arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-dev-calculateDelta'
       }]
       }
     }
   },
   // import the function via paths
-  functions: { storeMunicipalityData },
+  functions: { storeMunicipalityData, calculateDelta },
   resources: {
     Resources: {
       drKuntaDevBucket: {
