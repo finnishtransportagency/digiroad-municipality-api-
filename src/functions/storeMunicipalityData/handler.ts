@@ -10,14 +10,16 @@ const storeMunicipalityData: ValidatedEventAPIGatewayProxyEvent<
 > = async () => {
   
   const s3 = new aws.S3();
-  
+  const now = new Date().toISOString().slice(0,19);
+  const municipality = 'espoo'
+
   try {
   const url: string = s3.getSignedUrl(
     "putObject",
     {
       Bucket: "dr-kunta-dev-bucket",
       Expires: 60 * 60,
-      Key: "municipalityX/dateX",
+      Key: `${municipality}/${now}.json`,
     }
   );
   return formatJSONResponse({
