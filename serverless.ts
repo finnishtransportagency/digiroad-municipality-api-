@@ -12,7 +12,7 @@ const serverlessConfiguration: AWS = {
     runtime: 'nodejs14.x',
     apiGateway: {
       minimumCompressionSize: 1024,
-      shouldStartNameWithService: true,
+      shouldStartNameWithService: true
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
@@ -22,15 +22,12 @@ const serverlessConfiguration: AWS = {
     region: 'eu-west-1',
     vpc: {
       securityGroupIds: [process.env.SECURITYGROUPID],
-      subnetIds: [
-        process.env.SUBNETAID,
-        process.env.SUBNETBID
-      ]
-    
+      subnetIds: [process.env.SUBNETAID, process.env.SUBNETBID]
     },
     iam: {
       role: {
-        statements: [{
+        statements: [
+          {
             Effect: 'Allow',
             Action: [
               's3:PutObject',
@@ -39,20 +36,18 @@ const serverlessConfiguration: AWS = {
               's3:GetObject'
             ],
             Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/*`
-            },{
+          },
+          {
             Effect: 'Allow',
-            Action: [
-              's3:ListBucket'
-            ],
+            Action: ['s3:ListBucket'],
             Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket`
-            },{
-            
+          },
+          {
             Effect: 'Allow',
-            Action: [
-              'lambda:InvokeFunction'
-            ],
+            Action: ['lambda:InvokeFunction'],
             Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-calculateDelta`
-      }]
+          }
+        ]
       }
     }
   },
@@ -78,9 +73,9 @@ const serverlessConfiguration: AWS = {
       target: 'node14',
       define: { 'require.resolve': undefined },
       platform: 'node',
-      concurrency: 10,
-    },
-  },
+      concurrency: 10
+    }
+  }
 };
 
 module.exports = serverlessConfiguration;

@@ -10,10 +10,10 @@ export default {
         path: 'storeMunicipalityData',
         request: {
           schemas: {
-            'application/json': schema,
-          },
-        },
-      },
-    },
-  ],
+            'application/json': schema
+          }
+        }
+      }
+    }
+  ]
 };
