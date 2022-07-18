@@ -7,5 +7,5 @@ phases:
       - npm install
   build:
     commands:
-      - serverless deploy
+      - serverless deploy --stage ${STAGE_NAME}
   

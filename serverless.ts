@@ -17,6 +17,7 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+      STAGE_NAME: process.env.STAGE_NAME
     },
     region: 'eu-west-1',
     vpc: {
@@ -37,20 +38,20 @@ const serverlessConfiguration: AWS = {
               's3:ListBucket',
               's3:GetObject'
             ],
-            Resource: "arn:aws:s3:::dr-kunta-dev-bucket/*"
+            Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/*`
             },{
             Effect: 'Allow',
             Action: [
               's3:ListBucket'
             ],
-            Resource: 'arn:aws:s3:::dr-kunta-dev-bucket'
+            Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket`
             },{
             
             Effect: 'Allow',
             Action: [
               'lambda:InvokeFunction'
             ],
-            Resource: 'arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-dev-calculateDelta'
+            Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-calculateDelta`
       }]
       }
     }
@@ -59,10 +60,10 @@ const serverlessConfiguration: AWS = {
   functions: { storeMunicipalityData, calculateDelta },
   resources: {
     Resources: {
-      drKuntaDevBucket: {
+      drKuntaBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
-          BucketName: 'dr-kunta-dev-bucket'
+          BucketName: `dr-kunta-${process.env.STAGE_NAME}-bucket`
         }
       }
     }

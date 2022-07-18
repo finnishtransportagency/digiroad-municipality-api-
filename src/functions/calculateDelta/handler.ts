@@ -11,7 +11,7 @@ const calculateDelta = async (event) => {
 
   try {
     const params = {
-      Bucket: 'dr-kunta-dev-bucket',
+      Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
       Prefix: municipality
     }
 
@@ -39,8 +39,8 @@ const calculateDelta = async (event) => {
     }
   }
   
-  const updateObject = JSON.parse(await getObject('dr-kunta-dev-bucket', updateKey)).features;
-  const refrenceObject = JSON.parse(await getObject('dr-kunta-dev-bucket', refrenceKey)).features;
+  const updateObject = JSON.parse(await getObject(`dr-kunta-${process.env.STAGE_NAME}-bucket`, updateKey)).features;
+  const refrenceObject = JSON.parse(await getObject(`dr-kunta-${process.env.STAGE_NAME}-bucket`, refrenceKey)).features;
  
   const created = [];
   const deleted = [];
