@@ -1,26 +1,29 @@
 import { middyfy } from '@libs/lambda';
 import * as aws from "aws-sdk";
 
-const calculateDelta = async () => {
+const calculateDelta = async (event) => {
   
   const s3 = new aws.S3();
 
+  const key: string = decodeURIComponent(event.Records[0].s3.object.key)
+
+  const municipality: string = key.split('/')[0];
+
   try {
     const params = {
-      Bucket: 'dr-kunta-dev-bucket'
+      Bucket: 'dr-kunta-dev-bucket',
+      Prefix: municipality
     }
 
     var keys = await s3.listObjectsV2(params).promise()
+    const sortedKeyList = keys.Contents.sort(k => -k.LastModified.getTime())
+    var updateKey = sortedKeyList[0].Key;
+    var refrenceKey = sortedKeyList[1].Key;
 
   } catch (e) {
     throw new Error(`Could not list object keys from S3: ${e.message}`)
   }
   
-
-  const sortedKeyList = keys.Contents.sort(k => -k.LastModified.getTime())
-  const updateKey = sortedKeyList[0].Key;
-  const refrenceKey = sortedKeyList[1].Key;
-
   async function getObject (bucket, objectKey) {
     try {
       const params = {
