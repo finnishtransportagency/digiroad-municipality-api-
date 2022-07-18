@@ -18,9 +18,13 @@ const storeMunicipalityData: ValidatedEventAPIGatewayProxyEvent<
       Expires: 60 * 60,
       Key: `${municipality}/${now}.json`
     });
-    return formatJSONResponse({
-      message: url
-    });
+    return {
+      statusCode: 307,
+      headers: {
+        location: url
+      },
+      body: 'success'
+    };
   } catch (err) {
     console.log(err);
     return formatJSONResponse({

@@ -6,7 +6,7 @@ export default {
   events: [
     {
       http: {
-        method: 'post',
+        method: 'put',
         path: 'storeMunicipalityData',
         request: {
           schemas: {
