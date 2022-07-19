@@ -8,6 +8,18 @@ const calculateDelta = async (event) => {
 
   const municipality: string = key.split('/')[0];
 
+  interface ObstacleFeature {
+    type: string;
+    properties: {
+      ID: number;
+      EST_TYYPPI: number;
+    };
+    geometry: {
+      type: string;
+      coordinates: Array<number>;
+    };
+  }
+
   try {
     const params = {
       Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
@@ -22,7 +34,7 @@ const calculateDelta = async (event) => {
     throw new Error(`Could not list object keys from S3: ${e.message}`);
   }
 
-  async function getObject(bucket, objectKey) {
+  async function getObject(bucket: string, objectKey: string) {
     try {
       const params = {
         Bucket: bucket,
@@ -37,18 +49,18 @@ const calculateDelta = async (event) => {
     }
   }
 
-  const updateObject = JSON.parse(
+  const updateObject: Array<ObstacleFeature> = JSON.parse(
     await getObject(`dr-kunta-${process.env.STAGE_NAME}-bucket`, updateKey)
   ).features;
-  const refrenceObject = JSON.parse(
+  const refrenceObject: Array<ObstacleFeature> = JSON.parse(
     await getObject(`dr-kunta-${process.env.STAGE_NAME}-bucket`, refrenceKey)
   ).features;
 
-  const created = [];
-  const deleted = [];
-  const updated = [];
+  const created: Array<ObstacleFeature> = [];
+  const deleted: Array<ObstacleFeature> = [];
+  const updated: Array<ObstacleFeature> = [];
 
-  function comparePoints(obj1, obj2) {
+  function comparePoints(obj1: ObstacleFeature, obj2: ObstacleFeature) {
     if (obj1.properties.EST_TYYPPI !== obj2.properties.EST_TYYPPI) {
       return true;
     }

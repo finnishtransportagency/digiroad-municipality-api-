@@ -1,13 +1,8 @@
-import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import * as aws from 'aws-sdk';
 
-import schema from './schema';
-
-const storeMunicipalityData: ValidatedEventAPIGatewayProxyEvent<
-  typeof schema
-> = async () => {
+const storeMunicipalityData = async () => {
   const s3 = new aws.S3();
   const now = new Date().toISOString().slice(0, 19);
   const municipality = 'espoo';
