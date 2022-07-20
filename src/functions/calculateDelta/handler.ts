@@ -1,5 +1,6 @@
 import { middyfy } from '@libs/lambda';
 import * as aws from 'aws-sdk';
+import { matchRoadLink } from '..';
 
 const calculateDelta = async (event) => {
   const s3 = new aws.S3();
@@ -18,6 +19,11 @@ const calculateDelta = async (event) => {
       type: string;
       coordinates: Array<number>;
     };
+  }
+  interface PayloadFeature {
+    Created: Array<ObstacleFeature>;
+    Deleted: Array<ObstacleFeature>;
+    Updated: Array<ObstacleFeature>;
   }
 
   try {
@@ -103,6 +109,18 @@ const calculateDelta = async (event) => {
   console.log(`Created: ${JSON.stringify(created)}`);
   console.log(`Deleted: ${JSON.stringify(deleted)}`);
   console.log(`Updated: ${JSON.stringify(updated)}`);
-};
 
+  const payLoad: PayloadFeature = {
+    Created: created,
+    Deleted: deleted,
+    Updated: updated
+  };
+  const lambda = new aws.Lambda();
+  const param = {
+    FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-matchRoadLink`,
+    InvocationType: 'Event',
+    Payload: JSON.stringify(payLoad)
+  };
+  await lambda.invoke(param).promise();
+};
 export const main = middyfy(calculateDelta);

@@ -2,6 +2,7 @@ import type { AWS } from '@serverless/typescript';
 
 import storeMunicipalityData from '@functions/storeMunicipalityData';
 import calculateDelta from '@functions/calculateDelta';
+import matchRoadLink from '@functions/matchRoadLink';
 
 const serverlessConfiguration: AWS = {
   service: 'digiroad-municipality-api',
@@ -46,13 +47,18 @@ const serverlessConfiguration: AWS = {
             Effect: 'Allow',
             Action: ['lambda:InvokeFunction'],
             Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-calculateDelta`
+          },
+          {
+            Effect: 'Allow',
+            Action: ['lambda:InvokeFunction', 'lambda:InvokeAsync'],
+            Resource: '*'
           }
         ]
       }
     }
   },
   // import the function via paths
-  functions: { storeMunicipalityData, calculateDelta },
+  functions: { storeMunicipalityData, calculateDelta, matchRoadLink },
   resources: {
     Resources: {
       drKuntaBucket: {
