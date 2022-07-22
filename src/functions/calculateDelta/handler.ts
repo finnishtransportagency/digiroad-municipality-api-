@@ -86,7 +86,7 @@ const calculateDelta = async (event) => {
       }
     }
     if (!found) {
-      deleted.push(updateObject[j]);
+      deleted.push(refrenceObject[j]);
     }
   }
   console.log(`Created: ${JSON.stringify(created)}`);
