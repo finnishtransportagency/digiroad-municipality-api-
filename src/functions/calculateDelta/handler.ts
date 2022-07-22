@@ -1,6 +1,5 @@
 import { middyfy } from '@libs/lambda';
 import * as aws from 'aws-sdk';
-import { matchRoadLink } from '..';
 
 const calculateDelta = async (event) => {
   const s3 = new aws.S3();

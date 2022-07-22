@@ -3,6 +3,7 @@ import type { AWS } from '@serverless/typescript';
 import storeMunicipalityData from '@functions/storeMunicipalityData';
 import calculateDelta from '@functions/calculateDelta';
 import matchRoadLink from '@functions/matchRoadLink';
+import reportRejectedDelta from '@functions/reportRejectedDelta';
 
 const serverlessConfiguration: AWS = {
   service: 'digiroad-municipality-api',
@@ -58,7 +59,12 @@ const serverlessConfiguration: AWS = {
     }
   },
   // import the function via paths
-  functions: { storeMunicipalityData, calculateDelta, matchRoadLink },
+  functions: {
+    storeMunicipalityData,
+    calculateDelta,
+    matchRoadLink,
+    reportRejectedDelta
+  },
   resources: {
     Resources: {
       drKuntaBucket: {
