@@ -1,5 +1,6 @@
 import { middyfy } from '@libs/lambda';
 import * as aws from 'aws-sdk';
+import { ObstacleFeature, PayloadFeature } from '@functions/typing';
 
 const calculateDelta = async (event) => {
   const s3 = new aws.S3();
@@ -7,23 +8,6 @@ const calculateDelta = async (event) => {
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
 
   const municipality: string = key.split('/')[0];
-
-  interface ObstacleFeature {
-    type: string;
-    properties: {
-      ID: number;
-      EST_TYYPPI: number;
-    };
-    geometry: {
-      type: string;
-      coordinates: Array<number>;
-    };
-  }
-  interface PayloadFeature {
-    Created: Array<ObstacleFeature>;
-    Deleted: Array<ObstacleFeature>;
-    Updated: Array<ObstacleFeature>;
-  }
 
   try {
     const params = {
