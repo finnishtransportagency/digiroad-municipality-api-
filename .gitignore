@@ -1,36 +1,9 @@
-# OS X
-.DS_Store*
-Icon?
-._*
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Linux
-.directory
-*~
-
-# Build
-build
-dist
-
-# npm
+# package directories
 node_modules
-package-lock.json
-*.log
-*.gz
+jspm_packages
 
-# yarn
-yarn.lock
-yarn-error.log
+# Serverless directories
+.serverless
 
-# environmentvariables
-.env
-
-# Coveralls
-coverage
-
-# Benchmarking
-benchmarks/graphs
+# esbuild directories
+.esbuild
