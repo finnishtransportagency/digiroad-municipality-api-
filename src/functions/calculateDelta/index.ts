@@ -7,7 +7,8 @@ export default {
       s3: {
         bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
         event: 's3:ObjectCreated:*',
-        existing: true
+        existing: true,
+        rules: [{ prefix: 'update/' }]
       }
     }
   ]

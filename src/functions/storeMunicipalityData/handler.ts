@@ -11,7 +11,7 @@ const storeMunicipalityData = async () => {
     const url: string = s3.getSignedUrl('putObject', {
       Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
       Expires: 60 * 60,
-      Key: `${municipality}/${now}.json`
+      Key: `update/${municipality}/${now}.json`
     });
     return {
       statusCode: 307,

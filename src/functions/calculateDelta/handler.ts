@@ -7,12 +7,12 @@ const calculateDelta = async (event) => {
 
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
 
-  const municipality: string = key.split('/')[0];
+  const municipality: string = key.split('/')[1];
 
   try {
     const params = {
       Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-      Prefix: municipality
+      Prefix: `update/${municipality}`
     };
 
     var keys = await s3.listObjectsV2(params).promise();
