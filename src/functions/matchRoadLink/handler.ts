@@ -56,7 +56,6 @@ const matchRoadLinks = async (event) => {
         coordinates[j] = new Coordinate(point.x, point.y, point.z);
       }
       var lineString = geomFactory.createLineString(coordinates);
-      console.log('lineString: ', lineString);
       DistanceToPoint.computeDistance(
         lineString,
         obstacleCoords,
@@ -64,7 +63,6 @@ const matchRoadLinks = async (event) => {
       );
       var distance = pointPairDistance.getDistance();
       if (distance < minDistance) {
-        console.log('<');
         minDistance = distance;
         minLink = roadlink;
         minLinkCoordinates = coordinates;
