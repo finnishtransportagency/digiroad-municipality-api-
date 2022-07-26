@@ -69,7 +69,7 @@ const matchRoadLinks = async (event) => {
         minPosOnLink = pointPairDistance.getCoordinate(0);
       }
     }
-    console.log('minPosLink: ', minDistance);
+    console.log('minPosLink: ', minDistance, 'id: ', obstacle.properties.ID);
     pointPairDistance.initialize();
     for (let i = 0; i < minLinkCoordinates.length - 1; i++) {
       const startPoint = minLinkCoordinates[i];
