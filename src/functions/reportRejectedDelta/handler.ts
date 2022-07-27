@@ -12,7 +12,7 @@ const reportRejectedDelta = async (event) => {
     Body: JSON.stringify(event)
   };
 
-  await s3.upload(params);
+  s3.upload(params);
 };
 
 export const main = middyfy(reportRejectedDelta);
