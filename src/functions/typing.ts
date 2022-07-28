@@ -34,3 +34,12 @@ export interface LinkObject {
   linkId: number;
   points: Array<LinkPoint>;
 }
+
+export interface matchResultObject {
+  ID: number;
+  EST_TYYPPI: number;
+  DR_LINK_ID: number;
+  DR_M_VALUE: number;
+  DR_OFFSET: number;
+  DR_REJECTED: boolean;
+}
