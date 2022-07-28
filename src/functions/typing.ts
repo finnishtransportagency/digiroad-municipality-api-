@@ -18,6 +18,9 @@ export interface PayloadFeature {
   Created: Array<ObstacleFeature>;
   Deleted: Array<ObstacleFeature>;
   Updated: Array<ObstacleFeature>;
+  metadata?: {
+    OFFSET_LIMIT?: number;
+  };
 }
 
 export interface LinkPoint {

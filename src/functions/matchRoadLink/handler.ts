@@ -105,6 +105,7 @@ const matchRoadLinks = async (event) => {
     Deleted: event.Deleted,
     Updated: event.Updated
   };
+  payLoad.metadata = { OFFSET_LIMIT: MAX_OFFSET };
   console.log(JSON.stringify(payLoad));
   const lambda = new aws.Lambda();
   const param = {
