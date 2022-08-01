@@ -35,7 +35,8 @@ const serverlessConfiguration: AWS = {
               's3:PutObject',
               's3:PutObjectAcl',
               's3:ListBucket',
-              's3:GetObject'
+              's3:GetObject',
+              's3:DeleteObject'
             ],
             Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/*`
           },

@@ -1,6 +1,7 @@
 import { middyfy } from '@libs/lambda';
 import * as aws from 'aws-sdk';
 import { ObstacleFeature, PayloadFeature } from '@functions/typing';
+import { schema } from './validationSchema';
 
 const calculateDelta = async (event) => {
   const s3 = new aws.S3();
@@ -38,12 +39,30 @@ const calculateDelta = async (event) => {
     }
   }
 
-  const updateObject: Array<ObstacleFeature> = JSON.parse(
-    await getObject(`dr-kunta-${process.env.STAGE_NAME}-bucket`, updateKey)
-  ).features;
-  const refrenceObject: Array<ObstacleFeature> = JSON.parse(
+  try {
+    var updateObject = JSON.parse(
+      await getObject(`dr-kunta-${process.env.STAGE_NAME}-bucket`, updateKey)
+    );
+    schema.isValid(updateObject).then(async function (valid: boolean) {
+      if (!valid) {
+        throw new Error('Invalid schema');
+      }
+    });
+  } catch (e) {
+    const params = {
+      Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+      Key: updateKey
+    };
+    await s3.deleteObject(params).promise();
+    throw new Error(`Object deleted because of invalid data: ${e.message}`);
+  }
+
+  const referenceObject = JSON.parse(
     await getObject(`dr-kunta-${process.env.STAGE_NAME}-bucket`, refrenceKey)
-  ).features;
+  );
+
+  const updateFeatures: Array<ObstacleFeature> = updateObject.features;
+  const referenceFeatures: Array<ObstacleFeature> = referenceObject.features;
 
   const created: Array<ObstacleFeature> = [];
   const deleted: Array<ObstacleFeature> = [];
@@ -62,31 +81,35 @@ const calculateDelta = async (event) => {
     return false;
   }
 
-  for (let i = 0; i < updateObject.length; i++) {
+  for (let i = 0; i < updateFeatures.length; i++) {
     let found = false;
-    for (let j = 0; j < refrenceObject.length; j++) {
-      if (updateObject[i].properties.ID === refrenceObject[j].properties.ID) {
-        if (comparePoints(updateObject[i], refrenceObject[j])) {
-          updated.push(updateObject[i]);
+    for (let j = 0; j < referenceFeatures.length; j++) {
+      if (
+        updateFeatures[i].properties.ID === referenceFeatures[j].properties.ID
+      ) {
+        if (comparePoints(updateFeatures[i], referenceFeatures[j])) {
+          updated.push(updateFeatures[i]);
         }
         found = true;
         break;
       }
     }
     if (!found) {
-      created.push(updateObject[i]);
+      created.push(updateFeatures[i]);
     }
   }
-  for (let j = 0; j < refrenceObject.length; j++) {
+  for (let j = 0; j < referenceFeatures.length; j++) {
     let found = false;
-    for (let i = 0; i < updateObject.length; i++) {
-      if (updateObject[i].properties.ID === refrenceObject[j].properties.ID) {
+    for (let i = 0; i < updateFeatures.length; i++) {
+      if (
+        updateFeatures[i].properties.ID === referenceFeatures[j].properties.ID
+      ) {
         found = true;
         break;
       }
     }
     if (!found) {
-      deleted.push(refrenceObject[j]);
+      deleted.push(referenceFeatures[j]);
     }
   }
   console.log(`Created: ${JSON.stringify(created)}`);

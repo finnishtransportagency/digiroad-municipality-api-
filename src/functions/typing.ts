@@ -1,3 +1,15 @@
+export interface ObstacleGeoJSON {
+  type: string;
+  name?: string;
+  crs?: {
+    type?: string;
+    properties?: {
+      name?: string;
+    };
+  };
+  features: Array<ObstacleFeature>;
+}
+
 export interface ObstacleFeature {
   type: string;
   properties: {
