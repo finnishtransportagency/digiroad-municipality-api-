@@ -19,7 +19,10 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
-      STAGE_NAME: process.env.STAGE_NAME
+      STAGE_NAME: process.env.STAGE_NAME,
+      SMTP_USERNAME: process.env.SMTP_USERNAME,
+      SMTP_PASSWORD: process.env.SMTP_PASSWORD,
+      MUNICIPALITY_EMAIL: process.env.MUNICIPALITY_EMAIL
     },
     region: 'eu-west-1',
     vpc: {
