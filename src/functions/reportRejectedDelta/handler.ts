@@ -1,6 +1,8 @@
 import { middyfy } from '@libs/lambda';
 import * as aws from 'aws-sdk';
 import nodemailer from 'nodemailer';
+import ejs from 'ejs';
+import * as path from 'path';
 
 const reportRejectedDelta = async (event) => {
   console.log(JSON.stringify(event));
@@ -24,16 +26,36 @@ const reportRejectedDelta = async (event) => {
       pass: `${process.env.SMTP_PASSWORD}`
     }
   });
-  const info = await transporter.sendMail({
-    from: 'noreply.digiroad@vaylapilvi.fi',
-    to: process.env.MUNICIPALITY_EMAIL,
-    subject: 'Rejected delta',
-    text: 'Something wrong with delta',
-    html: '<strong>Someething wrong with delta</strong>',
-    headers: { 'x-myheader': 'test header' }
-  });
 
-  console.log('Message sent: %s', info.response);
+  if (event.ReportSource === 'calculateDelta') {
+    const email = await ejs.renderFile(
+      path.resolve(
+        __dirname,
+        './templates/municipality/' + 'InvalidGeoJSON.ejs'
+      ),
+      event
+    );
+    await transporter.sendMail({
+      from: 'noreply.digiroad@vaylapilvi.fi',
+      to: process.env.MUNICIPALITY_EMAIL,
+      subject: 'Digiroad municipality API: upload rejected',
+      html: email
+    });
+  } else if (event.ReportSource === 'matchRoadLink') {
+    const email = await ejs.renderFile(
+      path.resolve(
+        __dirname,
+        './templates/municipality/' + 'RejectedFeatures.ejs'
+      ),
+      event
+    );
+    await transporter.sendMail({
+      from: 'noreply.digiroad@vaylapilvi.fi',
+      to: process.env.MUNICIPALITY_EMAIL,
+      subject: 'Digiroad municipality API: some features could not be updated',
+      html: email
+    });
+  }
 };
 
 export const main = middyfy(reportRejectedDelta);
