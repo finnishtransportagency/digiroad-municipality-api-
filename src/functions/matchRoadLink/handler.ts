@@ -1,6 +1,5 @@
 import { middyfy } from '@libs/lambda';
 import * as aws from 'aws-sdk';
-import Coordinate from 'jsts/org/locationtech/jts/geom/Coordinate.js';
 import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel.js';
 import GeometryFactory from 'jsts/org/locationtech/jts/geom/GeometryFactory.js';
 import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance.js';
@@ -64,9 +63,13 @@ const matchRoadLinks = async (event) => {
   const payLoad: PayloadFeature = {
     Created: event.Created,
     Deleted: event.Deleted,
-    Updated: event.Updated
+    Updated: event.Updated,
+    metadata: {
+      OFFSET_LIMIT: MAX_OFFSET,
+      municipality: event.metadata.municipality
+    }
   };
-  payLoad.metadata = { OFFSET_LIMIT: MAX_OFFSET };
+
   console.log(JSON.stringify(payLoad));
   const lambda = new aws.Lambda();
   const param = {

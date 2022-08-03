@@ -32,6 +32,7 @@ export interface PayloadFeature {
   Updated: Array<ObstacleFeature>;
   metadata?: {
     OFFSET_LIMIT?: number;
+    municipality: string;
   };
 }
 

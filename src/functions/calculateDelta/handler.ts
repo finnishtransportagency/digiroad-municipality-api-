@@ -119,7 +119,10 @@ const calculateDelta = async (event) => {
   const payLoad: PayloadFeature = {
     Created: created,
     Deleted: deleted,
-    Updated: updated
+    Updated: updated,
+    metadata: {
+      municipality: municipality
+    }
   };
   const lambda = new aws.Lambda();
   const param = {

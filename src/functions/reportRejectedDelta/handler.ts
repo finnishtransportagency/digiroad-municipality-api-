@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer';
 const reportRejectedDelta = async (event) => {
   const s3 = new aws.S3();
   const now = new Date().toISOString().slice(0, 19);
-  const municipality = 'espoo';
+  const municipality = event.metadata.municipality;
 
   const params = {
     Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
