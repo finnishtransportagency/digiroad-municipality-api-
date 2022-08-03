@@ -52,7 +52,7 @@ const calculateDelta = async (event) => {
       .invoke({
         FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
         InvocationType: 'Event',
-        Payload: e.message
+        Payload: JSON.stringify({ Message: e.message })
       })
       .promise();
     const params = {
