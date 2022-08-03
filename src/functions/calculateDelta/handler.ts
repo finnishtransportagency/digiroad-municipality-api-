@@ -43,11 +43,10 @@ const calculateDelta = async (event) => {
     var updateObject = JSON.parse(
       await getObject(`dr-kunta-${process.env.STAGE_NAME}-bucket`, updateKey)
     );
-    schema.isValid(updateObject).then(function (valid: boolean) {
-      if (!valid) {
-        throw new Error('Invalid schema');
-      }
-    });
+    const valid = await schema.validate(updateObject);
+    if (!valid) {
+      throw new Error('Invalid schema');
+    }
   } catch (e) {
     const params = {
       Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
