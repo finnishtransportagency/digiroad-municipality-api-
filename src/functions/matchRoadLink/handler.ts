@@ -60,7 +60,7 @@ const matchRoadLinks = async (event) => {
       ...matchResults
     };
   }
-  const payLoad: PayloadFeature = {
+  const body: PayloadFeature = {
     Created: event.Created,
     Deleted: event.Deleted,
     Updated: event.Updated,
@@ -70,12 +70,15 @@ const matchRoadLinks = async (event) => {
     }
   };
 
-  console.log(JSON.stringify(payLoad));
   const lambda = new aws.Lambda();
   const param = {
     FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
     InvocationType: 'Event',
-    Payload: JSON.stringify(payLoad)
+    Payload: JSON.stringify({
+      ReportSource: 'matchRoadLink',
+      Municipality: event.metadata.municipality,
+      Body: body
+    })
   };
   await lambda.invoke(param).promise();
 };

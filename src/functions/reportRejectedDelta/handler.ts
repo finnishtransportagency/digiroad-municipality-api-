@@ -1,14 +1,12 @@
 import { middyfy } from '@libs/lambda';
-//import * as aws from 'aws-sdk';
+import * as aws from 'aws-sdk';
 import nodemailer from 'nodemailer';
 
-const reportRejectedDelta = async (event, context) => {
-  console.log(JSON.stringify(context));
+const reportRejectedDelta = async (event) => {
   console.log(JSON.stringify(event));
-  /*
   const s3 = new aws.S3();
   const now = new Date().toISOString().slice(0, 19);
-  const municipality = event.metadata.municipality;
+  const municipality = event.Municipality;
 
   const params = {
     Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
@@ -17,7 +15,7 @@ const reportRejectedDelta = async (event, context) => {
   };
 
   await s3.upload(params).promise();
-*/
+
   var transporter = nodemailer.createTransport({
     host: 'email-smtp.eu-west-1.amazonaws.com',
     port: 587,
