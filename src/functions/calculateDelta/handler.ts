@@ -5,7 +5,7 @@ import { schema } from './validationSchema';
 
 const calculateDelta = async (event) => {
   const s3 = new aws.S3();
-
+  const lambda = new aws.Lambda();
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
 
   const municipality: string = key.split('/')[1];
@@ -48,6 +48,13 @@ const calculateDelta = async (event) => {
       throw new Error('Invalid schema');
     }
   } catch (e) {
+    await lambda
+      .invoke({
+        FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
+        InvocationType: 'Event',
+        Payload: e.message
+      })
+      .promise();
     const params = {
       Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
       Key: updateKey
@@ -123,7 +130,6 @@ const calculateDelta = async (event) => {
       municipality: municipality
     }
   };
-  const lambda = new aws.Lambda();
   const param = {
     FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-matchRoadLink`,
     InvocationType: 'Event',
