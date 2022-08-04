@@ -26,36 +26,32 @@ const reportRejectedDelta = async (event) => {
       pass: `${process.env.SMTP_PASSWORD}`
     }
   });
-
-  if (event.ReportSource === 'calculateDelta') {
-    const email = await ejs.renderFile(
-      path.resolve(
-        __dirname,
-        './templates/municipality/' + 'InvalidGeoJSON.ejs'
-      ),
-      event
-    );
-    await transporter.sendMail({
-      from: 'noreply.digiroad@vaylapilvi.fi',
-      to: process.env.MUNICIPALITY_EMAIL,
-      subject: 'Digiroad municipality API: upload rejected',
-      html: email
-    });
-  } else if (event.ReportSource === 'matchRoadLink') {
-    const email = await ejs.renderFile(
-      path.resolve(
-        __dirname,
-        './templates/municipality/' + 'RejectedFeatures.ejs'
-      ),
-      event
-    );
-    await transporter.sendMail({
-      from: 'noreply.digiroad@vaylapilvi.fi',
-      to: process.env.MUNICIPALITY_EMAIL,
-      subject: 'Digiroad municipality API: some features could not be updated',
-      html: email
-    });
+  let templateName: string;
+  let emailSubject: string;
+  const recipient: Array<string> = [process.env.MUNICIPALITY_EMAIL];
+  switch (event.ReportSource) {
+    case 'calculateDelta':
+      templateName = 'invalidGeoJSON.ejs';
+      emailSubject = 'Digiroad municipality API: upload rejected';
+      break;
+    case 'matchRoadLink':
+      templateName = 'rejectedFeatures.ejs';
+      emailSubject =
+        'Digiroad municipality API: some features could not be updated';
+      recipient.push(process.env.OPERATOR_EMAIL);
+      break;
   }
+
+  const municipalityEmail = await ejs.renderFile(
+    path.resolve(__dirname, './templates/' + templateName),
+    event
+  );
+  await transporter.sendMail({
+    from: 'noreply.digiroad@vaylapilvi.fi',
+    to: recipient,
+    subject: emailSubject + ` (${event.Municipality})`,
+    html: municipalityEmail
+  });
 };
 
 export const main = middyfy(reportRejectedDelta);

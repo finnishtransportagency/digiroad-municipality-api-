@@ -22,7 +22,8 @@ const serverlessConfiguration: AWS = {
       STAGE_NAME: process.env.STAGE_NAME,
       SMTP_USERNAME: process.env.SMTP_USERNAME,
       SMTP_PASSWORD: process.env.SMTP_PASSWORD,
-      MUNICIPALITY_EMAIL: process.env.MUNICIPALITY_EMAIL
+      MUNICIPALITY_EMAIL: process.env.MUNICIPALITY_EMAIL,
+      OPERATOR_EMAIL: process.env.OPERATOR_EMAIL
     },
     region: 'eu-west-1',
     vpc: {
