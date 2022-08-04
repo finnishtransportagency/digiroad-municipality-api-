@@ -1,33 +1,122 @@
+<% var created=Body.Created.filter( feature=> feature.properties.DR_REJECTED) %>
+<% var deleted=Body.Deleted.filter( feature=> feature.properties.DR_REJECTED) %>
+<% var updated=Body.Updated.filter( feature=> feature.properties.DR_REJECTED) %>
+<% var totalFailed = created.length + deleted.length + updated.length %>
+<% var total = Body.Created.length + Body.Deleted.length + Body.Updated.length %>
 <h3>Municipality API report for municipality: <%= Municipality%></h3>
-<p>The following features have been rejected and have not been updated in Digiroad:</p>
-<% var created = Body.Created.filter( feature => feature.properties.DR_REJECTED) %>
-<% var deleted = Body.Deleted.filter( feature => feature.properties.DR_REJECTED) %>
-<% var updated = Body.Updated.filter( feature => feature.properties.DR_REJECTED) %>
-<h4>Created:</h4>
-<table style="border: 1px solid darkgray; padding: 5px;">
-  <% created.forEach(function(feature){ %>
+<p>
+  Maximum allowed offset from the center of the Digiroad Link: <%=Body.metadata.OFFSET_LIMIT %> meters.
+</p>
+<p><%=totalFailed %>/<%=total %> features failed.</p>
+<p>
+  The following features have been rejected and have not been updated in Digiroad:
+</p>
+<table style="font-family: arial, sans-serif;
+border-collapse: collapse;
+width: 100%;">
+  <% if(created.length > 0) { %>
   <tr>
-    <td style="font-weight: bold; padding-right: 10px;"></td>
-    <td> ID: <%=feature.properties.ID %> offset: <%=feature.properties.DR_OFFSET %></td>
+    <th colspan=2 style="text-align: center;
+    padding: 8px;">Created</th>
   </tr>
-  <% }) %>
-</table>
-<h4>Deleted:</h4>
-<table style="border: 1px solid darkgray; padding: 5px;">
-  <% deleted.forEach(function(feature){ %>
   <tr>
-    <td style="font-weight: bold; padding-right: 10px;"></td>
-    <td> ID: <%=feature.properties.ID %> offset: <%=feature.properties.DR_OFFSET %></td>
+    <th style="border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;width: 50%;">ID</th>
+    <th style="border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;width: 50%;">Offset</th>
   </tr>
-  <% }) %>
-</table>
-<h4>Updated:</h4>
-<table style="border: 1px solid darkgray; padding: 5px;">
-  <% updated.forEach(function(feature){ %>
+  <% created.forEach(function(feature, index){ %>
+  <% if (index % 2 === 0) { %>
   <tr>
-    <td style="font-weight: bold; padding-right: 10px;"></td>
-    <td> ID: <%=feature.properties.ID %> offset: <%=feature.properties.DR_OFFSET %></td>
+    <td style="border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
+    <td style="border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;width: 50%;"><%=feature.properties.DR_OFFSET.toFixed(2) %> meters</td>
   </tr>
-  <% }) %>
+  <% } else { %>
+  <tr style="background-color: #dddddd;">
+    <td style="border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
+    <td style="border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;width: 50%;"><%=feature.properties.DR_OFFSET.toFixed(2) %> meters</td>
+  </tr>
+  <% }}) %>
+
+  <% } %>
+
+  <% if(deleted.length > 0) { %>
+  <tr>
+    <th colspan=2 style="text-align: center;
+      padding: 8px;">Deleted</th>
+  </tr>
+  <tr>
+    <th style="border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;width: 50%;">ID</th>
+    <th style="border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;width: 50%;">Offset</th>
+  </tr>
+  <% deleted.forEach(function(feature, index){ %>
+  <% if (index % 2 === 0) { %>
+  <tr style="background-color: #dddddd;">
+    <td style="border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
+    <td style="border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;width: 50%;"><%=feature.properties.DR_OFFSET.toFixed(2) %> meters</td>
+  </tr>
+  <% } else { %>
+  <tr>
+    <td style="border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
+    <td style="border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;width: 50%;"><%=feature.properties.DR_OFFSET.toFixed(2) %> meters</td>
+  </tr>
+  <% }}) %>
+
+  <% } %>
+  <% if(updated.length > 0) { %>
+  <tr>
+    <th colspan=2 style="text-align: center;
+      padding: 8px;">Updated</th>
+  </tr>
+  <tr>
+    <th style="border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;width: 50%;">ID</th>
+    <th style="border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;width: 50%;">Offset</th>
+  </tr>
+  <% updated.forEach(function(feature, index){ %>
+  <% if (index % 2 === 0) { %>
+  <tr>
+    <td style="border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
+    <td style="border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;width: 50%;"><%=feature.properties.DR_OFFSET.toFixed(2) %> meters</td>
+  </tr>
+  <% } else { %>
+  <tr style="background-color: #dddddd;">
+    <td style="border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
+    <td style="border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;width: 50%;"><%=feature.properties.DR_OFFSET.toFixed(2) %> meters</td>
+  </tr>
+  <% }}) %>
+  <% } %>
 </table>
-<p>Max allowed offset from the center of the Digiroad Link: <%= Body.metadata.OFFSET_LIMIT %> </p>
