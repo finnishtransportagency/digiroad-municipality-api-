@@ -28,7 +28,7 @@ const reportRejectedDelta = async (event) => {
   });
   let templateName: string;
   let emailSubject: string;
-  const recipient: Array<string> = [process.env.MUNICIPALITY_EMAIL];
+  const recipients: Array<string> = [process.env.MUNICIPALITY_EMAIL];
   switch (event.ReportSource) {
     case 'calculateDelta':
       templateName = 'invalidGeoJSON.ejs';
@@ -38,7 +38,7 @@ const reportRejectedDelta = async (event) => {
       templateName = 'rejectedFeatures.ejs';
       emailSubject =
         'Digiroad municipality API: some features could not be updated';
-      recipient.push(process.env.OPERATOR_EMAIL);
+      recipients.push(process.env.OPERATOR_EMAIL);
       break;
   }
 
@@ -48,7 +48,7 @@ const reportRejectedDelta = async (event) => {
   );
   await transporter.sendMail({
     from: 'noreply.digiroad@vaylapilvi.fi',
-    to: recipient,
+    bcc: recipients,
     subject: emailSubject + ` (${event.Municipality})`,
     html: municipalityEmail
   });
