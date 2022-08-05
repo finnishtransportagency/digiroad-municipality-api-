@@ -1,19 +1,14 @@
-import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint.js';
-
-import {
-  ObstacleFeature,
-  LinkObject,
-  matchResultObject
-} from '@functions/typing';
+import { LinkObject, matchResultObject } from '@functions/typing';
+import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
 
 export default function (
-  linkCoordinates: Array<jsts.geom.Coordinate>,
+  linkCoordinates: Array<jsts.org.locationtech.jts.geom.Coordinate>,
   link: LinkObject,
   distanceToObstacle: number,
-  closestPointOnLink: jsts.geom.Coordinate,
-  obstacleCoordinates: jsts.geom.Coordinate,
-  pointPairDistance: jsts.algorithm.distance.PointPairDistance,
-  geomFactory: jsts.geom.GeometryFactory,
+  closestPointOnLink: jsts.org.locationtech.jts.geom.Coordinate,
+  obstacleCoordinates: jsts.org.locationtech.jts.geom.Coordinate,
+  pointPairDistance: jsts.org.locationtech.jts.algorithm.distance.PointPairDistance,
+  geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory,
   MAX_OFFSET: number
 ) {
   for (let i = 0; i < linkCoordinates.length - 1; i++) {

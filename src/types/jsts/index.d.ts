@@ -1,63 +1,100 @@
 declare namespace jsts {
-  namespace algorithm {
-    namespace distance {
-      import Coordinate = jsts.geom.Coordinate;
-      import Geometry = jsts.geom.Geometry;
-      import LineSegment = jsts.geom.LineSegment;
-      import LineString = jsts.geom.LineString;
-      import Polygon = jsts.geom.Polygon;
+  namespace org {
+    namespace locationtech {
+      namespace jts {
+        namespace geom {
+          export class PrecisionModel {
+            static FIXED: string;
+            static FLOATING: string;
+            static FLOATING_SINGLE: string;
 
-      export class PointPairDistance {
-        constructor();
+            constructor(modelType?: number | string);
+          }
 
-        getCoordinate(i: number): Coordinate;
+          export class GeometryFactory {
+            constructor(precisionModel?: PrecisionModel, SRID?: number);
 
-        getCoordinates(): Array<Coordinate>;
+            createLineString(coordinates: Array<Coordinate>): LineString;
+          }
 
-        getDistance(): number;
+          export class Coordinate {
+            constructor(x: number, y: number);
 
-        initialize(): void;
+            constructor(c: Coordinate);
 
-        initialize(p0: Coordinate, p1: Coordinate): void;
+            constructor();
 
-        setMaximum(p0: Coordinate, p1: Coordinate): void;
+            constructor(x: number, y: number, z: number);
 
-        setMaximum(ptDist: PointPairDistance): void;
+            x: number;
 
-        setMinimum(p0: Coordinate, p1: Coordinate): void;
+            y: number;
 
-        setMinimum(ptDist: PointPairDistance): void;
+            z: number;
+          }
 
-        toString(): string;
-      }
+          export class Geometry {
+            constructor(factory?: any);
+          }
 
-      export class DistanceToPoint {
-        constructor();
+          export class LineString extends Geometry {
+            constructor(points: Array<Coordinate>, factory?: any);
+          }
+        }
+        namespace algorithm {
+          namespace distance {
+            import Coordinate = jsts.org.locationtech.jts.geom.Coordinate;
+            import LineString = jsts.org.locationtech.jts.geom.LineString;
 
-        static computeDistance(
-          geom: Geometry,
-          pt: Coordinate,
-          ptDist: PointPairDistance
-        ): void;
+            export class PointPairDistance {
+              constructor();
 
-        static computeDistance(
-          segment: LineSegment,
-          pt: Coordinate,
-          ptDist: PointPairDistance
-        ): void;
+              getCoordinate(i: number): Coordinate;
 
-        static computeDistance(
-          line: LineString,
-          pt: Coordinate,
-          ptDist: PointPairDistance
-        ): void;
+              getDistance(): number;
 
-        static computeDistance(
-          poly: Polygon,
-          pt: Coordinate,
-          ptDist: PointPairDistance
-        ): void;
+              initialize(): void;
+
+              initialize(p0: Coordinate, p1: Coordinate): void;
+            }
+
+            export class DistanceToPoint {
+              constructor();
+
+              static computeDistance(
+                line: LineString,
+                pt: Coordinate,
+                ptDist: PointPairDistance
+              ): void;
+            }
+          }
+        }
       }
     }
   }
+}
+declare module 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance' {
+  export default jsts.org.locationtech.jts.algorithm.distance.PointPairDistance;
+}
+
+declare module 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint' {
+  export default jsts.org.locationtech.jts.algorithm.distance.DistanceToPoint;
+}
+
+declare module 'jsts/org/locationtech/jts/geom/GeometryFactory' {
+  export default jsts.org.locationtech.jts.geom.GeometryFactory;
+}
+
+declare module 'jsts/org/locationtech/jts/geom/Coordinate' {
+  export default jsts.org.locationtech.jts.geom.Coordinate;
+}
+declare module 'jsts/org/locationtech/jts/geom/LineString' {
+  export default jsts.org.locationtech.jts.geom.LineString;
+}
+declare module 'jsts/org/locationtech/jts/geom/Geometry' {
+  export default jsts.org.locationtech.jts.geom.Geometry;
+}
+
+declare module 'jsts/org/locationtech/jts/geom/PrecisionModel' {
+  export default jsts.org.locationtech.jts.geom.PrecisionModel;
 }

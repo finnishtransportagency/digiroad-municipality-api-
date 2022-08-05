@@ -1,9 +1,9 @@
 import { middyfy } from '@libs/lambda';
 import * as aws from 'aws-sdk';
-import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel.js';
-import GeometryFactory from 'jsts/org/locationtech/jts/geom/GeometryFactory.js';
-import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance.js';
 import findNearestLink from './findNearestLink';
+import GeometryFactory from 'jsts/org/locationtech/jts/geom/GeometryFactory';
+import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel';
+import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance';
 
 import { PayloadFeature, ObstacleFeature, LinkObject } from '@functions/typing';
 
@@ -36,12 +36,8 @@ const matchRoadLinks = async (event) => {
   const obstacles: Array<ObstacleFeature> = event.Created.concat(
     event.Deleted
   ).concat(event.Updated);
-  const geomFactory: jsts.geom.GeometryFactory = new GeometryFactory(
-    new PrecisionModel(),
-    3067
-  );
-  const pointPairDistance: jsts.algorithm.distance.PointPairDistance =
-    new PointPairDistance();
+  const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
+  const pointPairDistance = new PointPairDistance();
 
   for (let p = 0; p < obstacles.length; p++) {
     pointPairDistance.initialize();
