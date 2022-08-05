@@ -1,10 +1,4 @@
-import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint.js';
-
-import {
-  ObstacleFeature,
-  LinkObject,
-  matchResultObject
-} from '@functions/typing';
+import { LinkObject, matchResultObject } from '@functions/typing';
 
 export default function (
   linkCoordinates: Array<jsts.geom.Coordinate>,
@@ -20,7 +14,7 @@ export default function (
     const startPoint = linkCoordinates[i];
     const endPoint = linkCoordinates[i + 1];
     const lineOnLink = geomFactory.createLineString([startPoint, endPoint]);
-    DistanceToPoint.computeDistance(
+    jsts.algorithm.distance.DistanceToPoint.computeDistance(
       lineOnLink,
       obstacleCoordinates,
       pointPairDistance

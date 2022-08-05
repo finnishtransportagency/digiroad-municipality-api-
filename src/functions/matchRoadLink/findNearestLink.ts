@@ -1,5 +1,3 @@
-import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint.js';
-import Coordinate from 'jsts/org/locationtech/jts/geom/Coordinate.js';
 import findMValue from './findMValue';
 
 import { ObstacleFeature, LinkObject } from '@functions/typing';
@@ -15,7 +13,7 @@ export default function (
   let closestLinkCoordinates: Array<jsts.geom.Coordinate> = [];
   let closestPointOnLink: jsts.geom.Coordinate;
 
-  const obstacleCoordinates: jsts.geom.Coordinate = new Coordinate(
+  const obstacleCoordinates = new jsts.geom.Coordinate(
     obstacle.geometry.coordinates[0],
     obstacle.geometry.coordinates[1]
   );
@@ -26,10 +24,10 @@ export default function (
     const coordinates: Array<jsts.geom.Coordinate> = [];
     for (let j = 0; j < points.length; j++) {
       const point = points[j];
-      coordinates[j] = new Coordinate(point.x, point.y, point.z);
+      coordinates[j] = new jsts.geom.Coordinate(point.x, point.y, point.z);
     }
     const lineString = geomFactory.createLineString(coordinates);
-    DistanceToPoint.computeDistance(
+    jsts.algorithm.distance.DistanceToPoint.computeDistance(
       lineString,
       obstacleCoordinates,
       pointPairDistance
