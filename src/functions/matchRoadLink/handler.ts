@@ -6,6 +6,7 @@ import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel';
 import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance';
 
 import { PayloadFeature, ObstacleFeature, LinkObject } from '@functions/typing';
+import { rejects } from 'assert';
 
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
@@ -33,6 +34,8 @@ const matchRoadLinks = async (event) => {
     )
   );
 
+  let rejectsAmount = 0;
+
   const obstacles: Array<ObstacleFeature> = event.Created.concat(
     event.Deleted
   ).concat(event.Updated);
@@ -50,6 +53,10 @@ const matchRoadLinks = async (event) => {
       geomFactory,
       MAX_OFFSET
     );
+
+    if (matchResults.DR_REJECTED) {
+      rejectsAmount++;
+    }
 
     obstacle.properties = {
       ...obstacle.properties,
@@ -71,7 +78,8 @@ const matchRoadLinks = async (event) => {
     FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
     InvocationType: 'Event',
     Payload: JSON.stringify({
-      ReportSource: 'matchRoadLink',
+      ReportType:
+        rejectsAmount > 0 ? 'matchedWithFailures' : 'matchedSuccessfully',
       Municipality: event.metadata.municipality,
       Body: body
     })

@@ -53,7 +53,7 @@ const calculateDelta = async (event) => {
         FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
         InvocationType: 'Event',
         Payload: JSON.stringify({
-          ReportSource: 'calculateDelta',
+          ReportType: 'calculateDelta',
           Municipality: municipality,
           Body: { Message: e.message }
         })

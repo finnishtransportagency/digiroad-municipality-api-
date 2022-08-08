@@ -29,17 +29,19 @@ const reportRejectedDelta = async (event) => {
   let templateName: string;
   let emailSubject: string;
   const recipients: Array<string> = [process.env.MUNICIPALITY_EMAIL];
-  switch (event.ReportSource) {
+  switch (event.ReportType) {
     case 'calculateDelta':
       templateName = 'invalidGeoJSON.ejs';
       emailSubject = 'Digiroad municipality API: upload rejected';
       break;
-    case 'matchRoadLink':
+    case 'matchedWithFailures':
       templateName = 'rejectedFeatures.ejs';
       emailSubject =
         'Digiroad municipality API: some features could not be updated';
       recipients.push(process.env.OPERATOR_EMAIL);
       break;
+    case 'matchedSuccessfully':
+      return;
   }
 
   const municipalityEmail = await ejs.renderFile(
