@@ -4,6 +4,7 @@ import storeMunicipalityData from '@functions/storeMunicipalityData';
 import calculateDelta from '@functions/calculateDelta';
 import matchRoadLink from '@functions/matchRoadLink';
 import reportRejectedDelta from '@functions/reportRejectedDelta';
+import getNearbyLinks from '@functions/getNearbyLinks';
 
 const serverlessConfiguration: AWS = {
   service: 'digiroad-municipality-api',
@@ -23,7 +24,10 @@ const serverlessConfiguration: AWS = {
       SMTP_USERNAME: process.env.SMTP_USERNAME,
       SMTP_PASSWORD: process.env.SMTP_PASSWORD,
       MUNICIPALITY_EMAIL: process.env.MUNICIPALITY_EMAIL,
-      OPERATOR_EMAIL: process.env.OPERATOR_EMAIL
+      OPERATOR_EMAIL: process.env.OPERATOR_EMAIL,
+      DIGIROADSECURITYGROUPID: process.env.DIGIROADSECURITYGROUPID,
+      DIGIROADSUBNETAID: process.env.DIGIROADSUBNETAID,
+      DIGIROADSUBNETBID: process.env.DIGIROADSUBNETBID
     },
     region: 'eu-west-1',
     vpc: {
@@ -73,7 +77,8 @@ const serverlessConfiguration: AWS = {
     storeMunicipalityData,
     calculateDelta,
     matchRoadLink,
-    reportRejectedDelta
+    reportRejectedDelta,
+    getNearbyLinks
   },
   resources: {
     Resources: {
