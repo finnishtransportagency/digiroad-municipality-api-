@@ -6,6 +6,7 @@ import matchRoadLink from '@functions/matchRoadLink';
 import reportRejectedDelta from '@functions/reportRejectedDelta';
 import getNearbyLinks from '@functions/getNearbyLinks';
 import reportRejectedData from '@functions/reportRejectedData';
+import execDelta2SQL from '@functions/execDelta2SQL';
 
 const serverlessConfiguration: AWS = {
   service: 'digiroad-municipality-api',
@@ -80,7 +81,8 @@ const serverlessConfiguration: AWS = {
     matchRoadLink,
     reportRejectedDelta,
     getNearbyLinks,
-    reportRejectedData
+    reportRejectedData,
+    execDelta2SQL
   },
   resources: {
     Resources: {
