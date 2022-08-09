@@ -1,12 +1,14 @@
 import type { AWS } from '@serverless/typescript';
 
-import storeMunicipalityData from '@functions/storeMunicipalityData';
-import calculateDelta from '@functions/calculateDelta';
-import matchRoadLink from '@functions/matchRoadLink';
-import reportRejectedDelta from '@functions/reportRejectedDelta';
-import getNearbyLinks from '@functions/getNearbyLinks';
-import reportRejectedData from '@functions/reportRejectedData';
-import execDelta2SQL from '@functions/execDelta2SQL';
+import {
+  storeMunicipalityData,
+  calculateDelta,
+  matchRoadLink,
+  reportRejectedDelta,
+  getNearbyLinks,
+  reportRejectedData,
+  execDelta2SQL
+} from '@functions/index';
 
 const serverlessConfiguration: AWS = {
   service: 'digiroad-municipality-api',
