@@ -4,4 +4,4 @@ export { default as matchRoadLink } from './matchRoadLink';
 export { default as reportRejectedDelta } from './reportRejectedDelta';
 export { default as getNearbyLinks } from './getNearbyLinks';
 export { default as reportRejectedData } from './reportRejectedData';
-export { default as execDelta2SQL } from './reportRejectedData';
+export { default as execDelta2SQL } from './execDelta2SQL';
