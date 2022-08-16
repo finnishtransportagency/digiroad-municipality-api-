@@ -1,45 +1,22 @@
 import { middyfy } from '@libs/lambda';
 import { Client } from 'pg';
 
-const storeMunicipalityData = async (event) => {
-  var conn = 'postgres://digiroad2:PASSWORD@localhost:5432/digiroad2';
+const gerNearbyLinks = async (event) => {
+  var conn = 'postgres://digiroad2:PASSWORD@localhost:5432/digiroad2'; //NOTE: Not the way we will connect to actual DB
   var client = new Client(conn);
-  if (event === '') {
-    event = {
-      x: 371067.460682820994407,
-      y: 6675521.71858474612236
-    };
-  } else {
-    event = JSON.parse(event);
-  }
   client.connect();
   const query = {
     text: `
-    WITH ref_point AS (
-      SELECT ST_SetSRID(ST_Point($1, $2),3067) AS geom
-    )
-    
-    SELECT linkid, ST_AsGeoJSON(shape)
-      FROM roadlink, ref_point
-    WHERE ST_BUFFER(ref_point.geom, 70) && roadlink.shape
+    SELECT value#>'{properties}'->>'ID' AS ID, json_agg((st_astext(shape),linkid)) AS roadlinks
+    FROM json_array_elements(($1)::json->'features') AS features, roadlink
+    WHERE ST_BUFFER(ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067), 20) && roadlink.shape
+    GROUP BY ID
     `,
-    values: [event.x, event.y]
+    values: [event]
   };
-
-  const res = await client.query(query);
-  let resultingGeoJSON = '';
-  for (let i = 0; i < res.rowCount; i++) {
-    const element = res.rows[i];
-    resultingGeoJSON = resultingGeoJSON.concat(
-      '{ "type": "Feature", "properties": {}, geometry: '
-    );
-    resultingGeoJSON = resultingGeoJSON.concat(element.st_asgeojson);
-    resultingGeoJSON = resultingGeoJSON.concat(',');
-  }
-  console.log(resultingGeoJSON);
-  console.log('Connected to local DB');
-  console.log(JSON.stringify(event));
-  return;
+  const result = await client.query(query);
+  client.end();
+  return result.rows;
 };
 
-export const main = middyfy(storeMunicipalityData);
+export const main = middyfy(gerNearbyLinks);

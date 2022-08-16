@@ -6,34 +6,13 @@ import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel';
 import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance';
 
 import { PayloadFeature, ObstacleFeature, LinkObject } from '@functions/typing';
-import { rejects } from 'assert';
 
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
 
+const lambda = new aws.Lambda();
+
 const matchRoadLinks = async (event) => {
-  const s3 = new aws.S3();
-  async function getObject(bucket: string, objectKey: string) {
-    try {
-      const params = {
-        Bucket: bucket,
-        Key: objectKey
-      };
-
-      const data = await s3.getObject(params).promise();
-
-      return data.Body.toString('utf-8');
-    } catch (e) {
-      throw new Error(`Could not retrieve file from S3: ${e.message}`);
-    }
-  }
-  const roadLinks: Array<LinkObject> = JSON.parse(
-    await getObject(
-      `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-      'roadLinks/espoo-tuomarila'
-    )
-  );
-
   let rejectsAmount = 0;
 
   const obstacles: Array<ObstacleFeature> = event.Created.concat(
@@ -45,6 +24,16 @@ const matchRoadLinks = async (event) => {
   for (let p = 0; p < obstacles.length; p++) {
     pointPairDistance.initialize();
     const obstacle = obstacles[p];
+
+    const getNearbyLinksParams = {
+      FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-getNearbyLinks`,
+      InvocationType: 'Event',
+      Payload: event.Created
+    };
+
+    const allRoadlinks = await lambda.invoke(getNearbyLinksParams).promise();
+
+    const roadLinks = allRoadlinks[obstacle.properties.ID];
 
     const matchResults = findNearestLink(
       roadLinks,
@@ -73,8 +62,7 @@ const matchRoadLinks = async (event) => {
     }
   };
 
-  const lambda = new aws.Lambda();
-  const param = {
+  const reportRejectedDeltaParams = {
     FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
     InvocationType: 'Event',
     Payload: JSON.stringify({
@@ -84,7 +72,7 @@ const matchRoadLinks = async (event) => {
       Body: body
     })
   };
-  await lambda.invoke(param).promise();
+  await lambda.invoke(reportRejectedDeltaParams).promise();
 };
 
 export const main = middyfy(matchRoadLinks);
