@@ -4,22 +4,26 @@ import { parse } from 'wellknown';
 import { LineString4D, LinkPoint } from '@functions/typing';
 
 const gerNearbyLinks = async (event) => {
-  var conn = 'postgres://digiroad2:PASSWORD@localhost:5432/digiroad2'; //NOTE: Not the way we will connect to actual DB
+  var conn = 'postgres://digiroad2:PASSWORD@localhost:5432/digiroad2';
   var client = new Client(conn);
-  client.connect();
+  await client.connect();
+  const params = {
+    features: event
+  };
   const query = {
     text: `
-    SELECT value#>'{properties}'->>'ID' AS ID, json_agg((st_astext(shape),linkid)) AS roadlinks
+    SELECT (value#>'{properties}'->>'ID')::DECIMAL AS ID, json_agg((st_astext(shape),linkid)) AS roadlinks
     FROM json_array_elements(($1)::json->'features') AS features, roadlink
     WHERE ST_BUFFER(ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067), 20) && roadlink.shape
     GROUP BY ID
     `,
-    values: [event]
+    values: [params]
   };
-  client
+  return client
     .query(query)
     .then((res) => {
       res.rows.forEach((row) => {
+        row.id = Number(row.id);
         row.roadlinks.forEach((roadlink) => {
           const feature = parse(
             roadlink.f1.replace('LINESTRING ZM', 'LINESTRING')
@@ -37,7 +41,7 @@ const gerNearbyLinks = async (event) => {
               }
             );
 
-            roadlink.linkid = roadlink.f2;
+            roadlink.linkId = roadlink.f2;
             roadlink.points = pointObjects;
             delete roadlink.f1;
             delete roadlink.f2;
