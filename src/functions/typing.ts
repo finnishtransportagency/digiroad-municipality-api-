@@ -36,6 +36,8 @@ export interface PayloadFeature {
   };
 }
 
+export type LineString4D = [number, number, number, number];
+
 export interface LinkPoint {
   x: number;
   y: number;
