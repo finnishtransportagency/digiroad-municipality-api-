@@ -37,8 +37,8 @@ const matchRoadLinks = async (event) => {
       console.log('error in invocation');
       console.log(err, err.stack);
       return;
-    } else if (data.Payload) {
-      console.log('post-invocation');
+    } else {
+      console.log(data);
       const result = data.Payload.toString();
       const allRoadLinks = JSON.parse(result) as Array<ObstacleRoadLinkMap>;
       for (let p = 0; p < obstacles.length; p++) {
