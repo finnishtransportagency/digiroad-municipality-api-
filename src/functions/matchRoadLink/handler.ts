@@ -36,16 +36,20 @@ const matchRoadLinks = async (event) => {
     if (err) {
       console.log(err);
       return;
-    } else {
+    } else if (data.Payload) {
       const result = data.Payload.toString();
       const allRoadLinks = JSON.parse(result) as Array<ObstacleRoadLinkMap>;
-      console.log(allRoadLinks[0].roadlinks);
       for (let p = 0; p < obstacles.length; p++) {
         pointPairDistance.initialize();
         const obstacle = obstacles[p];
-        const roadLinks: Array<LinkObject> = allRoadLinks.find(
+        const roadLinks: Array<LinkObject> | undefined = allRoadLinks.find(
           (i) => i.id === obstacle.properties.ID
-        ).roadlinks;
+        )?.roadlinks;
+
+        if (!roadLinks) {
+          console.log('roadLink is undefined');
+          return;
+        }
 
         const matchResults = findNearestLink(
           roadLinks,
@@ -54,6 +58,10 @@ const matchRoadLinks = async (event) => {
           geomFactory,
           MAX_OFFSET
         );
+        if (!matchResults) {
+          console.log('matchResults is undefined');
+          return;
+        }
 
         if (matchResults.DR_REJECTED) {
           rejectsAmount++;

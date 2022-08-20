@@ -4,12 +4,17 @@ import { parse } from 'wellknown';
 import { LineString4D, LinkPoint } from '@functions/typing';
 
 const gerNearbyLinks = async (event) => {
-  var conn = 'postgres://digiroad2:PASSWORD@localhost:5432/digiroad2';
-  var client = new Client(conn);
+  const client = new Client({
+    host: process.env.PGHOST,
+    port: parseInt(process.env.PGPORT || '5432'),
+    user: process.env.PGUSER,
+    password: process.env.PGPASSWORD
+  });
   await client.connect();
   const params = {
     features: event
   };
+
   const query = {
     text: `
     SELECT (value#>'{properties}'->>'ID')::DECIMAL AS ID, json_agg((st_astext(shape),linkid)) AS roadlinks
@@ -28,8 +33,9 @@ const gerNearbyLinks = async (event) => {
           const feature = parse(
             roadlink.f1.replace('LINESTRING ZM', 'LINESTRING')
           );
-          if (feature.type === 'LineString') {
-            const coordinates = feature.coordinates as unknown as LineString4D;
+          if (feature?.type === 'LineString') {
+            const coordinates =
+              feature.coordinates as unknown as Array<LineString4D>;
             const pointObjects: Array<LinkPoint> = coordinates.map(
               (coordinate) => {
                 return {
