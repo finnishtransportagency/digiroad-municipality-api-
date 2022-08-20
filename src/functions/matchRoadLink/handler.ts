@@ -31,72 +31,72 @@ const matchRoadLinks = async (event) => {
     InvocationType: 'RequestResponse',
     Payload: JSON.stringify(event.Created)
   };
-  console.log('pre-invocation');
-  lambda.invoke(getNearbyLinksParams, function (err, data) {
-    if (err) {
-      console.log('error in invocation');
-      console.log(err, err.stack);
-      return;
-    } else {
-      console.log(data);
-      const result = data.Payload.toString();
-      const allRoadLinks = JSON.parse(result) as Array<ObstacleRoadLinkMap>;
-      for (let p = 0; p < obstacles.length; p++) {
-        pointPairDistance.initialize();
-        const obstacle = obstacles[p];
-        const roadLinks: Array<LinkObject> | undefined = allRoadLinks.find(
-          (i) => i.id === obstacle.properties.ID
-        )?.roadlinks;
+  try {
+    const invocationResult = await lambda
+      .invoke(getNearbyLinksParams)
+      .promise();
+    console.log(invocationResult);
+    var allRoadLinks = JSON.parse(
+      invocationResult.Payload.toString()
+    ) as Array<ObstacleRoadLinkMap>;
 
-        if (!roadLinks) {
-          console.log('roadLink is undefined');
-          return;
-        }
+    for (let p = 0; p < obstacles.length; p++) {
+      pointPairDistance.initialize();
+      const obstacle = obstacles[p];
+      const roadLinks: Array<LinkObject> | undefined = allRoadLinks.find(
+        (i) => i.id === obstacle.properties.ID
+      )?.roadlinks;
 
-        const matchResults = findNearestLink(
-          roadLinks,
-          obstacle,
-          pointPairDistance,
-          geomFactory,
-          MAX_OFFSET
-        );
-        if (!matchResults) {
-          console.log('matchResults is undefined');
-          return;
-        }
-
-        if (matchResults.DR_REJECTED) {
-          rejectsAmount++;
-        }
-
-        obstacle.properties = {
-          ...obstacle.properties,
-          ...matchResults
-        };
+      if (!roadLinks) {
+        console.log('roadLink is undefined');
+        return;
       }
-      const body: PayloadFeature = {
-        Created: event.Created,
-        Deleted: event.Deleted,
-        Updated: event.Updated,
-        metadata: {
-          OFFSET_LIMIT: MAX_OFFSET,
-          municipality: event.metadata.municipality
-        }
-      };
 
-      const reportRejectedDeltaParams = {
-        FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
-        InvocationType: 'Event',
-        Payload: JSON.stringify({
-          ReportType:
-            rejectsAmount > 0 ? 'matchedWithFailures' : 'matchedSuccessfully',
-          Municipality: event.metadata.municipality,
-          Body: body
-        })
+      const matchResults = findNearestLink(
+        roadLinks,
+        obstacle,
+        pointPairDistance,
+        geomFactory,
+        MAX_OFFSET
+      );
+      if (!matchResults) {
+        console.log('matchResults is undefined');
+        return;
+      }
+
+      if (matchResults.DR_REJECTED) {
+        rejectsAmount++;
+      }
+
+      obstacle.properties = {
+        ...obstacle.properties,
+        ...matchResults
       };
-      lambda.invoke(reportRejectedDeltaParams);
     }
-  });
+    const body: PayloadFeature = {
+      Created: event.Created,
+      Deleted: event.Deleted,
+      Updated: event.Updated,
+      metadata: {
+        OFFSET_LIMIT: MAX_OFFSET,
+        municipality: event.metadata.municipality
+      }
+    };
+
+    const reportRejectedDeltaParams = {
+      FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
+      InvocationType: 'Event',
+      Payload: JSON.stringify({
+        ReportType:
+          rejectsAmount > 0 ? 'matchedWithFailures' : 'matchedSuccessfully',
+        Municipality: event.metadata.municipality,
+        Body: body
+      })
+    };
+    lambda.invoke(reportRejectedDeltaParams);
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export const main = middyfy(matchRoadLinks);
