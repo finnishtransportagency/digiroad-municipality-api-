@@ -34,7 +34,8 @@ const matchRoadLinks = async (event) => {
 
   lambda.invoke(getNearbyLinksParams, async function (err, data) {
     if (err) {
-      console.log(err);
+      console.log('error in invocation');
+      console.log(err, err.stack);
       return;
     } else if (data.Payload) {
       const result = data.Payload.toString();
