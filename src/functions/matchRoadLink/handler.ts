@@ -31,13 +31,14 @@ const matchRoadLinks = async (event) => {
     InvocationType: 'RequestResponse',
     Payload: JSON.stringify(event.Created)
   };
-
+  console.log('pre-invocation');
   lambda.invoke(getNearbyLinksParams, async function (err, data) {
     if (err) {
       console.log('error in invocation');
       console.log(err, err.stack);
       return;
     } else if (data.Payload) {
+      console.log('post-invocation');
       const result = data.Payload.toString();
       const allRoadLinks = JSON.parse(result) as Array<ObstacleRoadLinkMap>;
       for (let p = 0; p < obstacles.length; p++) {
