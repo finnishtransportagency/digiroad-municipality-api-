@@ -32,7 +32,7 @@ const matchRoadLinks = async (event) => {
     Payload: JSON.stringify(event.Created)
   };
   console.log('pre-invocation');
-  lambda.invoke(getNearbyLinksParams, async function (err, data) {
+  lambda.invoke(getNearbyLinksParams, function (err, data) {
     if (err) {
       console.log('error in invocation');
       console.log(err, err.stack);
@@ -94,7 +94,7 @@ const matchRoadLinks = async (event) => {
           Body: body
         })
       };
-      await lambda.invoke(reportRejectedDeltaParams).promise();
+      lambda.invoke(reportRejectedDeltaParams);
     }
   });
 };
