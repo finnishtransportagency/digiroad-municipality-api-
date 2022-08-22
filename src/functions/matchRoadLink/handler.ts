@@ -32,7 +32,6 @@ const matchRoadLinks = async (event) => {
     Payload: JSON.stringify(event.Created)
   };
   console.log('pre-invocation');
-  await lambda.invoke(getNearbyLinksParams).promise();
   lambda.invoke(getNearbyLinksParams, async function (err, data) {
     if (err) {
       console.log('error in invocation');
