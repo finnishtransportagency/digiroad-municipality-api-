@@ -5,24 +5,32 @@ import { LineString4D, LinkPoint } from '@functions/typing';
 
 const gerNearbyLinks = async (event) => {
   const client = new Client({
-    host: process.env.PGHOST,
-    port: parseInt(process.env.PGPORT || '5432'),
-    user: process.env.PGUSER,
-    password: process.env.PGPASSWORD
+    host: 'localhost',
+    port: 5432,
+    user: 'digiroad2',
+    password: 'digiroad2'
   });
   await client.connect();
-  const params = {
-    features: event
-  };
 
   const query = {
     text: `
-    SELECT (value#>'{properties}'->>'ID')::DECIMAL AS ID, json_agg((st_astext(shape),linkid)) AS roadlinks
-    FROM json_array_elements(($1)::json->'features') AS features, roadlink
-    WHERE ST_BUFFER(ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067), 20) && roadlink.shape
+    WITH municipality_ AS (
+      SELECT id
+      FROM municipality
+      WHERE LOWER(name_fi) = LOWER((($1)::json->>'municipality')::TEXT)
+    ), acceptable_roadlinks AS (
+      SELECT linkid, shape
+      FROM roadlink, municipality_
+      WHERE roadlink.municipalitycode = municipality_.id AND (roadlink.adminclass = 2 OR roadlink.adminclass = 3 OR roadlink.adminclass IS NULL)
+    )
+
+    
+    SELECT (value#>'{properties}'->>'ID')::NUMERIC AS ID, json_agg((st_astext(shape),linkid)) AS roadlinks
+    FROM json_array_elements(($1)::json->'features') AS features, acceptable_roadlinks
+    WHERE ST_BUFFER(ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067), 20) && acceptable_roadlinks.shape 
     GROUP BY ID
     `,
-    values: [params]
+    values: [event]
   };
   return client
     .query(query)
