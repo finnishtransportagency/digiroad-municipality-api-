@@ -17,7 +17,7 @@ const gerNearbyLinks = async (event) => {
     WITH municipality_ AS (
       SELECT id
       FROM municipality
-      WHERE LOWER(name_fi) = LOWER((($1)::json->>'municipality')::TEXT)
+      WHERE LOWER(name_fi) = LOWER($1)
     ), acceptable_roadlinks AS (
       SELECT linkid, shape
       FROM roadlink, municipality_
@@ -26,11 +26,11 @@ const gerNearbyLinks = async (event) => {
 
     
     SELECT (value#>'{properties}'->>'ID')::NUMERIC AS ID, json_agg((st_astext(shape),linkid)) AS roadlinks
-    FROM json_array_elements(($1)::json->'features') AS features, acceptable_roadlinks
+    FROM json_array_elements($2) AS features, acceptable_roadlinks
     WHERE ST_BUFFER(ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067), 20) && acceptable_roadlinks.shape 
     GROUP BY ID
     `,
-    values: [event]
+    values: [event.municipality, JSON.stringify(event.features)]
   };
   return client
     .query(query)
