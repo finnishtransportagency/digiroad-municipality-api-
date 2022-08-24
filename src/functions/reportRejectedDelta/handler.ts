@@ -5,7 +5,6 @@ import ejs from 'ejs';
 import * as path from 'path';
 
 const reportRejectedDelta = async (event) => {
-  console.log(JSON.stringify(event));
   const s3 = new aws.S3();
   const now = new Date().toISOString().slice(0, 19);
   const municipality = event.Municipality;
