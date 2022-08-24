@@ -1,7 +1,7 @@
 import { middyfy } from '@libs/lambda';
-import { Client } from 'pg';
+import { Client, QueryResult } from 'pg';
 import { parse } from 'wellknown';
-import { LineString4D, LinkPoint } from '@functions/typing';
+import { LinkPoint } from '@functions/typing';
 
 const gerNearbyLinks = async (event) => {
   const client = new Client({
@@ -21,9 +21,8 @@ const gerNearbyLinks = async (event) => {
     ), acceptable_roadlinks AS (
       SELECT linkid, shape
       FROM roadlink, municipality_
-      WHERE roadlink.municipalitycode = municipality_.id AND (roadlink.adminclass = 2 OR roadlink.adminclass = 3 OR roadlink.adminclass IS NULL)
+      WHERE roadlink.municipalitycode = municipality_.id AND (roadlink.adminclass IN (2,3) OR roadlink.adminclass IS NULL)
     )
-
     
     SELECT (value#>'{properties}'->>'ID')::NUMERIC AS ID, json_agg((st_astext(shape),linkid)) AS roadlinks
     FROM json_array_elements($2) AS features, acceptable_roadlinks
@@ -34,16 +33,16 @@ const gerNearbyLinks = async (event) => {
   };
   return client
     .query(query)
-    .then((res) => {
+    .then((res: QueryResult) => {
       res.rows.forEach((row) => {
         row.id = Number(row.id);
         row.roadlinks.forEach((roadlink) => {
           const feature = parse(
+            //LINESTRING ZM is not recognized by wellknown, thus this replace statement
             roadlink.f1.replace('LINESTRING ZM', 'LINESTRING')
           );
           if (feature?.type === 'LineString') {
-            const coordinates =
-              feature.coordinates as unknown as Array<LineString4D>;
+            const coordinates = feature.coordinates as Array<Array<number>>;
             const pointObjects: Array<LinkPoint> = coordinates.map(
               (coordinate) => {
                 return {

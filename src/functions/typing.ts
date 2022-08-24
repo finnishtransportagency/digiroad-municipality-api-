@@ -1,5 +1,3 @@
-import { number } from 'yup';
-
 export interface ObstacleGeoJSON {
   type: string;
   name?: string;
@@ -37,8 +35,6 @@ export interface PayloadFeature {
     municipality: string;
   };
 }
-
-export type LineString4D = [number, number, number, number];
 
 export interface ObstacleRoadLinkMap {
   id: number;
