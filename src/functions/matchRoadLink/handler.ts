@@ -15,7 +15,7 @@ import {
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
 
-const lambda = new aws.Lambda();
+const lambda = new aws.Lambda({ endpoint: 'http://localhost:3002' });
 
 const matchRoadLinks = async (event) => {
   let rejectsAmount = 0;
@@ -26,16 +26,20 @@ const matchRoadLinks = async (event) => {
   const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
   const pointPairDistance = new PointPairDistance();
 
+  const getNearbyLinksPayload = {
+    features: obstacles,
+    municipality: event.metadata.municipality
+  };
   const getNearbyLinksParams = {
     FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-getNearbyLinks`,
     InvocationType: 'RequestResponse',
-    Payload: JSON.stringify(event.Created)
+    Payload: JSON.stringify(getNearbyLinksPayload)
   };
+
   try {
     const invocationResult = await lambda
       .invoke(getNearbyLinksParams)
       .promise();
-    console.log(invocationResult);
     var allRoadLinks = JSON.parse(
       invocationResult.Payload.toString()
     ) as Array<ObstacleRoadLinkMap>;
@@ -82,6 +86,7 @@ const matchRoadLinks = async (event) => {
         municipality: event.metadata.municipality
       }
     };
+    console.log(body);
 
     const reportRejectedDeltaParams = {
       FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
