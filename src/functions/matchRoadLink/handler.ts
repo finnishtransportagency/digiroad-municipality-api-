@@ -86,7 +86,6 @@ const matchRoadLinks = async (event) => {
         municipality: event.metadata.municipality
       }
     };
-    console.log('Result of match: ', body);
 
     const reportRejectedDeltaParams = {
       FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
@@ -98,7 +97,7 @@ const matchRoadLinks = async (event) => {
         Body: body
       })
     };
-    lambda.invoke(reportRejectedDeltaParams);
+    await lambda.invoke(reportRejectedDeltaParams).promise();
   } catch (error) {
     console.error('Matching failed:', error);
   }
