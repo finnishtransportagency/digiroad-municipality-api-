@@ -15,7 +15,7 @@ import {
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
 
-const lambda = new aws.Lambda({ endpoint: 'http://localhost:3002' });
+const lambda = new aws.Lambda();
 
 const matchRoadLinks = async (event) => {
   let rejectsAmount = 0;
