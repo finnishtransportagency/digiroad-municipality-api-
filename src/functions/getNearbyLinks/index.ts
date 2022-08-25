@@ -10,6 +10,7 @@ export default {
     PGHOST: process.env.PGHOST,
     PGUSER: process.env.PGUSER,
     PGPASSWORD: process.env.PGPASSWORD,
-    PGPORT: process.env.PGPORT
+    PGPORT: process.env.PGPORT,
+    PGDATABASE: process.env.PGDATABASE
   }
 };

@@ -35,7 +35,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%=feature.properties.DR_OFFSET.toFixed(2) %> meters</td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? feature.properties.DR_OFFSET.toFixed(2) : "Out of range" %> meters</td>
   </tr>
   <% } else { %>
   <tr style="background-color: #dddddd;">
@@ -44,7 +44,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%=feature.properties.DR_OFFSET.toFixed(2) %> meters</td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? feature.properties.DR_OFFSET.toFixed(2) : "Out of range" %> meters</td>
   </tr>
   <% }}) %>
 
@@ -71,7 +71,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%=feature.properties.DR_OFFSET.toFixed(2) %> meters</td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? feature.properties.DR_OFFSET.toFixed(2) : "Out of range" %> meters</td>
   </tr>
   <% } else { %>
   <tr>
@@ -80,7 +80,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%=feature.properties.DR_OFFSET.toFixed(2) %> meters</td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? feature.properties.DR_OFFSET.toFixed(2) : "Out of range" %> meters</td>
   </tr>
   <% }}) %>
 
@@ -106,7 +106,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%=feature.properties.DR_OFFSET.toFixed(2) %> meters</td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? feature.properties.DR_OFFSET.toFixed(2) : "Out of range" %> meters</td>
   </tr>
   <% } else { %>
   <tr style="background-color: #dddddd;">
@@ -115,7 +115,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%=feature.properties.DR_OFFSET.toFixed(2) %> meters</td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? feature.properties.DR_OFFSET.toFixed(2) : "Out of range" %> meters</td>
   </tr>
   <% }}) %>
   <% } %>
