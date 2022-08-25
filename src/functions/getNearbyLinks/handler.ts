@@ -64,9 +64,9 @@ const gerNearbyLinks = async (event) => {
       client.end();
       return res.rows;
     })
-    .catch((e) => {
+    .catch((error) => {
       client.end();
-      console.log(e);
+      console.error('Query failed:', error);
       return;
     });
 };
