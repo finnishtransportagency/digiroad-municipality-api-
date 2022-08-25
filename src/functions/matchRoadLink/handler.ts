@@ -26,16 +26,20 @@ const matchRoadLinks = async (event) => {
   const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
   const pointPairDistance = new PointPairDistance();
 
+  const getNearbyLinksPayload = {
+    features: obstacles,
+    municipality: event.metadata.municipality
+  };
   const getNearbyLinksParams = {
     FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-getNearbyLinks`,
     InvocationType: 'RequestResponse',
-    Payload: JSON.stringify(event.Created)
+    Payload: JSON.stringify(getNearbyLinksPayload)
   };
+
   try {
     const invocationResult = await lambda
       .invoke(getNearbyLinksParams)
       .promise();
-    console.log(invocationResult);
     var allRoadLinks = JSON.parse(
       invocationResult.Payload.toString()
     ) as Array<ObstacleRoadLinkMap>;
@@ -93,9 +97,9 @@ const matchRoadLinks = async (event) => {
         Body: body
       })
     };
-    lambda.invoke(reportRejectedDeltaParams);
-  } catch (e) {
-    console.log(e);
+    await lambda.invoke(reportRejectedDeltaParams).promise();
+  } catch (error) {
+    console.error('Matching failed:', error);
   }
 };
 
