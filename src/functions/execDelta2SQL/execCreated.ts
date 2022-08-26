@@ -1,4 +1,33 @@
-export default function (feature, client) {
-  //TODO implement function for inserting new obstacles
+export default async function (feature, client) {
+  const assetQuery = {
+    text: `
+        INSERT INTO asset (id, created_date, external_id, asset_type_id, municipality_code, geometry) 
+        VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP, $1, $2, $3, $4);
+        `,
+    values: [feature.properties.ID, 220, 49, null]
+  };
+  await client.query(assetQuery);
+
+  const lrmPositionQuery = {
+    text: `
+        INSERT INTO lrm_position (id, start_measure, endd_measure, link_id)
+        VALUES (nextval('LRM_POSITION_PRIMARY_KEY_SEQ'), $1, $2, $3)
+        `,
+    values: [
+      feature.properties.DR_M_VALUE,
+      feature.properties.DR_M_VALUE,
+      feature.properties.DR_LINK_ID
+    ]
+  };
+  await client.query(lrmPositionQuery);
+
+  const assetLinkQuery = {
+    text: `
+        INSERT INTO asset_link (asset_id, position_id)
+        VALUES (currval('PRIMARY_KEY_SEQ'), currval('LRM_POSITION_PRIMARY_KEY_SEQ'))
+        `,
+    values: []
+  };
+  await client.query(assetLinkQuery);
   return;
 }
