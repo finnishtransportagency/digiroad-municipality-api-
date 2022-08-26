@@ -15,39 +15,19 @@ const execDelta2SQL = async (event) => {
   });
   client.connect();
 
-  event = {
-    Created: [
-      {
-        type: 'Feature',
-        properties: { ID: 239937611, EST_TYYPPI: 2 },
-        geometry: {
-          type: 'Point',
-          coordinates: [371399.948244109924417, 6676323.277201947756112]
-        }
-      },
-      {
-        type: 'Feature',
-        properties: { ID: 238971211, EST_TYYPPI: 2 },
-        geometry: {
-          type: 'Point',
-          coordinates: [371203.68010533216875, 6676811.599865953437984]
-        }
-      }
-    ]
-  };
-
   try {
     await client.query('BEGIN');
 
     for (const feature of event.Created) {
       await execCreated(feature, client);
     }
+
+    for (const feature of event.Updated) {
+      await execUpdated(feature, client);
+    }
     /*
     for (const feature of event.Deleted) {
       execDeleted(feature, client);
-    }
-    for (const feature of event.Updated) {
-      execUpdated(feature, client);
     }
     */
 
