@@ -1,7 +1,6 @@
 import { middyfy } from '@libs/lambda';
 import { Client, QueryResult } from 'pg';
-import { parse } from 'wellknown';
-import { LinkPoint } from '@functions/typing';
+import { Geometry, LineString, Point } from 'wkx';
 
 const gerNearbyLinks = async (event) => {
   const client = new Client({
@@ -38,28 +37,14 @@ const gerNearbyLinks = async (event) => {
       res.rows.forEach((row) => {
         row.id = Number(row.id);
         row.roadlinks.forEach((roadlink) => {
-          const feature = parse(
-            //LINESTRING ZM is not recognized by wellknown, thus this replace statement
-            roadlink.f1.replace('LINESTRING ZM', 'LINESTRING')
-          );
-          if (feature?.type === 'LineString') {
-            const coordinates = feature.coordinates as Array<Array<number>>;
-            const pointObjects: Array<LinkPoint> = coordinates.map(
-              (coordinate) => {
-                return {
-                  x: coordinate[0],
-                  y: coordinate[1],
-                  z: coordinate[2],
-                  m: coordinate[3]
-                };
-              }
-            );
-
-            roadlink.linkId = roadlink.f2;
-            roadlink.points = pointObjects;
-            delete roadlink.f1;
-            delete roadlink.f2;
-          }
+          const feature = Geometry.parse(
+            `SRID=3067;${roadlink.f1}`
+          ) as LineString;
+          const pointObjects: Array<Point> = feature.points;
+          roadlink.linkId = roadlink.f2;
+          roadlink.points = pointObjects;
+          delete roadlink.f1;
+          delete roadlink.f2;
         });
       });
       client.end();
