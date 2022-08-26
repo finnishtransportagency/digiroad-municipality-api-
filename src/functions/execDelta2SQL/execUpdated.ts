@@ -1,6 +1,6 @@
 import execCreated from './execCreated';
 
-export default async function (feature, client) {
+export default async function (feature, municipality_code, client) {
   const point = `Point(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]} 0 0 )`;
   const assetQuery = {
     text: `
@@ -13,7 +13,7 @@ export default async function (feature, client) {
   };
   const assetResult = await client.query(assetQuery);
   if (!assetResult.rows[0]) {
-    await execCreated(feature, client);
+    await execCreated(feature, municipality_code, client);
     return;
   }
   const asset_id = assetResult.rows[0].id;
