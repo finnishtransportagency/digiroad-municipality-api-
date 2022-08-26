@@ -42,6 +42,9 @@ export interface ObstacleRoadLinkMap {
 }
 
 export interface LinkPoint {
+  srid?: number;
+  hasZ?: boolean;
+  hasM?: boolean;
   x: number;
   y: number;
   z: number;
