@@ -17,9 +17,21 @@ const execDelta2SQL = async (event) => {
 
   try {
     await client.query('BEGIN');
+    const municipality_code = parseInt(
+      (
+        await client.query({
+          text: `
+            SELECT id
+            FROM municipality
+            WHERE LOWER(name_fi) = LOWER($1)
+            `,
+          values: ['espoo']
+        })
+      ).rows[0].id
+    );
 
     for (const feature of event.Created) {
-      await execCreated(feature, client);
+      await execCreated(feature, municipality_code, client);
     }
     for (const feature of event.Deleted) {
       await execDeleted(feature, client);

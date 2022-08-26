@@ -1,10 +1,10 @@
-export default async function (feature, client) {
+export default async function (feature, municipality_code, client) {
   const assetQuery = {
     text: `
         INSERT INTO asset (id, created_date, external_id, asset_type_id, municipality_code, geometry) 
         VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP, $1, $2, $3, $4);
         `,
-    values: [feature.properties.ID, 220, 49, null]
+    values: [feature.properties.ID, 220, municipality_code, null]
   };
   await client.query(assetQuery);
 
