@@ -1,10 +1,17 @@
 export default async function (feature, municipality_code, client) {
+  const point = `Point(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]} 0 0 )`;
   const assetQuery = {
     text: `
-        INSERT INTO asset (id, created_date, external_id, asset_type_id, municipality_code, geometry) 
-        VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP, $1, $2, $3, $4);
+        INSERT INTO asset (id, created_date, geometry, created_by,external_id, asset_type_id, municipality_code) 
+        VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP, ST_GeomFromText(($1),3067), $2, $3, $4, $5);
         `,
-    values: [feature.properties.ID, 220, municipality_code, null]
+    values: [
+      point,
+      'test-creator',
+      feature.properties.ID,
+      220,
+      municipality_code
+    ]
   };
   await client.query(assetQuery);
 
@@ -27,9 +34,20 @@ export default async function (feature, municipality_code, client) {
   await client.query(assetLinkQuery);
   const singleChoiceValueQuery = {
     text: `
-        INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id)
-        VALUES (currval('PRIMARY_KEY_SEQ'), (SELECT id from enumerated_value WHERE name_fi='Suljettu yhteys'), (SELECT id FROM property WHERE public_id='esterakennelma'))
-    `
+        WITH _property AS (
+          SELECT id
+          FROM property 
+          WHERE public_id=($1)
+        ), _enumerated_value AS (
+          SELECT enumerated_value.id
+          FROM enumerated_value, _property
+          WHERE property_id = _property.id AND value=($2)
+        )
+
+        INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
+        VALUES (currval('PRIMARY_KEY_SEQ'), (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP,($3))
+    `,
+    values: ['esterakennelma', feature.properties.EST_TYYPPI, 'test-creator']
   };
   await client.query(singleChoiceValueQuery);
   return;

@@ -40,7 +40,35 @@ export default async function (feature, municipality_code, client) {
       position_id
     ]
   };
+
   await client.query(lrmPositionQuery);
+
+  const singleChoiceValueQuery = {
+    text: `
+    WITH _property AS (
+      SELECT id
+      FROM property 
+      WHERE public_id=($1) AND asset_type_id=($2)
+    ), _enumerated_value AS (
+      SELECT enumerated_value.id
+      FROM enumerated_value, _property
+      WHERE property_id = _property.id AND value=($3)
+    )
+    UPDATE single_choice_value
+    SET enumerated_value_id = (SELECT id FROM _enumerated_value), modified_date=CURRENT_TIMESTAMP, modified_by=($4)
+    WHERE asset_id=($5) AND property_id=(SELECT id FROM _property)
+
+`,
+    values: [
+      'esterakennelma',
+      220,
+      feature.properties.EST_TYYPPI,
+      'test-modifier',
+      asset_id
+    ]
+  };
+
+  await client.query(singleChoiceValueQuery);
 
   return;
 }
