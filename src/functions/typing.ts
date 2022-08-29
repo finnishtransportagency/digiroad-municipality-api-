@@ -36,13 +36,21 @@ export interface PayloadFeature {
   };
 }
 
+export interface ObstacleRoadLinkMap {
+  id: number;
+  roadlinks: Array<LinkObject>;
+}
+
 export interface LinkPoint {
+  srid?: number;
+  hasZ?: boolean;
+  hasM?: boolean;
   x: number;
   y: number;
   z: number;
   m: number;
 }
-//this is a temporary interface for our testdata for links
+
 export interface LinkObject {
   linkId: number;
   points: Array<LinkPoint>;

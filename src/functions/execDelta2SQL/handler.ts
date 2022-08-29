@@ -34,10 +34,10 @@ const execDelta2SQL = async (event) => {
       await execCreated(feature, municipality_code, client);
     }
     for (const feature of event.Deleted) {
-      await execDeleted(feature, client);
+      await execDeleted(feature, municipality_code, client);
     }
     for (const feature of event.Updated) {
-      await execUpdated(feature, client);
+      await execUpdated(feature, municipality_code, client);
     }
 
     await client.query('COMMIT');
