@@ -9,7 +9,7 @@ export default async function (feature, municipality_code, client) {
         WHERE external_id=($3) AND municipality_code=($4)
         RETURNING id
         `,
-    values: [point, 'mr_modifier', feature.properties.ID, 49]
+    values: [point, 'test_modifier', feature.properties.ID, municipality_code]
   };
   const assetResult = await client.query(assetQuery);
   if (!assetResult.rows[0]) {
