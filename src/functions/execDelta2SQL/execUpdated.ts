@@ -1,6 +1,12 @@
+import { ObstacleFeature } from '@functions/typing';
+import { Client } from 'pg';
 import execCreated from './execCreated';
 
-export default async function (feature, municipality_code, client) {
+export default async function (
+  feature: ObstacleFeature,
+  municipality_code: number,
+  client: Client
+) {
   const point = `Point(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]} 0 0 )`;
   const assetQuery = {
     text: `

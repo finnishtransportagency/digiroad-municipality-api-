@@ -1,4 +1,11 @@
-export default async function (feature, municipality_code, client) {
+import { ObstacleFeature } from '@functions/typing';
+import { Client } from 'pg';
+
+export default async function (
+  feature: ObstacleFeature,
+  municipality_code: number,
+  client: Client
+) {
   const assetQuery = {
     text: `
         UPDATE asset
