@@ -15,6 +15,8 @@ const execDelta2SQL = async (event) => {
   });
   client.connect();
 
+  const municipality = event.metadata.municipality;
+
   try {
     await client.query('BEGIN');
     const municipality_code = parseInt(
@@ -25,7 +27,7 @@ const execDelta2SQL = async (event) => {
             FROM municipality
             WHERE LOWER(name_fi) = LOWER($1)
             `,
-          values: ['espoo']
+          values: [municipality]
         })
       ).rows[0].id
     );
@@ -44,7 +46,7 @@ const execDelta2SQL = async (event) => {
   } catch (error) {
     await client.query('ROLLBACK');
     client.end();
-    console.log('Database error, rollbacking: ', error);
+    console.log('Database error, rolling back: ', error);
     return;
   }
 
