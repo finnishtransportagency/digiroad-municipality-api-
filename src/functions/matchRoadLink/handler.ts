@@ -83,6 +83,15 @@ const matchRoadLinks = async (event) => {
       }
     };
 
+    const execDelta2SQLParams = {
+      FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
+      InvocationType: 'Event',
+      Payload: JSON.stringify({
+        Body: body
+      })
+    };
+    lambda.invoke(execDelta2SQLParams);
+
     const reportRejectedDeltaParams = {
       FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
       InvocationType: 'Event',
