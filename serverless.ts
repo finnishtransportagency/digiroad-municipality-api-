@@ -76,6 +76,11 @@ const serverlessConfiguration: AWS = {
             Effect: 'Allow',
             Action: ['lambda:InvokeFunction'],
             Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-getNearbyLinks`
+          },
+          {
+            Effect: 'Allow',
+            Action: ['lambda:InvokeFunction'],
+            Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-execDelta2SQL`
           }
         ]
       }
