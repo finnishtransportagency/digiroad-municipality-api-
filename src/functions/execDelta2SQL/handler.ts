@@ -15,7 +15,7 @@ const execDelta2SQL = async (event) => {
   });
   client.connect();
 
-  const municipality: string = event.metadata.municipality;
+  const municipality: string = event.Body.metadata.municipality;
 
   try {
     await client.query('BEGIN');
@@ -32,13 +32,13 @@ const execDelta2SQL = async (event) => {
       ).rows[0].id
     );
 
-    for (const feature of event.Created) {
+    for (const feature of event.Body.Created) {
       await execCreated(feature, municipality_code, client);
     }
-    for (const feature of event.Deleted) {
+    for (const feature of event.Body.Deleted) {
       await execDeleted(feature, municipality_code, client);
     }
-    for (const feature of event.Updated) {
+    for (const feature of event.Body.Updated) {
       await execUpdated(feature, municipality_code, client);
     }
 

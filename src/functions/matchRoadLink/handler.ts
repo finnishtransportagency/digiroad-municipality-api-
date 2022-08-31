@@ -15,7 +15,7 @@ import {
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
 
-const lambda = new aws.Lambda();
+const lambda = new aws.Lambda({ endpoint: 'http://localhost:3002' });
 
 const matchRoadLinks = async (event) => {
   let rejectsAmount = 0;
@@ -76,7 +76,33 @@ const matchRoadLinks = async (event) => {
         obstacle.properties.DR_REJECTED = true;
       }
     }
-    const body: PayloadFeature = {
+
+    const execDelta2SQLBody: PayloadFeature = {
+      Created: event.Created.filter(
+        (feature: ObstacleFeature) => !feature.properties.DR_REJECTED
+      ),
+      Deleted: event.Deleted.filter(
+        (feature: ObstacleFeature) => !feature.properties.DR_REJECTED
+      ),
+      Updated: event.Updated.filter(
+        (feature: ObstacleFeature) => !feature.properties.DR_REJECTED
+      ),
+      metadata: {
+        OFFSET_LIMIT: MAX_OFFSET,
+        municipality: event.metadata.municipality
+      }
+    };
+
+    const execDelta2SQLParams = {
+      FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-execDelta2SQL`,
+      InvocationType: 'Event',
+      Payload: JSON.stringify({
+        Body: execDelta2SQLBody
+      })
+    };
+    await lambda.invoke(execDelta2SQLParams).promise();
+
+    const reportRejectedDeltabody: PayloadFeature = {
       Created: event.Created,
       Deleted: event.Deleted,
       Updated: event.Updated,
@@ -86,15 +112,6 @@ const matchRoadLinks = async (event) => {
       }
     };
 
-    const execDelta2SQLParams = {
-      FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
-      InvocationType: 'Event',
-      Payload: JSON.stringify({
-        Body: body
-      })
-    };
-    lambda.invoke(execDelta2SQLParams);
-
     const reportRejectedDeltaParams = {
       FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
       InvocationType: 'Event',
@@ -102,10 +119,10 @@ const matchRoadLinks = async (event) => {
         ReportType:
           rejectsAmount > 0 ? 'matchedWithFailures' : 'matchedSuccessfully',
         Municipality: event.metadata.municipality,
-        Body: body
+        Body: reportRejectedDeltabody
       })
     };
-    await lambda.invoke(reportRejectedDeltaParams).promise();
+    //await lambda.invoke(reportRejectedDeltaParams).promise();
   } catch (error) {
     console.error('Matching failed:', error);
   }
