@@ -96,9 +96,7 @@ const matchRoadLinks = async (event) => {
     const execDelta2SQLParams = {
       FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-execDelta2SQL`,
       InvocationType: 'Event',
-      Payload: JSON.stringify({
-        Body: execDelta2SQLBody
-      })
+      Payload: JSON.stringify(execDelta2SQLBody)
     };
     await lambda.invoke(execDelta2SQLParams).promise();
 

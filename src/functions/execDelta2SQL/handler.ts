@@ -14,8 +14,7 @@ const execDelta2SQL = async (event) => {
     password: process.env.PGPASSWORD
   });
   client.connect();
-
-  const municipality: string = event.Body.metadata.municipality;
+  const municipality: string = event.metadata.municipality;
 
   try {
     await client.query('BEGIN');
@@ -32,13 +31,13 @@ const execDelta2SQL = async (event) => {
       ).rows[0].id
     );
 
-    for (const feature of event.Body.Created) {
+    for (const feature of event.Created) {
       await execCreated(feature, municipality_code, client);
     }
-    for (const feature of event.Body.Deleted) {
+    for (const feature of event.Deleted) {
       await execDeleted(feature, municipality_code, client);
     }
-    for (const feature of event.Body.Updated) {
+    for (const feature of event.Updated) {
       await execUpdated(feature, municipality_code, client);
     }
 
