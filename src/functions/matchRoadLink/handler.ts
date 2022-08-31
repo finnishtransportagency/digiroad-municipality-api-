@@ -26,20 +26,23 @@ const matchRoadLinks = async (event) => {
   const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
   const pointPairDistance = new PointPairDistance();
 
+  const getNearbyLinksPayload = {
+    features: obstacles,
+    municipality: event.metadata.municipality
+  };
   const getNearbyLinksParams = {
     FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-getNearbyLinks`,
     InvocationType: 'RequestResponse',
-    Payload: JSON.stringify(event.Created)
+    Payload: JSON.stringify(getNearbyLinksPayload)
   };
+
   try {
     const invocationResult = await lambda
       .invoke(getNearbyLinksParams)
       .promise();
-    console.log(invocationResult);
     var allRoadLinks = JSON.parse(
       invocationResult.Payload.toString()
     ) as Array<ObstacleRoadLinkMap>;
-
     for (let p = 0; p < obstacles.length; p++) {
       pointPairDistance.initialize();
       const obstacle = obstacles[p];
@@ -47,31 +50,31 @@ const matchRoadLinks = async (event) => {
         (i) => i.id === obstacle.properties.ID
       )?.roadlinks;
 
-      if (!roadLinks) {
-        console.log('roadLink is undefined');
-        return;
-      }
+      if (roadLinks) {
+        const matchResults = findNearestLink(
+          roadLinks,
+          obstacle,
+          pointPairDistance,
+          geomFactory,
+          MAX_OFFSET
+        );
+        if (!matchResults) {
+          console.log('matchResults is undefined');
+          return;
+        }
 
-      const matchResults = findNearestLink(
-        roadLinks,
-        obstacle,
-        pointPairDistance,
-        geomFactory,
-        MAX_OFFSET
-      );
-      if (!matchResults) {
-        console.log('matchResults is undefined');
-        return;
-      }
+        if (matchResults.DR_REJECTED) {
+          rejectsAmount++;
+        }
 
-      if (matchResults.DR_REJECTED) {
+        obstacle.properties = {
+          ...obstacle.properties,
+          ...matchResults
+        };
+      } else {
         rejectsAmount++;
+        obstacle.properties.DR_REJECTED = true;
       }
-
-      obstacle.properties = {
-        ...obstacle.properties,
-        ...matchResults
-      };
     }
     const body: PayloadFeature = {
       Created: event.Created,
@@ -102,9 +105,9 @@ const matchRoadLinks = async (event) => {
         Body: body
       })
     };
-    lambda.invoke(reportRejectedDeltaParams);
-  } catch (e) {
-    console.log(e);
+    await lambda.invoke(reportRejectedDeltaParams).promise();
+  } catch (error) {
+    console.error('Matching failed:', error);
   }
 };
 
