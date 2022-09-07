@@ -14,7 +14,7 @@ export default async function (
         `,
     values: [
       point,
-      'test-creator',
+      'municipality-api',
       feature.properties.ID,
       220,
       municipality_code
@@ -54,7 +54,11 @@ export default async function (
         INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
         VALUES (currval('PRIMARY_KEY_SEQ'), (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP,($3))
     `,
-    values: ['esterakennelma', feature.properties.EST_TYYPPI, 'test-creator']
+    values: [
+      'esterakennelma',
+      feature.properties.EST_TYYPPI,
+      'municipality-api'
+    ]
   };
   await client.query(singleChoiceValueQuery);
   return;

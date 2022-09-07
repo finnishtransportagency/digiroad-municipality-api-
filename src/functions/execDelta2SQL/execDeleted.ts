@@ -12,7 +12,7 @@ export default async function (
         SET VALID_TO=CURRENT_TIMESTAMP, MODIFIED_BY=($1),modified_date=CURRENT_TIMESTAMP
         WHERE external_id=($2) AND municipality_code=($3)
         `,
-    values: ['test-expirer', feature.properties.ID, municipality_code]
+    values: ['municipality-api', feature.properties.ID, municipality_code]
   };
   await client.query(assetQuery);
   return;

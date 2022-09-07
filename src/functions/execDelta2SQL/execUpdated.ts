@@ -15,7 +15,12 @@ export default async function (
         WHERE external_id=($3) AND municipality_code=($4)
         RETURNING id
         `,
-    values: [point, 'test_modifier', feature.properties.ID, municipality_code]
+    values: [
+      point,
+      'municipality-api',
+      feature.properties.ID,
+      municipality_code
+    ]
   };
   const assetResult = await client.query(assetQuery);
   if (!assetResult.rows[0]) {
@@ -69,7 +74,7 @@ export default async function (
       'esterakennelma',
       220,
       feature.properties.EST_TYYPPI,
-      'test-modifier',
+      'municipality-api',
       asset_id
     ]
   };
