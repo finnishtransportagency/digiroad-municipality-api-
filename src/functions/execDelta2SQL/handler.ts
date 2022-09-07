@@ -2,7 +2,7 @@ import { middyfy } from '@libs/lambda';
 import { Client } from 'pg';
 
 import execCreated from './execCreated';
-import execDeleted from './execDeleted';
+import execExpired from './execExpired';
 import execUpdated from './execUpdated';
 
 const execDelta2SQL = async (event) => {
@@ -36,7 +36,7 @@ const execDelta2SQL = async (event) => {
       await execCreated(feature, municipality_code, client);
     }
     for (const feature of event.Deleted) {
-      await execDeleted(feature, municipality_code, client);
+      await execExpired(feature, municipality_code, client);
     }
     for (const feature of event.Updated) {
       await execUpdated(feature, municipality_code, client);
