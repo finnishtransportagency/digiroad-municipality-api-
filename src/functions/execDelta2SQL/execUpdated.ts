@@ -5,6 +5,7 @@ import execCreated from './execCreated';
 export default async function (
   feature: ObstacleFeature,
   municipality_code: number,
+  dbmodifier: string,
   client: Client
 ) {
   const point = `Point(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]} 0 0 )`;
@@ -15,16 +16,11 @@ export default async function (
         WHERE external_id=($3) AND municipality_code=($4)
         RETURNING id
         `,
-    values: [
-      point,
-      'municipality-api',
-      feature.properties.ID,
-      municipality_code
-    ]
+    values: [point, dbmodifier, feature.properties.ID, municipality_code]
   };
   const assetResult = await client.query(assetQuery);
   if (!assetResult.rows[0]) {
-    await execCreated(feature, municipality_code, client);
+    await execCreated(feature, municipality_code, dbmodifier, client);
     return;
   }
   const asset_id = assetResult.rows[0].id;
@@ -74,7 +70,7 @@ export default async function (
       'esterakennelma',
       220,
       feature.properties.EST_TYYPPI,
-      'municipality-api',
+      dbmodifier,
       asset_id
     ]
   };

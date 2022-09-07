@@ -4,6 +4,7 @@ import { Client } from 'pg';
 export default async function (
   feature: ObstacleFeature,
   municipality_code: number,
+  dbmodifier: string,
   client: Client
 ) {
   const point = `Point(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]} 0 0 )`;
@@ -12,13 +13,7 @@ export default async function (
         INSERT INTO asset (id, created_date, geometry, created_by,external_id, asset_type_id, municipality_code) 
         VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP, ST_GeomFromText(($1),3067), $2, $3, $4, $5);
         `,
-    values: [
-      point,
-      'municipality-api',
-      feature.properties.ID,
-      220,
-      municipality_code
-    ]
+    values: [point, dbmodifier, feature.properties.ID, 220, municipality_code]
   };
   await client.query(assetQuery);
 
@@ -54,11 +49,7 @@ export default async function (
         INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
         VALUES (currval('PRIMARY_KEY_SEQ'), (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP,($3))
     `,
-    values: [
-      'esterakennelma',
-      feature.properties.EST_TYYPPI,
-      'municipality-api'
-    ]
+    values: ['esterakennelma', feature.properties.EST_TYYPPI, dbmodifier]
   };
   await client.query(singleChoiceValueQuery);
   return;

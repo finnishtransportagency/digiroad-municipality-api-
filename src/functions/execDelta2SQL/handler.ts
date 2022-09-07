@@ -17,6 +17,8 @@ const execDelta2SQL = async (event) => {
 
   const municipality: string = event.metadata.municipality;
 
+  const dbmodifier = `municipality-api-${municipality}`;
+
   try {
     await client.query('BEGIN');
     const municipality_code: number = parseInt(
@@ -33,13 +35,13 @@ const execDelta2SQL = async (event) => {
     );
 
     for (const feature of event.Created) {
-      await execCreated(feature, municipality_code, client);
+      await execCreated(feature, municipality_code, dbmodifier, client);
     }
     for (const feature of event.Deleted) {
-      await execExpired(feature, municipality_code, client);
+      await execExpired(feature, municipality_code, dbmodifier, client);
     }
     for (const feature of event.Updated) {
-      await execUpdated(feature, municipality_code, client);
+      await execUpdated(feature, municipality_code, dbmodifier, client);
     }
 
     await client.query('COMMIT');
