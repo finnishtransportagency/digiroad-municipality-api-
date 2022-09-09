@@ -28,7 +28,7 @@ export default async function (
     text: `
         UPDATE asset
         SET VALID_TO=CURRENT_TIMESTAMP, MODIFIED_BY=($1),modified_date=CURRENT_TIMESTAMP
-        WHERE id=($1)
+        WHERE id=($2)
         `,
     values: [dbmodifier, asset_id]
   };
