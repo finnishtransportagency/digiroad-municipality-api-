@@ -35,11 +35,7 @@ export default async function (
         `,
     values: [point, dbmodifier, asset_id]
   };
-  const assetResult = await client.query(assetQuery);
-  if (!assetResult.rows[0]) {
-    await execCreated(feature, municipality_code, dbmodifier, client);
-    return;
-  }
+  await client.query(assetQuery);
 
   const assetLinkQuery = {
     text: `
