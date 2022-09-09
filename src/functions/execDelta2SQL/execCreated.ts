@@ -10,12 +10,21 @@ export default async function (
   const point = `Point(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]} 0 0 )`;
   const assetQuery = {
     text: `
-        INSERT INTO asset (id, created_date, geometry, created_by,external_id, asset_type_id, municipality_code) 
-        VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP, ST_GeomFromText(($1),3067), $2, $3, $4, $5);
+        INSERT INTO asset (id, created_date, geometry, created_by, asset_type_id, municipality_code) 
+        VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP, ST_GeomFromText(($1),3067), $2, $3, $4);
         `,
-    values: [point, dbmodifier, feature.properties.ID, 220, municipality_code]
+    values: [point, dbmodifier, 220, municipality_code]
   };
   await client.query(assetQuery);
+
+  const assetMunicipalityQuery = {
+    text: `
+      INSERT INTO municipality_asset_id_mapping (asset_id, municipality_asset_id, municipality_code)
+      VALUES (currval('PRIMARY_KEY_SEQ'), $1, $2)
+    `,
+    values: [feature.properties.ID, municipality_code]
+  };
+  await client.query(assetMunicipalityQuery);
 
   const lrmPositionQuery = {
     text: `

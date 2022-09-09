@@ -8,22 +8,38 @@ export default async function (
   dbmodifier: string,
   client: Client
 ) {
+  const assetMunicipalityQuery = {
+    text: `
+      SELECT asset_id
+      FROM municipality_asset_id_mapping
+      WHERE municipality_asset_id=($1) AND municipality_code=($2)
+    `,
+    values: [feature.properties.ID, municipality_code]
+  };
+
+  const assetMunicipalityResult = await client.query(assetMunicipalityQuery);
+
+  if (!assetMunicipalityResult.rows[0]) {
+    await execCreated(feature, municipality_code, dbmodifier, client);
+    return;
+  }
+
+  const asset_id: number = parseInt(assetMunicipalityResult.rows[0].asset_id);
+
   const point = `Point(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]} 0 0 )`;
   const assetQuery = {
     text: `
         UPDATE asset
         SET geometry=ST_GeomFromText(($1),3067), modified_date=CURRENT_TIMESTAMP, modified_by=($2)
-        WHERE external_id=($3) AND municipality_code=($4)
-        RETURNING id
+        WHERE id=($3)
         `,
-    values: [point, dbmodifier, feature.properties.ID, municipality_code]
+    values: [point, dbmodifier, asset_id]
   };
   const assetResult = await client.query(assetQuery);
   if (!assetResult.rows[0]) {
     await execCreated(feature, municipality_code, dbmodifier, client);
     return;
   }
-  const asset_id = assetResult.rows[0].id;
 
   const assetLinkQuery = {
     text: `
