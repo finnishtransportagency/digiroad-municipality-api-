@@ -1,5 +1,6 @@
 import { ObstacleFeature } from '@functions/typing';
 import { Client } from 'pg';
+import execUpdated from './execUpdated';
 
 export default async function (
   feature: ObstacleFeature,
@@ -7,6 +8,22 @@ export default async function (
   dbmodifier: string,
   client: Client
 ) {
+  const checkExistingAssetQuery = {
+    text: `
+      SELECT asset_id
+      FROM municipality_asset_id_mapping
+      WHERE municipality_asset_id=($1) AND municipality_code=($2)
+    `,
+    values: [feature.properties.ID, municipality_code]
+  };
+
+  const checkExistingAssetResult = await client.query(checkExistingAssetQuery);
+
+  if (checkExistingAssetResult.rowCount > 0) {
+    await execUpdated(feature, municipality_code, dbmodifier, client);
+    return;
+  }
+
   const point = `Point(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]} 0 0 )`;
   const assetQuery = {
     text: `

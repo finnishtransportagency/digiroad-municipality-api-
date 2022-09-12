@@ -30,7 +30,7 @@ export default async function (
   const assetQuery = {
     text: `
         UPDATE asset
-        SET geometry=ST_GeomFromText(($1),3067), modified_date=CURRENT_TIMESTAMP, modified_by=($2)
+        SET geometry=ST_GeomFromText(($1),3067), modified_date=CURRENT_TIMESTAMP, modified_by=($2), valid_to=NULL
         WHERE id=($3)
         `,
     values: [point, dbmodifier, asset_id]
