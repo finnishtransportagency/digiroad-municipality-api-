@@ -84,9 +84,7 @@ const matchRoadLinks = async (event) => {
     Created: event.Created.filter(
       (feature: ObstacleFeature) => !feature.properties.DR_REJECTED
     ),
-    Deleted: event.Deleted.filter(
-      (feature: ObstacleFeature) => !feature.properties.DR_REJECTED
-    ),
+    Deleted: event.Deleted,
     Updated: event.Updated.filter(
       (feature: ObstacleFeature) => !feature.properties.DR_REJECTED
     ),
