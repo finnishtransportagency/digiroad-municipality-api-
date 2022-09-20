@@ -31,7 +31,8 @@ const serverlessConfiguration: AWS = {
       OPERATOR_EMAIL: process.env.OPERATOR_EMAIL,
       DIGIROADSECURITYGROUPID: process.env.DIGIROADSECURITYGROUPID,
       DIGIROADSUBNETAID: process.env.DIGIROADSUBNETAID,
-      DIGIROADSUBNETBID: process.env.DIGIROADSUBNETBID
+      DIGIROADSUBNETBID: process.env.DIGIROADSUBNETBID,
+      TZ: process.env.TZ
     },
     region: 'eu-west-1',
     vpc: {
