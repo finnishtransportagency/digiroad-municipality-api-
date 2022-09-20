@@ -20,8 +20,8 @@ const gerNearbyLinks = async (event) => {
       WHERE LOWER(name_fi) = LOWER($1)
     ), acceptable_roadlinks AS (
       SELECT linkid, shape
-      FROM roadlink, municipality_
-      WHERE roadlink.municipalitycode = municipality_.id AND (roadlink.adminclass IN (2,3) OR roadlink.adminclass IS NULL)
+      FROM kgv_roadlink, municipality_
+      WHERE kgv_roadlink.municipalitycode = municipality_.id AND (kgv_roadlink.adminclass IN (2,3) OR kgv_roadlink.adminclass IS NULL)
     )
     
     SELECT (value#>'{properties}'->>'ID')::NUMERIC AS ID, json_agg((st_astext(shape),linkid)) AS roadlinks
