@@ -28,7 +28,7 @@ export default async function (
   const assetQuery = {
     text: `
         INSERT INTO asset (id, created_date, geometry, created_by, asset_type_id, municipality_code) 
-        VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP, ST_GeomFromText(($1),3067), $2, $3, $4);
+        VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ST_GeomFromText(($1),3067), $2, $3, $4);
         `,
     values: [point, dbmodifier, 220, municipality_code]
   };
@@ -73,7 +73,7 @@ export default async function (
         )
 
         INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
-        VALUES (currval('PRIMARY_KEY_SEQ'), (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP,($3))
+        VALUES (currval('PRIMARY_KEY_SEQ'), (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ($3))
     `,
     values: ['esterakennelma', feature.properties.EST_TYYPPI, dbmodifier]
   };

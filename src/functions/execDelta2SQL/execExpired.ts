@@ -27,7 +27,7 @@ export default async function (
   const assetQuery = {
     text: `
         UPDATE asset
-        SET VALID_TO=CURRENT_TIMESTAMP, MODIFIED_BY=($1),modified_date=CURRENT_TIMESTAMP
+        SET VALID_TO=CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', MODIFIED_BY=($1),modified_date=CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki'
         WHERE id=($2)
         `,
     values: [dbmodifier, asset_id]

@@ -30,7 +30,7 @@ export default async function (
   const assetQuery = {
     text: `
         UPDATE asset
-        SET geometry=ST_GeomFromText(($1),3067), modified_date=CURRENT_TIMESTAMP, modified_by=($2), valid_to=NULL
+        SET geometry=ST_GeomFromText(($1),3067), modified_date=CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', modified_by=($2), valid_to=NULL
         WHERE id=($3)
         `,
     values: [point, dbmodifier, asset_id]
@@ -51,7 +51,7 @@ export default async function (
   const lrmPositionQuery = {
     text: `
     UPDATE lrm_position
-    SET start_measure=($1), link_id=($2), modified_date=CURRENT_TIMESTAMP
+    SET start_measure=($1), link_id=($2), modified_date=CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki'
     WHERE id=($3)`,
     values: [
       feature.properties.DR_M_VALUE,
@@ -74,7 +74,7 @@ export default async function (
       WHERE property_id = _property.id AND value=($3)
     )
     UPDATE single_choice_value
-    SET enumerated_value_id = (SELECT id FROM _enumerated_value), modified_date=CURRENT_TIMESTAMP, modified_by=($4)
+    SET enumerated_value_id = (SELECT id FROM _enumerated_value), modified_date=CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', modified_by=($4)
     WHERE asset_id=($5) AND property_id=(SELECT id FROM _property)
 
 `,
