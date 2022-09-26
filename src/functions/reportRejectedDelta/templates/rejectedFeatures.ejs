@@ -1,8 +1,7 @@
 <% var created=Body.Created.filter( feature=> feature.properties.DR_REJECTED) %>
-<% var deleted=Body.Deleted.filter( feature=> feature.properties.DR_REJECTED) %>
 <% var updated=Body.Updated.filter( feature=> feature.properties.DR_REJECTED) %>
-<% var totalFailed = created.length + deleted.length + updated.length %>
-<% var total = Body.Created.length + Body.Deleted.length + Body.Updated.length %>
+<% var totalFailed = created.length  + updated.length %>
+<% var total = Body.Created.length + Body.Updated.length %>
 <h3>Municipality API report for municipality: <%= Municipality%></h3>
 <p>
   Maximum allowed offset from the center of the Digiroad Link: <%=Body.metadata.OFFSET_LIMIT %> meters.
@@ -35,7 +34,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? feature.properties.DR_OFFSET.toFixed(2) : "Out of range" %> meters</td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} meters` : "Out of range" %> </td>
   </tr>
   <% } else { %>
   <tr style="background-color: #dddddd;">
@@ -44,46 +43,9 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? feature.properties.DR_OFFSET.toFixed(2) : "Out of range" %> meters</td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} meters` : "Out of range" %> </td>
   </tr>
   <% }}) %>
-
-  <% } %>
-
-  <% if(deleted.length > 0) { %>
-  <tr>
-    <th colspan=2 style="text-align: center;
-      padding: 8px;">Deleted</th>
-  </tr>
-  <tr>
-    <th style="border: 1px solid #dddddd;
-      text-align: left;
-      padding: 8px;width: 50%;">ID</th>
-    <th style="border: 1px solid #dddddd;
-      text-align: left;
-      padding: 8px;width: 50%;">Offset</th>
-  </tr>
-  <% deleted.forEach(function(feature, index){ %>
-  <% if (index % 2 === 0) { %>
-  <tr style="background-color: #dddddd;">
-    <td style="border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
-    <td style="border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? feature.properties.DR_OFFSET.toFixed(2) : "Out of range" %> meters</td>
-  </tr>
-  <% } else { %>
-  <tr>
-    <td style="border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
-    <td style="border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? feature.properties.DR_OFFSET.toFixed(2) : "Out of range" %> meters</td>
-  </tr>
-  <% }}) %>
-
   <% } %>
   <% if(updated.length > 0) { %>
   <tr>

@@ -20,9 +20,7 @@ const lambda = new aws.Lambda();
 const matchRoadLinks = async (event) => {
   let rejectsAmount = 0;
 
-  const obstacles: Array<ObstacleFeature> = event.Created.concat(
-    event.Deleted
-  ).concat(event.Updated);
+  const obstacles: Array<ObstacleFeature> = event.Created.concat(event.Updated);
   const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
   const pointPairDistance = new PointPairDistance();
 
