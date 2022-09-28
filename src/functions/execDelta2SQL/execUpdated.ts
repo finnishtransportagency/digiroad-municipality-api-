@@ -26,7 +26,7 @@ export default async function (
 
   const asset_id: number = parseInt(assetMunicipalityResult.rows[0].asset_id);
 
-  const point = `Point(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]} 0 0 )`;
+  const point = `Point(${feature.properties.DR_GEOMETRY.x} ${feature.properties.DR_GEOMETRY.y} 0 0 )`;
   const assetQuery = {
     text: `
         UPDATE asset

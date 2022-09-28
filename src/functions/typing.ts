@@ -19,6 +19,7 @@ export interface ObstacleFeature {
     DR_M_VALUE?: number;
     DR_OFFSET?: number;
     DR_REJECTED?: boolean;
+    DR_GEOMETRY?: jsts.org.locationtech.jts.geom.Coordinate;
   };
   geometry: {
     type: string;
@@ -63,4 +64,5 @@ export interface matchResultObject {
   DR_M_VALUE: number;
   DR_OFFSET: number;
   DR_REJECTED: boolean;
+  DR_GEOMETRY: jsts.org.locationtech.jts.geom.Coordinate;
 }
