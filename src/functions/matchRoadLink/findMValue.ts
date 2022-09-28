@@ -27,6 +27,7 @@ export default function (
       result.DR_M_VALUE = link.points[i].m + pointPairDistance.getDistance();
       result.DR_OFFSET = distanceToObstacle;
       result.DR_REJECTED = distanceToObstacle >= MAX_OFFSET;
+      result.DR_GEOMETRY = closestPointOnLink;
       return result;
     }
   }

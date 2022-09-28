@@ -24,7 +24,7 @@ export default async function (
     return;
   }
 
-  const point = `Point(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]} 0 0 )`;
+  const point = `Point(${feature.properties.DR_GEOMETRY.x} ${feature.properties.DR_GEOMETRY.y} 0 0 )`;
   const assetQuery = {
     text: `
         INSERT INTO asset (id, created_date, geometry, created_by, asset_type_id, municipality_code) 
