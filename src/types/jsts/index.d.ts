@@ -39,6 +39,8 @@ declare namespace jsts {
 
           export class LineString extends Geometry {
             constructor(points: Array<Coordinate>, factory?: any);
+
+            getLength(): number;
           }
         }
         namespace algorithm {
