@@ -1,6 +1,5 @@
 import { LinkObject, matchResultObject } from '@functions/typing';
 import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
-import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance';
 
 export default function (
   linkCoordinates: Array<jsts.org.locationtech.jts.geom.Coordinate>,
@@ -25,12 +24,7 @@ export default function (
     if (pointPairDistance.getDistance() === distanceToObstacle) {
       pointPairDistance.initialize(closestPointOnLink, startPoint);
       const distance2D = pointPairDistance.getDistance();
-      const linkPointPair = new PointPairDistance();
-      linkPointPair.initialize(startPoint, endPoint);
-
-      const linkLength = linkPointPair.getDistance();
-      const ratio = distance2D / linkLength;
-
+      const ratio = distance2D / lineOnLink.getLength();
       closestPointOnLink.z = startPoint.z + (endPoint.z - startPoint.z) * ratio;
 
       const distance3D = Math.sqrt(
@@ -46,8 +40,7 @@ export default function (
       result.DR_GEOMETRY = closestPointOnLink;
       return result;
     } else {
-      pointPairDistance.initialize(startPoint, endPoint);
-      mValue += pointPairDistance.getDistance();
+      mValue += lineOnLink.getLength();
     }
   }
 }
