@@ -34,6 +34,10 @@ export default function (
       );
       const result: matchResultObject = <matchResultObject>{};
       result.DR_LINK_ID = link.linkId;
+      /*
+      The reason why M-value is calculated like this is to match the geometry-calculations that are done in Digiroad
+      to reduce unneccesary copies of assets in the database. 
+      */
       result.DR_M_VALUE = mValue + distance3D;
       result.DR_OFFSET = distanceToObstacle;
       result.DR_REJECTED = distanceToObstacle >= MAX_OFFSET;
