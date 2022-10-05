@@ -39,6 +39,8 @@ const serverlessConfiguration: AWS = {
       subnetIds: [process.env.SUBNETAID, process.env.SUBNETBID]
     },
     iam: {
+      deploymentRole:
+        'arn:aws:iam::${AWS::AccountId}:role/DRKunta-CloudFormationExecutionRole',
       role: {
         statements: [
           {
