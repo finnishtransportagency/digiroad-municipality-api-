@@ -40,7 +40,7 @@ const serverlessConfiguration: AWS = {
     },
     iam: {
       deploymentRole:
-        'arn:aws:iam::${AWS::AccountId}:role/DRKunta-CloudFormationExecutionRole',
+        'arn:aws:iam::${AWS::AccountId}:role/CloudFormationExecutionRole',
       role: {
         statements: [
           {
