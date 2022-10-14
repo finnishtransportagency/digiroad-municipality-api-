@@ -8,7 +8,6 @@ const reportRejectedDelta = async (event) => {
   const s3 = new aws.S3();
   const now = new Date().toISOString().slice(0, 19);
   const municipality = event.Municipality;
-
   const params = {
     Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
     Key: `logs/${municipality}/${now}`,
@@ -46,6 +45,7 @@ const reportRejectedDelta = async (event) => {
   } catch (error) {
     console.error(error);
   }
+  event.recipients = recipients;
 
   switch (event.ReportType) {
     case 'calculateDelta':
