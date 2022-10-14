@@ -25,6 +25,10 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       STAGE_NAME: process.env.STAGE_NAME,
+      SMTP_USERNAME: process.env.SMTP_USERNAME,
+      SMTP_PASSWORD: process.env.SMTP_PASSWORD,
+      MUNICIPALITY_EMAIL: process.env.MUNICIPALITY_EMAIL,
+      OPERATOR_EMAIL: process.env.OPERATOR_EMAIL,
       DIGIROADSECURITYGROUPID: process.env.DIGIROADSECURITYGROUPID,
       DIGIROADSUBNETAID: process.env.DIGIROADSUBNETAID,
       DIGIROADSUBNETBID: process.env.DIGIROADSUBNETBID
@@ -54,11 +58,6 @@ const serverlessConfiguration: AWS = {
             Effect: 'Allow',
             Action: ['s3:ListBucket'],
             Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket`
-          },
-          {
-            Effect: 'Allow',
-            Action: ['ssm:getParameter', 'ssm:GetParameters'],
-            Resource: `arn:aws:ssm:eu-west-1:475079312496:parameter/*`
           },
           {
             Effect: 'Allow',
