@@ -1,9 +1,18 @@
 import { middyfy } from '@libs/lambda';
+import { SSM } from 'aws-sdk';
 import { Client } from 'pg';
 
 import execCreated from './execCreated';
 import execExpired from './execExpired';
 import execUpdated from './execUpdated';
+
+const getParameter = async (name: string): Promise<string> => {
+  const ssm = new SSM();
+  const result = await ssm
+    .getParameter({ Name: name, WithDecryption: true })
+    .promise();
+  return result.Parameter.Value;
+};
 
 const execDelta2SQL = async (event) => {
   const client = new Client({
@@ -11,7 +20,7 @@ const execDelta2SQL = async (event) => {
     port: parseInt(process.env.PGPORT),
     database: process.env.PGDATABASE,
     user: process.env.PGUSER,
-    password: process.env.PGPASSWORD
+    password: await getParameter(process.env.PGPASSWORD_SSM_KEY)
   });
   client.connect();
 
