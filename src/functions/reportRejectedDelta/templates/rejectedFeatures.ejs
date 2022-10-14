@@ -4,7 +4,7 @@
 <% var total = Body.Created.length + Body.Updated.length %>
 <h3>Municipality API report for municipality: <%= Municipality%></h3>
 <% if (recipients.length <= 1) { %>
-<h2> NOTE: no email for municipality found, this email is only sent to operator</h2>
+<h2> NOTE: No email adress found for municipality. This email is only sent to the operator email.</h2>
 <% } %>
 <p>
   Maximum allowed offset from the center of the Digiroad Link: <%=Body.metadata.OFFSET_LIMIT %> meters.
