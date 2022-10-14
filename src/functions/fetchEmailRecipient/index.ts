@@ -9,7 +9,7 @@ export default {
   environment: {
     PGHOST: process.env.PGHOST,
     PGUSER: process.env.PGUSER,
-    PGPASSWORD: process.env.PGPASSWORD,
+    PGPASSWORD_SSM_KEY: process.env.PGPASSWORD_SSM_KEY,
     PGPORT: process.env.PGPORT,
     PGDATABASE: process.env.PGDATABASE
   }

@@ -88,6 +88,11 @@ const serverlessConfiguration: AWS = {
             Effect: 'Allow',
             Action: ['lambda:InvokeFunction'],
             Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-fetchEmailRecipient`
+          },
+          {
+            Effect: 'Allow',
+            Action: ['ssm:GetParameter', 'ssm:GetParameters'],
+            Resource: `arn:aws:ssm:eu-west-1:475079312496:parameter/*`
           }
         ]
       }

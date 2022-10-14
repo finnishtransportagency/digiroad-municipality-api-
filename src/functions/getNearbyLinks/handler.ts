@@ -1,6 +1,15 @@
 import { middyfy } from '@libs/lambda';
+import { SSM } from 'aws-sdk';
 import { Client, QueryResult } from 'pg';
 import { Geometry, LineString, Point } from 'wkx';
+
+const getParameter = async (name: string): Promise<string> => {
+  const ssm = new SSM();
+  const result = await ssm
+    .getParameter({ Name: name, WithDecryption: true })
+    .promise();
+  return result.Parameter.Value;
+};
 
 const gerNearbyLinks = async (event) => {
   const client = new Client({
@@ -8,7 +17,7 @@ const gerNearbyLinks = async (event) => {
     port: parseInt(process.env.PGPORT),
     database: process.env.PGDATABASE,
     user: process.env.PGUSER,
-    password: process.env.PGPASSWORD
+    password: await getParameter(process.env.PGPASSWORD_SSM_KEY)
   });
   await client.connect();
 

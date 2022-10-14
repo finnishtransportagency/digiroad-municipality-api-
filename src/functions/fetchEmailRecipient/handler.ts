@@ -1,5 +1,14 @@
 import { middyfy } from '@libs/lambda';
+import { SSM } from 'aws-sdk';
 import { Client } from 'pg';
+
+const getParameter = async (name: string): Promise<string> => {
+  const ssm = new SSM();
+  const result = await ssm
+    .getParameter({ Name: name, WithDecryption: true })
+    .promise();
+  return result.Parameter.Value;
+};
 
 const fetchEmailRecipient = async (event) => {
   const client = new Client({
@@ -7,7 +16,7 @@ const fetchEmailRecipient = async (event) => {
     port: parseInt(process.env.PGPORT),
     database: process.env.PGDATABASE,
     user: process.env.PGUSER,
-    password: process.env.PGPASSWORD
+    password: await getParameter(process.env.PGPASSWORD_SSM_KEY)
   });
   await client.connect();
 
