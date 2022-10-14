@@ -8,7 +8,6 @@ const reportRejectedDelta = async (event) => {
   const s3 = new aws.S3();
   const now = new Date().toISOString().slice(0, 19);
   const municipality = event.Municipality;
-
   const params = {
     Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
     Key: `logs/${municipality}/${now}`,
@@ -27,7 +26,27 @@ const reportRejectedDelta = async (event) => {
   });
   let templateName: string;
   let emailSubject: string;
-  const recipients: Array<string> = [process.env.MUNICIPALITY_EMAIL];
+
+  const lambda = new aws.Lambda();
+
+  const fetchEmailRecipientParams = {
+    FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-fetchEmailRecipient`,
+    InvocationType: 'RequestResponse',
+    Payload: JSON.stringify(event.Body.metadata)
+  };
+  let recipients = [];
+  try {
+    const fetchEmailRecipientResult = await lambda
+      .invoke(fetchEmailRecipientParams)
+      .promise();
+    recipients = JSON.parse(
+      fetchEmailRecipientResult.Payload.toString()
+    ) as Array<string>;
+  } catch (error) {
+    console.error(error);
+  }
+  event.recipients = recipients;
+
   switch (event.ReportType) {
     case 'calculateDelta':
       templateName = 'invalidGeoJSON.ejs';

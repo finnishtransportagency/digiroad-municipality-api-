@@ -6,7 +6,7 @@ import {
   matchRoadLink,
   reportRejectedDelta,
   getNearbyLinks,
-  reportRejectedData,
+  fetchEmailRecipient,
   execDelta2SQL
 } from '@functions/index';
 
@@ -83,6 +83,11 @@ const serverlessConfiguration: AWS = {
             Effect: 'Allow',
             Action: ['lambda:InvokeFunction'],
             Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-execDelta2SQL`
+          },
+          {
+            Effect: 'Allow',
+            Action: ['lambda:InvokeFunction'],
+            Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-fetchEmailRecipient`
           }
         ]
       }
@@ -95,7 +100,7 @@ const serverlessConfiguration: AWS = {
     matchRoadLink,
     reportRejectedDelta,
     getNearbyLinks,
-    reportRejectedData,
+    fetchEmailRecipient,
     execDelta2SQL
   },
   resources: {
