@@ -1,8 +1,17 @@
 import { middyfy } from '@libs/lambda';
 import * as aws from 'aws-sdk';
+import { SSM } from 'aws-sdk';
 import nodemailer from 'nodemailer';
 import ejs from 'ejs';
 import * as path from 'path';
+
+const getParameter = async (name: string): Promise<string> => {
+  const ssm = new SSM();
+  const result = await ssm
+    .getParameter({ Name: name, WithDecryption: true })
+    .promise();
+  return result.Parameter.Value;
+};
 
 const reportRejectedDelta = async (event) => {
   const s3 = new aws.S3();
@@ -20,8 +29,8 @@ const reportRejectedDelta = async (event) => {
     host: 'email-smtp.eu-west-1.amazonaws.com',
     port: 587,
     auth: {
-      user: `${process.env.SMTP_USERNAME}`,
-      pass: `${process.env.SMTP_PASSWORD}`
+      user: await getParameter(process.env.SMTP_USERNAME_SSM_KEY),
+      pass: await getParameter(process.env.SMTP_PASSWORD_SSM_KEY)
     }
   });
   let templateName: string;
