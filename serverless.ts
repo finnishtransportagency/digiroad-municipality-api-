@@ -61,36 +61,6 @@ const serverlessConfiguration: AWS = {
             Effect: 'Allow',
             Action: ['lambda:InvokeFunction'],
             Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-calculateDelta`
-          },
-          {
-            Effect: 'Allow',
-            Action: ['lambda:InvokeFunction'],
-            Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-matchRoadLink`
-          },
-          {
-            Effect: 'Allow',
-            Action: ['lambda:InvokeFunction'],
-            Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`
-          },
-          {
-            Effect: 'Allow',
-            Action: ['lambda:InvokeFunction'],
-            Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-getNearbyLinks`
-          },
-          {
-            Effect: 'Allow',
-            Action: ['lambda:InvokeFunction'],
-            Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-execDelta2SQL`
-          },
-          {
-            Effect: 'Allow',
-            Action: ['lambda:InvokeFunction'],
-            Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-fetchEmailRecipient`
-          },
-          {
-            Effect: 'Allow',
-            Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-            Resource: `arn:aws:ssm:eu-west-1:475079312496:parameter/*`
           }
         ]
       }
@@ -112,6 +82,221 @@ const serverlessConfiguration: AWS = {
         Type: 'AWS::S3::Bucket',
         Properties: {
           BucketName: `dr-kunta-${process.env.STAGE_NAME}-bucket`
+        }
+      },
+      calculateDeltaRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+          RoleName: `DRKunta-${process.env.STAGE_NAME}-calculateDeltaRole`,
+          AssumeRolePolicyDocument: {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: {
+                  Service: 'lambda.amazonaws.com'
+                },
+                Action: 'sts:AssumeRole'
+              }
+            ]
+          },
+          ManagedPolicyArns: [
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+          ],
+          Policies: [
+            {
+              PolicyName: `DRKunta-${process.env.STAGE_NAME}-calculateDeltaPolicy`,
+              PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      's3:PutObject',
+                      's3:PutObjectAcl',
+                      's3:ListBucket',
+                      's3:GetObject',
+                      's3:DeleteObject'
+                    ],
+                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/*`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: ['s3:ListBucket'],
+                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: ['lambda:InvokeFunction'],
+                    Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-matchRoadLink`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: ['lambda:InvokeFunction'],
+                    Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      'logs:CreateLogGroup',
+                      'logs:CreateLogStream',
+                      'logs:PutLogEvents'
+                    ],
+                    Resource:
+                      'arn:aws:logs:eu-west-1:475079312496:log-group:/aws/lambda/*'
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      DBLambdaRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+          RoleName: `DRKunta-${process.env.STAGE_NAME}-DBLambdaRole`,
+          AssumeRolePolicyDocument: {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: {
+                  Service: 'lambda.amazonaws.com'
+                },
+                Action: 'sts:AssumeRole'
+              }
+            ]
+          },
+          ManagedPolicyArns: [
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+          ],
+          Policies: [
+            {
+              PolicyName: `DRKunta-${process.env.STAGE_NAME}-DBLambdaPolicy`,
+              PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [
+                  {
+                    Effect: 'Allow',
+                    Action: ['ssm:GetParameter', 'ssm:GetParameters'],
+                    Resource: `arn:aws:ssm:eu-west-1:475079312496:parameter/*`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      'logs:CreateLogGroup',
+                      'logs:CreateLogStream',
+                      'logs:PutLogEvents'
+                    ],
+                    Resource:
+                      'arn:aws:logs:eu-west-1:475079312496:log-groups:/aws/lambda/*:*:*'
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      matchRoadLinkRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+          RoleName: `DRKunta-${process.env.STAGE_NAME}-matchRoadLinkRole`,
+          AssumeRolePolicyDocument: {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: {
+                  Service: 'lambda.amazonaws.com'
+                },
+                Action: 'sts:AssumeRole'
+              }
+            ]
+          },
+          ManagedPolicyArns: [
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+          ],
+          Policies: [
+            {
+              PolicyName: `DRKunta-${process.env.STAGE_NAME}-matchRoadLinkPolicy`,
+              PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [
+                  {
+                    Effect: 'Allow',
+                    Action: ['lambda:InvokeFunction'],
+                    Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: ['lambda:InvokeFunction'],
+                    Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-getNearbyLinks`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: ['lambda:InvokeFunction'],
+                    Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-execDelta2SQL`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      'logs:CreateLogGroup',
+                      'logs:CreateLogStream',
+                      'logs:PutLogEvents'
+                    ],
+                    Resource:
+                      'arn:aws:logs:eu-west-1:475079312496:log-groups:/aws/lambda/*:*:*'
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      reportRejectedDeltaRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+          RoleName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDeltaRole`,
+          AssumeRolePolicyDocument: {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: {
+                  Service: 'lambda.amazonaws.com'
+                },
+                Action: 'sts:AssumeRole'
+              }
+            ]
+          },
+          ManagedPolicyArns: [
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+          ],
+          Policies: [
+            {
+              PolicyName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDeltaPolicy`,
+              PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [
+                  {
+                    Effect: 'Allow',
+                    Action: ['lambda:InvokeFunction'],
+                    Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-fetchEmailRecipient`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      'logs:CreateLogGroup',
+                      'logs:CreateLogStream',
+                      'logs:PutLogEvents'
+                    ],
+                    Resource:
+                      'arn:aws:logs:eu-west-1:475079312496:log-groups:/aws/lambda/*:*:*'
+                  }
+                ]
+              }
+            }
+          ]
         }
       }
     }

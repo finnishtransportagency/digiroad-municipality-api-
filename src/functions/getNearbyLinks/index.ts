@@ -12,5 +12,6 @@ export default {
     PGPASSWORD_SSM_KEY: process.env.PGPASSWORD_SSM_KEY,
     PGPORT: process.env.PGPORT,
     PGDATABASE: process.env.PGDATABASE
-  }
+  },
+  role: 'DBLambdaRole'
 };

@@ -12,5 +12,6 @@ export default {
         rules: [{ prefix: 'update/' }]
       }
     }
-  ]
+  ],
+  role: 'calculateDeltaRole'
 };
