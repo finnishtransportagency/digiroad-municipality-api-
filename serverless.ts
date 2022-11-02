@@ -303,6 +303,11 @@ const serverlessConfiguration: AWS = {
                       's3:DeleteObject'
                     ],
                     Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/*`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: ['ssm:GetParameter', 'ssm:GetParameters'],
+                    Resource: `arn:aws:ssm:eu-west-1:475079312496:parameter/*`
                   }
                 ]
               }
