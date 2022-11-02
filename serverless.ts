@@ -36,8 +36,7 @@ const serverlessConfiguration: AWS = {
       subnetIds: [process.env.SUBNETAID, process.env.SUBNETBID]
     },
     iam: {
-      deploymentRole:
-        'arn:aws:iam::475079312496:role/CloudFormationExecutionRole',
+      deploymentRole: `arn:aws:iam::${process.env.AWS_ACCOUNT_ID}:role/CloudFormationExecutionRole`,
       role: {
         statements: [
           {
@@ -59,7 +58,7 @@ const serverlessConfiguration: AWS = {
           {
             Effect: 'Allow',
             Action: ['lambda:InvokeFunction'],
-            Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-calculateDelta`
+            Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:digiroad-municipality-api-${process.env.STAGE_NAME}-calculateDelta`
           }
         ]
       }
@@ -127,12 +126,12 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-matchRoadLink`
+                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:digiroad-municipality-api-${process.env.STAGE_NAME}-matchRoadLink`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`
+                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`
                   },
                   {
                     Effect: 'Allow',
@@ -141,8 +140,7 @@ const serverlessConfiguration: AWS = {
                       'logs:CreateLogStream',
                       'logs:PutLogEvents'
                     ],
-                    Resource:
-                      'arn:aws:logs:eu-west-1:475079312496:log-group:/aws/lambda/*'
+                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-group:/aws/lambda/*`
                   }
                 ]
               }
@@ -178,7 +176,7 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:475079312496:parameter/*`
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/*`
                   },
                   {
                     Effect: 'Allow',
@@ -187,8 +185,7 @@ const serverlessConfiguration: AWS = {
                       'logs:CreateLogStream',
                       'logs:PutLogEvents'
                     ],
-                    Resource:
-                      'arn:aws:logs:eu-west-1:475079312496:log-groups:/aws/lambda/*:*:*'
+                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
                   }
                 ]
               }
@@ -224,17 +221,17 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`
+                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-getNearbyLinks`
+                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:digiroad-municipality-api-${process.env.STAGE_NAME}-getNearbyLinks`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-execDelta2SQL`
+                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:digiroad-municipality-api-${process.env.STAGE_NAME}-execDelta2SQL`
                   },
                   {
                     Effect: 'Allow',
@@ -243,8 +240,7 @@ const serverlessConfiguration: AWS = {
                       'logs:CreateLogStream',
                       'logs:PutLogEvents'
                     ],
-                    Resource:
-                      'arn:aws:logs:eu-west-1:475079312496:log-groups:/aws/lambda/*:*:*'
+                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
                   }
                 ]
               }
@@ -280,7 +276,7 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:475079312496:function:digiroad-municipality-api-${process.env.STAGE_NAME}-fetchEmailRecipient`
+                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:digiroad-municipality-api-${process.env.STAGE_NAME}-fetchEmailRecipient`
                   },
                   {
                     Effect: 'Allow',
@@ -289,8 +285,7 @@ const serverlessConfiguration: AWS = {
                       'logs:CreateLogStream',
                       'logs:PutLogEvents'
                     ],
-                    Resource:
-                      'arn:aws:logs:eu-west-1:475079312496:log-groups:/aws/lambda/*:*:*'
+                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
                   },
                   {
                     Effect: 'Allow',
@@ -306,7 +301,7 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:475079312496:parameter/*`
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/*`
                   }
                 ]
               }
