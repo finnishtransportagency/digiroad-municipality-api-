@@ -11,7 +11,7 @@ import {
 } from '@functions/index';
 
 const serverlessConfiguration: AWS = {
-  service: 'digiroad-municipality-api',
+  service: 'DRKunta',
   frameworkVersion: '3',
   plugins: ['serverless-esbuild', 'serverless-offline'],
   provider: {
@@ -58,7 +58,7 @@ const serverlessConfiguration: AWS = {
           {
             Effect: 'Allow',
             Action: ['lambda:InvokeFunction'],
-            Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:digiroad-municipality-api-${process.env.STAGE_NAME}-calculateDelta`
+            Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-calculateDelta`
           }
         ]
       }
@@ -126,12 +126,12 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:digiroad-municipality-api-${process.env.STAGE_NAME}-matchRoadLink`
+                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-matchRoadLink`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`
+                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`
                   },
                   {
                     Effect: 'Allow',
@@ -221,17 +221,17 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`
+                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:digiroad-municipality-api-${process.env.STAGE_NAME}-getNearbyLinks`
+                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-getNearbyLinks`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:digiroad-municipality-api-${process.env.STAGE_NAME}-execDelta2SQL`
+                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-execDelta2SQL`
                   },
                   {
                     Effect: 'Allow',
@@ -276,7 +276,7 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:digiroad-municipality-api-${process.env.STAGE_NAME}-fetchEmailRecipient`
+                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-fetchEmailRecipient`
                   },
                   {
                     Effect: 'Allow',

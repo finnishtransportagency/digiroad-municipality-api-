@@ -50,7 +50,7 @@ const calculateDelta = async (event) => {
   } catch (e) {
     await lambda
       .invoke({
-        FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
+        FunctionName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
         InvocationType: 'Event',
         Payload: JSON.stringify({
           ReportType: 'calculateDelta',
@@ -135,7 +135,7 @@ const calculateDelta = async (event) => {
     }
   };
   const param = {
-    FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-matchRoadLink`,
+    FunctionName: `DRKunta-${process.env.STAGE_NAME}-matchRoadLink`,
     InvocationType: 'Event',
     Payload: JSON.stringify(payLoad)
   };
