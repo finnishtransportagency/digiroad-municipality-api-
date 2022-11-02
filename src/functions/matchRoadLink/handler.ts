@@ -29,7 +29,7 @@ const matchRoadLinks = async (event) => {
     municipality: event.metadata.municipality
   };
   const getNearbyLinksParams = {
-    FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-getNearbyLinks`,
+    FunctionName: `DRKunta-${process.env.STAGE_NAME}-getNearbyLinks`,
     InvocationType: 'RequestResponse',
     Payload: JSON.stringify(getNearbyLinksPayload)
   };
@@ -93,7 +93,7 @@ const matchRoadLinks = async (event) => {
   };
 
   const execDelta2SQLParams = {
-    FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-execDelta2SQL`,
+    FunctionName: `DRKunta-${process.env.STAGE_NAME}-execDelta2SQL`,
     InvocationType: 'Event',
     Payload: JSON.stringify(execDelta2SQLBody)
   };
@@ -110,7 +110,7 @@ const matchRoadLinks = async (event) => {
   };
 
   const reportRejectedDeltaParams = {
-    FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-reportRejectedDelta`,
+    FunctionName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
     InvocationType: 'Event',
     Payload: JSON.stringify({
       ReportType:

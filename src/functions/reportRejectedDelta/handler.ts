@@ -39,7 +39,7 @@ const reportRejectedDelta = async (event) => {
   const lambda = new aws.Lambda();
 
   const fetchEmailRecipientParams = {
-    FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-fetchEmailRecipient`,
+    FunctionName: `DRKunta-${process.env.STAGE_NAME}-fetchEmailRecipient`,
     InvocationType: 'RequestResponse',
     Payload: JSON.stringify({ municipality: event.Municipality })
   };
