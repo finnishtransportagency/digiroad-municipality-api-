@@ -41,7 +41,7 @@ const reportRejectedDelta = async (event) => {
   const fetchEmailRecipientParams = {
     FunctionName: `digiroad-municipality-api-${process.env.STAGE_NAME}-fetchEmailRecipient`,
     InvocationType: 'RequestResponse',
-    Payload: JSON.stringify(event.Municipality)
+    Payload: JSON.stringify({ municipality: event.Municipality })
   };
   let recipients = [];
   try {
