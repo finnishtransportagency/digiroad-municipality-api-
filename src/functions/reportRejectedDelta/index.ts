@@ -6,5 +6,6 @@ export default {
   environment: {
     SMTP_USERNAME_SSM_KEY: process.env.SMTP_USERNAME_SSM_KEY,
     SMTP_PASSWORD_SSM_KEY: process.env.SMTP_PASSWORD_SSM_KEY
-  }
+  },
+  role: 'reportRejectedDeltaRole'
 };

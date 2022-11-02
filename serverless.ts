@@ -87,7 +87,7 @@ const serverlessConfiguration: AWS = {
       calculateDeltaRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: 'calculateDeltaRole',
+          RoleName: 'DRKunta-${process.env.STAGE_NAME}-calculateDeltaRole',
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -105,7 +105,8 @@ const serverlessConfiguration: AWS = {
           ],
           Policies: [
             {
-              PolicyName: 'calculateDeltaPolicy',
+              PolicyName:
+                'DRKunta-${process.env.STAGE_NAME}-calculateDeltaPolicy',
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
@@ -154,7 +155,7 @@ const serverlessConfiguration: AWS = {
       DBLambdaRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: 'DBLambdaRole',
+          RoleName: 'DRKunta-${process.env.STAGE_NAME}-DBLambdaRole',
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -172,7 +173,7 @@ const serverlessConfiguration: AWS = {
           ],
           Policies: [
             {
-              PolicyName: 'DBLambdaPolicy',
+              PolicyName: 'DRKunta-${process.env.STAGE_NAME}-DBLambdaPolicy',
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
@@ -200,7 +201,7 @@ const serverlessConfiguration: AWS = {
       matchRoadLinkRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: 'matchRoadLinkRole',
+          RoleName: 'DRKunta-${process.env.STAGE_NAME}-matchRoadLinkRole',
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -218,7 +219,8 @@ const serverlessConfiguration: AWS = {
           ],
           Policies: [
             {
-              PolicyName: 'matchRoadLinkPolicy',
+              PolicyName:
+                'DRKunta-${process.env.STAGE_NAME}-matchRoadLinkPolicy',
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
@@ -256,7 +258,7 @@ const serverlessConfiguration: AWS = {
       reportRejectedDeltaRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: 'reportRejectedDeltaRole',
+          RoleName: 'DRKunta-${process.env.STAGE_NAME}-reportRejectedDeltaRole',
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -274,7 +276,8 @@ const serverlessConfiguration: AWS = {
           ],
           Policies: [
             {
-              PolicyName: 'reportRejectedDeltaPolicy',
+              PolicyName:
+                'DRKunta-${process.env.STAGE_NAME}-reportRejectedDeltaPolicy',
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
