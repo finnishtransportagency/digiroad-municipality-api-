@@ -292,6 +292,17 @@ const serverlessConfiguration: AWS = {
                     ],
                     Resource:
                       'arn:aws:logs:eu-west-1:475079312496:log-groups:/aws/lambda/*:*:*'
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      's3:PutObject',
+                      's3:PutObjectAcl',
+                      's3:ListBucket',
+                      's3:GetObject',
+                      's3:DeleteObject'
+                    ],
+                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/*`
                   }
                 ]
               }
