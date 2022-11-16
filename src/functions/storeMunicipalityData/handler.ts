@@ -2,10 +2,14 @@ import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import * as aws from 'aws-sdk';
 
-const storeMunicipalityData = async () => {
+const storeMunicipalityData = async (event) => {
   const s3 = new aws.S3();
   const now = new Date().toISOString().slice(0, 19);
-  const municipality = 'espoo';
+  const municipality = event.headers.municipality;
+  if (!municipality) {
+    console.error('No Municipality-header, aborting');
+    return;
+  }
 
   try {
     const url: string = s3.getSignedUrl('putObject', {
