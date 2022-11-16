@@ -1,4 +1,3 @@
-import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import * as aws from 'aws-sdk';
 
@@ -8,7 +7,10 @@ const storeMunicipalityData = async (event) => {
   const municipality = event.headers.municipality;
   if (!municipality) {
     console.error('No Municipality-header, aborting');
-    return;
+    return {
+      statusCode: 400,
+      body: 'municipality header missing'
+    };
   }
 
   try {
@@ -25,10 +27,11 @@ const storeMunicipalityData = async (event) => {
       body: 'success'
     };
   } catch (err) {
-    console.log(err);
-    return formatJSONResponse({
-      message: 'Something went wrong'
-    });
+    console.error(err);
+    return {
+      statusCode: 400,
+      body: 'Something went wrong'
+    };
   }
 };
 
