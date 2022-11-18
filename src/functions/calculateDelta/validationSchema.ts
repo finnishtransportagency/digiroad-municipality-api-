@@ -1,11 +1,42 @@
 import * as yup from 'yup';
 
-const propertiesSchema = yup.object().shape({
+yup.addMethod(yup.object, 'oneOfSchemas', function (schemas) {
+  return this.test(
+    'one-of-schemas',
+    'Schema does not match one of the allowed schemas',
+    (item) => {
+      return schemas.some((schema) =>
+        schema.isValidSync(item, { strict: true })
+      );
+    }
+  );
+});
+
+yup.addMethod(yup.array, 'oneOfSchemasArray', function (schemas) {
+  return this.test(
+    'one-of-schemas',
+    'Not all items in ${path} match one of the allowed schemas',
+    (items) =>
+      items.every((item) => {
+        return schemas.some((schema) =>
+          schema.isValidSync(item, { strict: true })
+        );
+      })
+  );
+});
+
+//NOT ACTUAL!
+const trafficSignPropertiesSchema = yup.object().shape({
+  ID: yup.number().required(),
+  LM_TYYPPI: yup.number().required().oneOf([1, 2, 3, 99])
+});
+
+const obstaclePropertiesSchema = yup.object().shape({
   ID: yup.number().required(),
   EST_TYYPPI: yup.number().required().oneOf([1, 2])
 });
 
-const geometrySchema = yup.object().shape({
+const pointGeometrySchema = yup.object().shape({
   type: yup
     .string()
     .required()
@@ -13,10 +44,13 @@ const geometrySchema = yup.object().shape({
   coordinates: yup.array().of(yup.number().required()).length(2)
 });
 
-const featureSchema = yup.object().shape({
+const pointFeatureSchema = yup.object().shape({
   type: yup.string().required(),
-  properties: propertiesSchema,
-  geometry: geometrySchema
+  properties: yup
+    .object()
+    .oneOfSchemas([obstaclePropertiesSchema, trafficSignPropertiesSchema])
+    .required(),
+  geometry: pointGeometrySchema.required()
 });
 
 const crsSchema = yup.object().shape({
@@ -30,13 +64,10 @@ const crsSchema = yup.object().shape({
 });
 
 const schema = yup.object().shape({
-  type: yup
-    .string()
-    .required()
-    .matches(/(FeatureCollection)/),
+  type: yup.string().required(),
   name: yup.string().notRequired(),
   crs: crsSchema.notRequired(),
-  features: yup.array().of(featureSchema)
+  features: yup.array().oneOfSchemasArray([pointFeatureSchema])
 });
 
-export { schema };
+export { schema, obstaclePropertiesSchema };
