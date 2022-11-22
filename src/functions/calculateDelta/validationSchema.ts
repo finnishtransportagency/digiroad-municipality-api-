@@ -3,7 +3,7 @@ import * as yup from 'yup';
 yup.addMethod(yup.object, 'oneOfSchemas', function (schemas) {
   return this.test(
     'one-of-schemas',
-    'Schema does not match one of the allowed schemas',
+    'Feature does not match one of the allowed schemas',
     (item) => {
       return schemas.some((schema) =>
         schema.isValidSync(item, { strict: true })
@@ -15,7 +15,7 @@ yup.addMethod(yup.object, 'oneOfSchemas', function (schemas) {
 yup.addMethod(yup.array, 'oneOfSchemasArray', function (schemas) {
   return this.test(
     'one-of-schemas',
-    'Not all items in ${path} match one of the allowed schemas',
+    'Not all features match one of the allowed schemas',
     (items) =>
       items.every((item) => {
         return schemas.some((schema) =>
