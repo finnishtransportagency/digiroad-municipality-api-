@@ -17,6 +17,7 @@ const serverlessConfiguration: AWS = {
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
+    endpointType: 'PRIVATE',
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true
