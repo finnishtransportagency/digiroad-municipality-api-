@@ -85,7 +85,7 @@ const serverlessConfiguration: AWS = {
           SecurityGroupIds: [process.env.SECURITYGROUPID],
           ServiceName: 'com.amazonaws.eu-west-1.execute-api',
           SubnetIds: [process.env.SUBNETAID, process.env.SUBNETBID],
-          VpcEndpointType: 'interface',
+          VpcEndpointType: 'Interface',
           VpcId: process.env.VPCID
         }
       },
