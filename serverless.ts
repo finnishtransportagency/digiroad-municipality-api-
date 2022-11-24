@@ -17,7 +17,6 @@ const serverlessConfiguration: AWS = {
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
-    endpointType: 'PRIVATE',
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true
@@ -32,6 +31,8 @@ const serverlessConfiguration: AWS = {
       DIGIROADSUBNETBID: process.env.DIGIROADSUBNETBID
     },
     region: 'eu-west-1',
+    endpointType: 'PRIVATE',
+    vpcEndpointIds: [{ Ref: 'testEndpoint' }],
     vpc: {
       securityGroupIds: [process.env.SECURITYGROUPID],
       subnetIds: [process.env.SUBNETAID, process.env.SUBNETBID]
@@ -77,6 +78,17 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
+      testEndpoint: {
+        Type: 'AWS::EC2::VPCEndpoint',
+        Properties: {
+          PrivateDnsEnabled: true,
+          SecurityGroupIds: [process.env.SECURITYGROUPID],
+          ServiceName: 'com.amazonaws.eu-west-1.execute-api',
+          SubnetIds: [process.env.SUBNETAID, process.env.SUBNETBID],
+          VpcEndpointType: 'Interface',
+          VpcId: process.env.VPCID
+        }
+      },
       drKuntaBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
