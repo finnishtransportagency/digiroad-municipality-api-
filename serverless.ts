@@ -86,7 +86,7 @@ const serverlessConfiguration: AWS = {
           ServiceName: 'com.amazonaws.eu-west-1.execute-api',
           SubnetIds: [process.env.SUBNETAID, process.env.SUBNETBID],
           VpcEndpointType: 'interface',
-          VpcId: { Ref: 'vpc' }
+          VpcId: process.env.VPCID
         }
       },
       drKuntaBucket: {
