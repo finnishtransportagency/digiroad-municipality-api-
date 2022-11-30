@@ -19,7 +19,26 @@ const serverlessConfiguration: AWS = {
     runtime: 'nodejs14.x',
     apiGateway: {
       minimumCompressionSize: 1024,
-      shouldStartNameWithService: true
+      shouldStartNameWithService: true,
+      resourcePolicy: [
+        {
+          Effect: 'Allow',
+          Principal: '*',
+          Action: 'execute-api:Invoke',
+          Resource: ['execute-api:/*']
+        },
+        {
+          Effect: 'Deny',
+          Principal: '*',
+          Action: 'execute-api:Invoke',
+          Resource: ['execute-api:/*'],
+          Condition: {
+            StringNotEquals: {
+              'aws:SourceVpce': { Ref: 'drKuntaEndpoint' }
+            }
+          }
+        }
+      ]
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
@@ -32,7 +51,7 @@ const serverlessConfiguration: AWS = {
     },
     region: 'eu-west-1',
     endpointType: 'PRIVATE',
-    vpcEndpointIds: [{ Ref: 'testEndpoint' }],
+    vpcEndpointIds: [{ Ref: 'drKuntaEndpoint' }],
     vpc: {
       securityGroupIds: [process.env.SECURITYGROUPID],
       subnetIds: [process.env.SUBNETAID, process.env.SUBNETBID]
@@ -78,7 +97,7 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
-      testEndpoint: {
+      drKuntaEndpoint: {
         Type: 'AWS::EC2::VPCEndpoint',
         Properties: {
           PrivateDnsEnabled: true,
