@@ -100,12 +100,26 @@ const serverlessConfiguration: AWS = {
       drKuntaEndpoint: {
         Type: 'AWS::EC2::VPCEndpoint',
         Properties: {
-          PrivateDnsEnabled: true,
+          PrivateDnsEnabled: false,
           SecurityGroupIds: [process.env.SECURITYGROUPID],
           ServiceName: 'com.amazonaws.eu-west-1.execute-api',
           SubnetIds: [process.env.SUBNETAID, process.env.SUBNETBID],
           VpcEndpointType: 'Interface',
-          VpcId: process.env.VPCID
+          VpcId: process.env.VPCID,
+          Policies: [
+            {
+              Statement: [
+                {
+                  Principal: '*',
+                  Action: ['execute-api:Invoke'],
+                  Effect: 'Allow',
+                  Resource: [
+                    `arn:aws:execute-api:eu-west-1:${process.env.ACCOUNTID}:*/*`
+                  ]
+                }
+              ]
+            }
+          ]
         }
       },
       drKuntaBucket: {
