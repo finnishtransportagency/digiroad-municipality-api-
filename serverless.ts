@@ -113,7 +113,7 @@ const serverlessConfiguration: AWS = {
                 Action: ['execute-api:Invoke'],
                 Effect: 'Allow',
                 Resource: [
-                  `arn:aws:execute-api:eu-west-1:${process.env.ACCOUNTID}:*/*`
+                  `arn:aws:execute-api:eu-west-1:${process.env.AWS_ACCOUNT_ID}:*/*`
                 ]
               }
             ]
