@@ -106,20 +106,18 @@ const serverlessConfiguration: AWS = {
           SubnetIds: [process.env.SUBNETAID, process.env.SUBNETBID],
           VpcEndpointType: 'Interface',
           VpcId: process.env.VPCID,
-          PolicyDocument: [
-            {
-              Statement: [
-                {
-                  Principal: '*',
-                  Action: ['execute-api:Invoke'],
-                  Effect: 'Allow',
-                  Resource: [
-                    `arn:aws:execute-api:eu-west-1:${process.env.ACCOUNTID}:*/*`
-                  ]
-                }
-              ]
-            }
-          ]
+          PolicyDocument: {
+            Statement: [
+              {
+                Principal: '*',
+                Action: ['execute-api:Invoke'],
+                Effect: 'Allow',
+                Resource: [
+                  `arn:aws:execute-api:eu-west-1:${process.env.ACCOUNTID}:*/*`
+                ]
+              }
+            ]
+          }
         }
       },
       drKuntaBucket: {
