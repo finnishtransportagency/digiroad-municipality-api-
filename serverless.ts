@@ -106,7 +106,7 @@ const serverlessConfiguration: AWS = {
           SubnetIds: [process.env.SUBNETAID, process.env.SUBNETBID],
           VpcEndpointType: 'Interface',
           VpcId: process.env.VPCID,
-          Policies: [
+          PolicyDocument: [
             {
               Statement: [
                 {
