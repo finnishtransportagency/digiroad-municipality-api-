@@ -3,7 +3,6 @@ import * as aws from 'aws-sdk';
 import findNearestLink from './findNearestLink';
 import GeometryFactory from 'jsts/org/locationtech/jts/geom/GeometryFactory';
 import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel';
-import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance';
 
 import {
   PayloadFeature,
@@ -22,7 +21,6 @@ const matchRoadLinks = async (event) => {
 
   const obstacles: Array<ObstacleFeature> = event.Created.concat(event.Updated);
   const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
-  const pointPairDistance = new PointPairDistance();
 
   const getNearbyLinksPayload = {
     features: obstacles,
@@ -45,7 +43,6 @@ const matchRoadLinks = async (event) => {
     console.error(error);
   }
   for (let p = 0; p < obstacles.length; p++) {
-    pointPairDistance.initialize();
     const obstacle = obstacles[p];
     const roadLinks: Array<LinkObject> | undefined = allRoadLinks.find(
       (i) => i.id === obstacle.properties.ID
@@ -55,7 +52,6 @@ const matchRoadLinks = async (event) => {
       const matchResults = findNearestLink(
         roadLinks,
         obstacle,
-        pointPairDistance,
         geomFactory,
         MAX_OFFSET
       );
