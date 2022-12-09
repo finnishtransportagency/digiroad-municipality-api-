@@ -8,86 +8,74 @@ export default async function (
   dbmodifier: string,
   client: Client
 ) {
-  const assetMunicipalityQuery = {
+  const expireQuery = {
     text: `
-      SELECT asset_id
-      FROM municipality_asset_id_mapping
-      WHERE municipality_asset_id=($1) AND municipality_code=($2)
-    `,
-    values: [feature.properties.ID, municipality_code]
+        UPDATE asset
+        SET VALID_TO=CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', MODIFIED_BY=($1),modified_date=CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki'
+        WHERE external_id=($2) AND municipality_code=($3) AND valid_to IS NULL
+        RETURNING created_by, created_date
+        `,
+    values: [dbmodifier, feature.properties.ID, municipality_code]
   };
+  const result = await client.query(expireQuery);
+  const createdData = result.rows[0];
 
-  const assetMunicipalityResult = await client.query(assetMunicipalityQuery);
-
-  if (!assetMunicipalityResult.rows[0]) {
+  if (!createdData) {
     await execCreated(feature, municipality_code, dbmodifier, client);
     return;
   }
-
-  const asset_id: number = parseInt(assetMunicipalityResult.rows[0].asset_id);
-
   const point = `Point(${feature.properties.DR_GEOMETRY.x} ${feature.properties.DR_GEOMETRY.y} 0 0 )`;
-  const assetQuery = {
+  const insertQuery = {
     text: `
-        UPDATE asset
-        SET geometry=ST_GeomFromText(($1),3067), modified_date=CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', modified_by=($2), valid_to=NULL
-        WHERE id=($3)
+        INSERT INTO asset (id, modified_date, geometry, modified_by, asset_type_id, municipality_code, external_id, created_by, created_date) 
+        VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ST_GeomFromText(($1),3067), $2, $3, $4, $5, $6,$7);
         `,
-    values: [point, dbmodifier, asset_id]
+    values: [
+      point,
+      dbmodifier,
+      220,
+      municipality_code,
+      feature.properties.ID,
+      createdData.created_by,
+      createdData.created_date
+    ]
   };
-  await client.query(assetQuery);
-
-  const assetLinkQuery = {
-    text: `
-        SELECT position_id
-        FROM asset_link
-        WHERE asset_id=($1)
-        `,
-    values: [asset_id]
-  };
-  const assetLinkResult = await client.query(assetLinkQuery);
-  const position_id = assetLinkResult.rows[0].position_id;
+  await client.query(insertQuery);
 
   const lrmPositionQuery = {
     text: `
-    UPDATE lrm_position
-    SET start_measure=($1), link_id=($2), modified_date=CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki'
-    WHERE id=($3)`,
-    values: [
-      feature.properties.DR_M_VALUE,
-      feature.properties.DR_LINK_ID,
-      position_id
-    ]
+        INSERT INTO lrm_position (id, start_measure, link_id)
+        VALUES (nextval('LRM_POSITION_PRIMARY_KEY_SEQ'), $1, $2)
+        `,
+    values: [feature.properties.DR_M_VALUE, feature.properties.DR_LINK_ID]
   };
-
   await client.query(lrmPositionQuery);
 
+  const assetLinkQuery = {
+    text: `
+        INSERT INTO asset_link (asset_id, position_id)
+        VALUES (currval('PRIMARY_KEY_SEQ'), currval('LRM_POSITION_PRIMARY_KEY_SEQ'))
+        `,
+    values: []
+  };
+  await client.query(assetLinkQuery);
   const singleChoiceValueQuery = {
     text: `
-    WITH _property AS (
-      SELECT id
-      FROM property 
-      WHERE public_id=($1) AND asset_type_id=($2)
-    ), _enumerated_value AS (
-      SELECT enumerated_value.id
-      FROM enumerated_value, _property
-      WHERE property_id = _property.id AND value=($3)
-    )
-    UPDATE single_choice_value
-    SET enumerated_value_id = (SELECT id FROM _enumerated_value), modified_date=CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', modified_by=($4)
-    WHERE asset_id=($5) AND property_id=(SELECT id FROM _property)
+        WITH _property AS (
+          SELECT id
+          FROM property 
+          WHERE public_id=($1)
+        ), _enumerated_value AS (
+          SELECT enumerated_value.id
+          FROM enumerated_value, _property
+          WHERE property_id = _property.id AND value=($2)
+        )
 
-`,
-    values: [
-      'esterakennelma',
-      220,
-      feature.properties.EST_TYYPPI,
-      dbmodifier,
-      asset_id
-    ]
+        INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
+        VALUES (currval('PRIMARY_KEY_SEQ'), (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ($3))
+    `,
+    values: ['esterakennelma', feature.properties.EST_TYYPPI, dbmodifier]
   };
-
   await client.query(singleChoiceValueQuery);
-
   return;
 }
