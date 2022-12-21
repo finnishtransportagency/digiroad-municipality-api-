@@ -15,7 +15,7 @@ export interface ObstacleFeature {
   properties: {
     ID: number;
     EST_TYYPPI: number;
-    DR_LINK_ID?: number;
+    DR_LINK_ID?: string;
     DR_M_VALUE?: number;
     DR_OFFSET?: number;
     DR_REJECTED?: boolean;
@@ -53,14 +53,14 @@ export interface LinkPoint {
 }
 
 export interface LinkObject {
-  linkId: number;
+  linkId: string;
   points: Array<LinkPoint>;
 }
 
 export interface matchResultObject {
   ID: number;
   EST_TYYPPI: number;
-  DR_LINK_ID: number;
+  DR_LINK_ID: string;
   DR_M_VALUE: number;
   DR_OFFSET: number;
   DR_REJECTED: boolean;
