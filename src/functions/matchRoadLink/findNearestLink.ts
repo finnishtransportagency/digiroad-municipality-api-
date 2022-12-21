@@ -2,10 +2,10 @@ import findMValue from './findMValue';
 import Coordinate from 'jsts/org/locationtech/jts/geom/Coordinate';
 import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
 
-import { ObstacleFeature, LinkObject } from '@functions/typing';
+import { Feature, LinkObject } from '@functions/typing';
 export default function (
   roadLinks: Array<LinkObject>,
-  obstacle: ObstacleFeature,
+  obstacle: Feature,
   pointPairDistance: jsts.org.locationtech.jts.algorithm.distance.PointPairDistance,
   geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory,
   MAX_OFFSET: number

@@ -1,7 +1,8 @@
 import { middyfy } from '@libs/lambda';
 import * as aws from 'aws-sdk';
-import { ObstacleFeature, PayloadFeature } from '@functions/typing';
+import { Feature, PayloadFeature } from '@functions/typing';
 import { schema } from './validationSchema';
+import isEqual from 'lodash.isequal';
 
 const calculateDelta = async (event) => {
   const s3 = new aws.S3();
@@ -71,24 +72,16 @@ const calculateDelta = async (event) => {
     await getObject(`dr-kunta-${process.env.STAGE_NAME}-bucket`, refrenceKey)
   );
 
-  const updateFeatures: Array<ObstacleFeature> = updateObject.features;
-  const referenceFeatures: Array<ObstacleFeature> = referenceObject.features;
+  const updateFeatures: Array<Feature> = updateObject.features;
+  const referenceFeatures: Array<Feature> = referenceObject.features;
 
-  const created: Array<ObstacleFeature> = [];
-  const deleted: Array<ObstacleFeature> = [];
-  const updated: Array<ObstacleFeature> = [];
+  const created: Array<Feature> = [];
+  const deleted: Array<Feature> = [];
+  const updated: Array<Feature> = [];
 
-  function comparePoints(obj1: ObstacleFeature, obj2: ObstacleFeature) {
-    if (obj1.properties.EST_TYYPPI !== obj2.properties.EST_TYYPPI) {
-      return true;
-    }
-    if (
-      obj1.geometry.coordinates[0] !== obj2.geometry.coordinates[0] ||
-      obj1.geometry.coordinates[1] !== obj2.geometry.coordinates[1]
-    ) {
-      return true;
-    }
-    return false;
+  // returns true if Features differ
+  function comparePoints(obj1: Feature, obj2: Feature) {
+    return !isEqual(obj1, obj2);
   }
 
   for (let i = 0; i < updateFeatures.length; i++) {

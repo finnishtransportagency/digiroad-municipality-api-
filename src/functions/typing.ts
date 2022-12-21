@@ -1,4 +1,4 @@
-export interface ObstacleGeoJSON {
+export interface GeoJSON {
   type: string;
   name?: string;
   crs?: {
@@ -7,37 +7,51 @@ export interface ObstacleGeoJSON {
       name?: string;
     };
   };
-  features: Array<ObstacleFeature>;
+  features: Array<Feature>;
 }
 
-export interface ObstacleFeature {
+export interface Feature {
   type: string;
-  properties: {
-    ID: number;
-    EST_TYYPPI: number;
-    DR_LINK_ID?: number;
-    DR_M_VALUE?: number;
-    DR_OFFSET?: number;
-    DR_REJECTED?: boolean;
-    DR_GEOMETRY?: jsts.org.locationtech.jts.geom.Coordinate;
-  };
+  properties: ObstacleProperties | TrafficSignProperties;
   geometry: {
     type: string;
     coordinates: Array<number>;
   };
 }
 
+export interface ObstacleProperties {
+  ID: number;
+  EST_TYYPPI: number;
+  DR_LINK_ID?: number;
+  DR_M_VALUE?: number;
+  DR_OFFSET?: number;
+  DR_REJECTED?: boolean;
+  DR_GEOMETRY?: jsts.org.locationtech.jts.geom.Coordinate;
+}
+
+//Not actual
+export interface TrafficSignProperties {
+  ID: number;
+  LM_TYYPPI: string;
+  LM_TEKSTI: string;
+  DR_LINK_ID?: number;
+  DR_M_VALUE?: number;
+  DR_OFFSET?: number;
+  DR_REJECTED?: boolean;
+  DR_GEOMETRY?: jsts.org.locationtech.jts.geom.Coordinate;
+}
+
 export interface PayloadFeature {
-  Created: Array<ObstacleFeature>;
-  Deleted: Array<ObstacleFeature>;
-  Updated: Array<ObstacleFeature>;
+  Created: Array<Feature>;
+  Deleted: Array<Feature>;
+  Updated: Array<Feature>;
   metadata?: {
     OFFSET_LIMIT?: number;
     municipality: string;
   };
 }
 
-export interface ObstacleRoadLinkMap {
+export interface FeatureRoadlinkMap {
   id: number;
   roadlinks: Array<LinkObject>;
 }
@@ -58,8 +72,6 @@ export interface LinkObject {
 }
 
 export interface matchResultObject {
-  ID: number;
-  EST_TYYPPI: number;
   DR_LINK_ID: number;
   DR_M_VALUE: number;
   DR_OFFSET: number;

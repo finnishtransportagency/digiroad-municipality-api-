@@ -7,9 +7,9 @@ import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/Poin
 
 import {
   PayloadFeature,
-  ObstacleFeature,
+  Feature,
   LinkObject,
-  ObstacleRoadLinkMap
+  FeatureRoadlinkMap
 } from '@functions/typing';
 
 // Max offset permitted from middle of linestring
@@ -20,7 +20,7 @@ const lambda = new aws.Lambda();
 const matchRoadLinks = async (event) => {
   let rejectsAmount = 0;
 
-  const obstacles: Array<ObstacleFeature> = event.Created.concat(event.Updated);
+  const obstacles: Array<Feature> = event.Created.concat(event.Updated);
   const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
   const pointPairDistance = new PointPairDistance();
 
@@ -40,7 +40,7 @@ const matchRoadLinks = async (event) => {
       .promise();
     var allRoadLinks = JSON.parse(
       invocationResult.Payload.toString()
-    ) as Array<ObstacleRoadLinkMap>;
+    ) as Array<FeatureRoadlinkMap>;
   } catch (error) {
     console.error(error);
   }
@@ -80,11 +80,11 @@ const matchRoadLinks = async (event) => {
 
   const execDelta2SQLBody: PayloadFeature = {
     Created: event.Created.filter(
-      (feature: ObstacleFeature) => !feature.properties.DR_REJECTED
+      (feature: Feature) => !feature.properties.DR_REJECTED
     ),
     Deleted: event.Deleted,
     Updated: event.Updated.filter(
-      (feature: ObstacleFeature) => !feature.properties.DR_REJECTED
+      (feature: Feature) => !feature.properties.DR_REJECTED
     ),
     metadata: {
       OFFSET_LIMIT: MAX_OFFSET,
