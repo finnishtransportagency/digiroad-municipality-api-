@@ -68,9 +68,11 @@ const calculateDelta = async (event) => {
     throw new Error(`Object deleted because of invalid data: ${e.message}`);
   }
 
-  const referenceObject = JSON.parse(
+  let referenceObject = JSON.parse(
     await getObject(`dr-kunta-${process.env.STAGE_NAME}-bucket`, refrenceKey)
   );
+
+  referenceObject = schema.cast(referenceObject);
 
   const updateFeatures: Array<ObstacleFeature> = updateObject.features;
   const referenceFeatures: Array<ObstacleFeature> = referenceObject.features;
