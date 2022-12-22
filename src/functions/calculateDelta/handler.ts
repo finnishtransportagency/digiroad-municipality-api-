@@ -47,6 +47,7 @@ const calculateDelta = async (event) => {
     if (!valid) {
       throw new Error('Invalid schema');
     }
+    updateObject = schema.cast(updateObject);
   } catch (e) {
     await lambda
       .invoke({

@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 
 const propertiesSchema = yup.object().shape({
-  ID: yup.number().required(),
+  ID: yup.string().required(),
   EST_TYYPPI: yup.number().required().oneOf([1, 2])
 });
 
