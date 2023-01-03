@@ -117,7 +117,7 @@ const serverlessConfiguration: AWS = {
               ToPort: 443
             },
             {
-              CidrIp: '::/0',
+              CidrIpv6: '::/0',
               FromPort: 443,
               IpProtocol: 'tcp',
               ToPort: 443
@@ -147,6 +147,29 @@ const serverlessConfiguration: AWS = {
               }
             ]
           }
+        }
+      },
+      CNAMERecord: {
+        Type: 'Custom::VaylapilviRoute53Record',
+        Properties: {
+          ServiceToken:
+            'arn:aws:sns:eu-west-1:434599271542:Vaylapilvi-Route53-Record',
+          Type: 'CNAME',
+          Name: 'drkuntatest',
+          Records: [
+            {
+              'Fn::Join': [
+                '',
+                [
+                  { Ref: 'ApiGatewayRestApi' },
+                  '-',
+                  { Ref: 'drKuntaEndpoint' },
+                  '.execute-api.eu-west-1.amazonaws.com'
+                ]
+              ]
+            }
+          ],
+          Comment: 'vpce'
         }
       },
       drKuntaBucket: {
