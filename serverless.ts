@@ -97,11 +97,40 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
+      VpceSecurityGroup: {
+        Type: 'AWS::EC2::SecurityGroup',
+        Properties: {
+          GroupDescription: `DRKunta-${process.env.STAGE_NAME}-vpce-security-group`,
+          GroupName: `DRKunta-${process.env.STAGE_NAME}-vpce-security-group`,
+          SecurityGroupEgress: [
+            {
+              CidrIp: '0.0.0.0/0',
+              Description: 'Allow all outbound traffic by default',
+              IpProtocol: '-1'
+            }
+          ],
+          SecurityGroupIngress: [
+            {
+              CidrIp: '0.0.0.0/0',
+              FromPort: 443,
+              IpProtocol: 'tcp',
+              ToPort: 443
+            },
+            {
+              CidrIp: '::/0',
+              FromPort: 443,
+              IpProtocol: 'tcp',
+              ToPort: 443
+            }
+          ],
+          VpcId: process.env.VPCID
+        }
+      },
       drKuntaEndpoint: {
         Type: 'AWS::EC2::VPCEndpoint',
         Properties: {
           PrivateDnsEnabled: false,
-          SecurityGroupIds: [process.env.SECURITYGROUPID],
+          SecurityGroupIds: [{ Ref: 'VpceSecurityGroup' }],
           ServiceName: 'com.amazonaws.eu-west-1.execute-api',
           SubnetIds: [process.env.SUBNETAID, process.env.SUBNETBID],
           VpcEndpointType: 'Interface',
