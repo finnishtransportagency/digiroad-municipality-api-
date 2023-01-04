@@ -52,7 +52,7 @@ export interface PayloadFeature {
 }
 
 export interface FeatureRoadlinkMap {
-  id: number;
+  id: string;
   roadlinks: Array<LinkObject>;
 }
 
@@ -67,12 +67,14 @@ export interface LinkPoint {
 }
 
 export interface LinkObject {
-  linkId: number;
+  linkId: string;
   points: Array<LinkPoint>;
 }
 
 export interface matchResultObject {
-  DR_LINK_ID: number;
+  ID: string;
+  EST_TYYPPI: number;
+  DR_LINK_ID: string;
   DR_M_VALUE: number;
   DR_OFFSET: number;
   DR_REJECTED: boolean;

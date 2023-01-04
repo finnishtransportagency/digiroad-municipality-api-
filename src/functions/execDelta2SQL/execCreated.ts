@@ -10,9 +10,9 @@ export default async function (
 ) {
   const checkExistingAssetQuery = {
     text: `
-      SELECT asset_id
-      FROM municipality_asset_id_mapping
-      WHERE municipality_asset_id=($1) AND municipality_code=($2)
+      SELECT id
+      FROM asset
+      WHERE external_id=($1) AND municipality_code=($2) AND valid_to IS NULL
     `,
     values: [feature.properties.ID, municipality_code]
   };
@@ -27,21 +27,12 @@ export default async function (
   const point = `Point(${feature.properties.DR_GEOMETRY.x} ${feature.properties.DR_GEOMETRY.y} 0 0 )`;
   const assetQuery = {
     text: `
-        INSERT INTO asset (id, created_date, geometry, created_by, asset_type_id, municipality_code) 
-        VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ST_GeomFromText(($1),3067), $2, $3, $4);
+        INSERT INTO asset (id, created_date, geometry, created_by, asset_type_id, municipality_code, external_id) 
+        VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ST_GeomFromText(($1),3067), $2, $3, $4, $5);
         `,
-    values: [point, dbmodifier, 220, municipality_code]
+    values: [point, dbmodifier, 220, municipality_code, feature.properties.ID]
   };
   await client.query(assetQuery);
-
-  const assetMunicipalityQuery = {
-    text: `
-      INSERT INTO municipality_asset_id_mapping (asset_id, municipality_asset_id, municipality_code)
-      VALUES (currval('PRIMARY_KEY_SEQ'), $1, $2)
-    `,
-    values: [feature.properties.ID, municipality_code]
-  };
-  await client.query(assetMunicipalityQuery);
 
   const lrmPositionQuery = {
     text: `

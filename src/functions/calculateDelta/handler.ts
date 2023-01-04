@@ -20,7 +20,7 @@ const calculateDelta = async (event) => {
     var keys = await s3.listObjectsV2(params).promise();
     const sortedKeyList = keys.Contents.sort((k) => -k.LastModified.getTime());
     var updateKey = sortedKeyList[0].Key;
-    var refrenceKey = sortedKeyList[1].Key;
+    var refrenceKey = sortedKeyList.length > 1 ? sortedKeyList[1].Key : null; //null for first upload where a refrence object does not exist
   } catch (e) {
     throw new Error(`Could not list object keys from S3: ${e.message}`);
   }
@@ -48,6 +48,7 @@ const calculateDelta = async (event) => {
     if (!valid) {
       throw new Error('Invalid schema');
     }
+    updateObject = schema.cast(updateObject);
   } catch (e) {
     await lambda
       .invoke({
@@ -68,9 +69,17 @@ const calculateDelta = async (event) => {
     throw new Error(`Object deleted because of invalid data: ${e.message}`);
   }
 
-  const referenceObject = JSON.parse(
-    await getObject(`dr-kunta-${process.env.STAGE_NAME}-bucket`, refrenceKey)
-  );
+  let referenceObject =
+    refrenceKey === null
+      ? { type: 'FeatureCollection', features: [] }
+      : JSON.parse(
+          await getObject(
+            `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+            refrenceKey
+          )
+        );
+
+  referenceObject = schema.cast(referenceObject);
 
   const updateFeatures: Array<Feature> = updateObject.features;
   const referenceFeatures: Array<Feature> = referenceObject.features;

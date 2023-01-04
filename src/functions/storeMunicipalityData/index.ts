@@ -6,7 +6,7 @@ export default {
     {
       http: {
         method: 'put',
-        path: 'storeMunicipalityData'
+        path: 'upload'
       }
     }
   ]

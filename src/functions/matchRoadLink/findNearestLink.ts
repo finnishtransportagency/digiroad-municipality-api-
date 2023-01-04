@@ -1,15 +1,16 @@
 import findMValue from './findMValue';
 import Coordinate from 'jsts/org/locationtech/jts/geom/Coordinate';
 import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
+import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance';
 
 import { Feature, LinkObject } from '@functions/typing';
 export default function (
   roadLinks: Array<LinkObject>,
   obstacle: Feature,
-  pointPairDistance: jsts.org.locationtech.jts.algorithm.distance.PointPairDistance,
   geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory,
   MAX_OFFSET: number
 ) {
+  const pointPairDistance = new PointPairDistance();
   let minDistance = Number.MAX_VALUE;
   let closestLink: LinkObject;
   let closestLinkCoordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> =
