@@ -1,13 +1,16 @@
-import { ObstacleFeature } from '@functions/typing';
+import { Feature, ObstacleProperties } from '@functions/typing';
 import { Client } from 'pg';
 import execCreated from './execCreated';
 
 export default async function (
-  feature: ObstacleFeature,
+  feature: Feature,
   municipality_code: number,
   dbmodifier: string,
   client: Client
 ) {
+  const obstacleProperties: ObstacleProperties =
+    feature.properties as ObstacleProperties;
+
   const expireQuery = {
     text: `
         UPDATE asset
@@ -15,7 +18,7 @@ export default async function (
         WHERE external_id=($2) AND municipality_code=($3) AND valid_to IS NULL
         RETURNING created_by, created_date
         `,
-    values: [dbmodifier, feature.properties.ID, municipality_code]
+    values: [dbmodifier, obstacleProperties.ID, municipality_code]
   };
   const result = await client.query(expireQuery);
   const createdData = result.rows[0];
@@ -24,7 +27,7 @@ export default async function (
     await execCreated(feature, municipality_code, dbmodifier, client);
     return;
   }
-  const point = `Point(${feature.properties.DR_GEOMETRY.x} ${feature.properties.DR_GEOMETRY.y} 0 0 )`;
+  const point = `Point(${obstacleProperties.DR_GEOMETRY.x} ${obstacleProperties.DR_GEOMETRY.y} 0 0 )`;
   const insertQuery = {
     text: `
         INSERT INTO asset (id, modified_date, geometry, modified_by, asset_type_id, municipality_code, external_id, created_by, created_date) 
@@ -35,7 +38,7 @@ export default async function (
       dbmodifier,
       220,
       municipality_code,
-      feature.properties.ID,
+      obstacleProperties.ID,
       createdData.created_by,
       createdData.created_date
     ]
@@ -47,7 +50,7 @@ export default async function (
         INSERT INTO lrm_position (id, start_measure, link_id)
         VALUES (nextval('LRM_POSITION_PRIMARY_KEY_SEQ'), $1, $2)
         `,
-    values: [feature.properties.DR_M_VALUE, feature.properties.DR_LINK_ID]
+    values: [obstacleProperties.DR_M_VALUE, obstacleProperties.DR_LINK_ID]
   };
   await client.query(lrmPositionQuery);
 
@@ -74,7 +77,7 @@ export default async function (
         INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
         VALUES (currval('PRIMARY_KEY_SEQ'), (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ($3))
     `,
-    values: ['esterakennelma', feature.properties.EST_TYYPPI, dbmodifier]
+    values: ['esterakennelma', obstacleProperties.EST_TYYPPI, dbmodifier]
   };
   await client.query(singleChoiceValueQuery);
   return;

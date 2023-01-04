@@ -2,9 +2,9 @@ import { middyfy } from '@libs/lambda';
 import { SSM } from 'aws-sdk';
 import { Client } from 'pg';
 
-import execCreated from './execCreated';
-import execExpired from './execExpired';
-import execUpdated from './execUpdated';
+import execCreatedObstacle from './execObstacle/execCreated';
+import execExpiredObstacle from './execObstacle/execExpired';
+import execUpdatedObstacle from './execObstacle/execUpdated';
 
 const getParameter = async (name: string): Promise<string> => {
   const ssm = new SSM();
@@ -44,13 +44,43 @@ const execDelta2SQL = async (event) => {
     );
 
     for (const feature of event.Created) {
-      await execCreated(feature, municipality_code, dbmodifier, client);
+      if (feature.properties.type === 'OBSTACLE') {
+        await execCreatedObstacle(
+          feature,
+          municipality_code,
+          dbmodifier,
+          client
+        );
+      }
+      if (feature.properties.type === 'TRAFFICSIGN') {
+        //TODO
+      }
     }
     for (const feature of event.Deleted) {
-      await execExpired(feature, municipality_code, dbmodifier, client);
+      if (feature.properties.type === 'OBSTACLE') {
+        await execExpiredObstacle(
+          feature,
+          municipality_code,
+          dbmodifier,
+          client
+        );
+      }
+      if (feature.properties.type === 'TRAFFICSIGN') {
+        //TODO
+      }
     }
     for (const feature of event.Updated) {
-      await execUpdated(feature, municipality_code, dbmodifier, client);
+      if (feature.properties.type === 'OBSTACLE') {
+        await execUpdatedObstacle(
+          feature,
+          municipality_code,
+          dbmodifier,
+          client
+        );
+      }
+      if (feature.properties.type === 'TRAFFICSIGN') {
+        //TODO
+      }
     }
 
     await client.query('COMMIT');

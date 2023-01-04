@@ -27,11 +27,19 @@ yup.addMethod(yup.array, 'oneOfSchemasArray', function (schemas) {
 
 //NOT ACTUAL!
 const trafficSignPropertiesSchema = yup.object().shape({
+  type: yup
+    .string()
+    .required()
+    .matches(/(TRAFFICSIGN)/),
   ID: yup.string().required(),
   LM_TYYPPI: yup.number().required().oneOf([1, 2, 3, 99])
 });
 
 const obstaclePropertiesSchema = yup.object().shape({
+  type: yup
+    .string()
+    .required()
+    .matches(/(OBSTACLE)/),
   ID: yup.string().required(),
   EST_TYYPPI: yup.number().required().oneOf([1, 2])
 });

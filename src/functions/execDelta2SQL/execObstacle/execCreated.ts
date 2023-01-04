@@ -1,20 +1,23 @@
-import { ObstacleFeature } from '@functions/typing';
+import { Feature, ObstacleProperties } from '@functions/typing';
 import { Client } from 'pg';
 import execUpdated from './execUpdated';
 
 export default async function (
-  feature: ObstacleFeature,
+  feature: Feature,
   municipality_code: number,
   dbmodifier: string,
   client: Client
 ) {
+  const obstacleProperties: ObstacleProperties =
+    feature.properties as ObstacleProperties;
+
   const checkExistingAssetQuery = {
     text: `
       SELECT id
       FROM asset
       WHERE external_id=($1) AND municipality_code=($2) AND valid_to IS NULL
     `,
-    values: [feature.properties.ID, municipality_code]
+    values: [obstacleProperties.ID, municipality_code]
   };
 
   const checkExistingAssetResult = await client.query(checkExistingAssetQuery);
@@ -24,13 +27,13 @@ export default async function (
     return;
   }
 
-  const point = `Point(${feature.properties.DR_GEOMETRY.x} ${feature.properties.DR_GEOMETRY.y} 0 0 )`;
+  const point = `Point(${obstacleProperties.DR_GEOMETRY.x} ${obstacleProperties.DR_GEOMETRY.y} 0 0 )`;
   const assetQuery = {
     text: `
         INSERT INTO asset (id, created_date, geometry, created_by, asset_type_id, municipality_code, external_id) 
         VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ST_GeomFromText(($1),3067), $2, $3, $4, $5);
         `,
-    values: [point, dbmodifier, 220, municipality_code, feature.properties.ID]
+    values: [point, dbmodifier, 220, municipality_code, obstacleProperties.ID]
   };
   await client.query(assetQuery);
 
@@ -39,7 +42,7 @@ export default async function (
         INSERT INTO lrm_position (id, start_measure, link_id)
         VALUES (nextval('LRM_POSITION_PRIMARY_KEY_SEQ'), $1, $2)
         `,
-    values: [feature.properties.DR_M_VALUE, feature.properties.DR_LINK_ID]
+    values: [obstacleProperties.DR_M_VALUE, obstacleProperties.DR_LINK_ID]
   };
   await client.query(lrmPositionQuery);
 
@@ -51,6 +54,7 @@ export default async function (
     values: []
   };
   await client.query(assetLinkQuery);
+
   const singleChoiceValueQuery = {
     text: `
         WITH _property AS (
@@ -66,7 +70,7 @@ export default async function (
         INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
         VALUES (currval('PRIMARY_KEY_SEQ'), (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ($3))
     `,
-    values: ['esterakennelma', feature.properties.EST_TYYPPI, dbmodifier]
+    values: ['esterakennelma', obstacleProperties.EST_TYYPPI, dbmodifier]
   };
   await client.query(singleChoiceValueQuery);
   return;

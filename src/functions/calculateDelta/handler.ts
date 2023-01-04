@@ -97,7 +97,10 @@ const calculateDelta = async (event) => {
     let found = false;
     for (let j = 0; j < referenceFeatures.length; j++) {
       if (
-        updateFeatures[i].properties.ID === referenceFeatures[j].properties.ID
+        updateFeatures[i].properties.ID ===
+          referenceFeatures[j].properties.ID &&
+        updateFeatures[i].properties.type ===
+          referenceFeatures[j].properties.type
       ) {
         if (comparePoints(updateFeatures[i], referenceFeatures[j])) {
           updated.push(updateFeatures[i]);
@@ -114,7 +117,10 @@ const calculateDelta = async (event) => {
     let found = false;
     for (let i = 0; i < updateFeatures.length; i++) {
       if (
-        updateFeatures[i].properties.ID === referenceFeatures[j].properties.ID
+        updateFeatures[i].properties.ID ===
+          referenceFeatures[j].properties.ID &&
+        updateFeatures[i].properties.type ===
+          referenceFeatures[j].properties.type
       ) {
         found = true;
         break;

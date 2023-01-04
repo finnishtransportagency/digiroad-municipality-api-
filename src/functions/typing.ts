@@ -11,7 +11,7 @@ export interface GeoJSON {
 }
 
 export interface Feature {
-  type: string;
+  type?: string;
   properties: ObstacleProperties | TrafficSignProperties;
   geometry: {
     type: string;
@@ -20,9 +20,10 @@ export interface Feature {
 }
 
 export interface ObstacleProperties {
-  ID: number;
+  type: string;
+  ID: string;
   EST_TYYPPI: number;
-  DR_LINK_ID?: number;
+  DR_LINK_ID?: string;
   DR_M_VALUE?: number;
   DR_OFFSET?: number;
   DR_REJECTED?: boolean;
@@ -31,7 +32,8 @@ export interface ObstacleProperties {
 
 //Not actual
 export interface TrafficSignProperties {
-  ID: number;
+  type: string;
+  ID: string;
   LM_TYYPPI: string;
   LM_TEKSTI: string;
   DR_LINK_ID?: number;
