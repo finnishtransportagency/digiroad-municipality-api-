@@ -155,7 +155,7 @@ const serverlessConfiguration: AWS = {
           ServiceToken:
             'arn:aws:sns:eu-west-1:434599271542:Vaylapilvi-Route53-Record',
           Type: 'CNAME',
-          Name: 'drkuntatest',
+          Name: `drkunta${process.env.STAGE_NAME}`,
           Records: [
             {
               'Fn::Join': [
