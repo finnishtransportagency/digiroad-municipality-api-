@@ -34,6 +34,7 @@ export interface ObstacleProperties {
 export interface TrafficSignProperties {
   type: string;
   ID: string;
+  bearing: number;
   LM_TYYPPI: string;
   LM_TEKSTI: string;
   DR_LINK_ID?: number;
