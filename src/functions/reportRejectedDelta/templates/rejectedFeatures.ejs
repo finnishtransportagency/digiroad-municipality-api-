@@ -2,6 +2,18 @@
 <% var updated=Body.Updated.filter( feature=> feature.properties.DR_REJECTED) %>
 <% var totalFailed = created.length  + updated.length %>
 <% var total = Body.Created.length + Body.Updated.length %>
+<h3>Kuntarajapinta raportti (<%= Municipality%>):</h3>
+<% if (recipients.length <= 1) { %>
+<h2> HUOM: Kunnan sähköpostia ei löytynyt. Tämä sähköposti lähetetty vain operaattorin sähköpostiin.</h2>
+<% } %>
+<p>
+  Suurin sallitu etäisyys kunnan tielinkistä: <%=Body.metadata.OFFSET_LIMIT %> meteriä.
+</p>
+<p><%=totalFailed %>/<%=total %> kohdetta hylätty.</p>
+<p>
+  Alla olevan taulukon kohteet hylätty, eikä niitä ole lisätty Digiroadiin.
+</p>
+<p>--------------------------------------------------------------------------------------------</p>
 <h3>Municipality API report for municipality: <%= Municipality%></h3>
 <% if (recipients.length <= 1) { %>
 <h2> NOTE: No email adress found for municipality. This email is only sent to the operator email.</h2>
@@ -19,7 +31,7 @@ width: 100%;">
   <% if(created.length > 0) { %>
   <tr>
     <th colspan=2 style="text-align: center;
-    padding: 8px;">Created</th>
+    padding: 8px;">Lisätyt / Created</th>
   </tr>
   <tr>
     <th style="border: 1px solid #dddddd;
@@ -53,7 +65,7 @@ width: 100%;">
   <% if(updated.length > 0) { %>
   <tr>
     <th colspan=2 style="text-align: center;
-      padding: 8px;">Updated</th>
+      padding: 8px;">Päivitetyt / Updated</th>
   </tr>
   <tr>
     <th style="border: 1px solid #dddddd;
@@ -61,7 +73,7 @@ width: 100%;">
       padding: 8px;width: 50%;">ID</th>
     <th style="border: 1px solid #dddddd;
       text-align: left;
-      padding: 8px;width: 50%;">Offset</th>
+      padding: 8px;width: 50%;">Etäisyys tielinkistä / Offset</th>
   </tr>
   <% updated.forEach(function(feature, index){ %>
   <% if (index % 2 === 0) { %>
@@ -71,7 +83,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} meters` : "Out of range" %> </td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} m` : ">10 m"%> </td>
   </tr>
   <% } else { %>
   <tr style="background-color: #dddddd;">
@@ -80,7 +92,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} meters` : "Out of range" %> </td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} m` : ">10 m"%> </td>
   </tr>
   <% }}) %>
   <% } %>
