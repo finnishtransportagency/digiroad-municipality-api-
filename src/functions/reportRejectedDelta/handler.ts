@@ -64,11 +64,13 @@ const reportRejectedDelta = async (event) => {
   switch (event.ReportType) {
     case 'calculateDelta':
       templateName = 'invalidGeoJSON.ejs';
-      emailSubject = `${subjectHeader}Digiroad kuntarajapinta: talletus hylätty / Digiroad municipality API: upload rejected`;
+      emailSubject = `${subjectHeader} Digiroad kuntarajapinta: talletus hylätty / Digiroad municipality API: upload rejected`;
+      if (process.env.STAGE_NAME === 'dev' || process.env.STAGE_NAME === 'test')
+        recipients.push(process.env.OPERATOR_EMAIL);
       break;
     case 'matchedWithFailures':
       templateName = 'rejectedFeatures.ejs';
-      emailSubject = `${subjectHeader}Digiroad kuntarajapinta: joitain kohteita ei voitu päivittää / Digiroad municipality API: some features could not be updated`;
+      emailSubject = `${subjectHeader} Digiroad kuntarajapinta: joitain kohteita ei voitu päivittää / Digiroad municipality API: some features could not be updated`;
       recipients.push(process.env.OPERATOR_EMAIL);
       break;
     case 'matchedSuccessfully':
