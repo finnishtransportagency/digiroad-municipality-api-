@@ -4,7 +4,7 @@ const propertiesSchema = yup.object().shape({
   TYPE: yup
     .string()
     .required()
-    .matches(/(OBSTACLE)/),
+    .matches(/(^OBSTACLE$)/),
   ID: yup.string().required(),
   EST_TYYPPI: yup.number().required().oneOf([1, 2])
 });
@@ -13,7 +13,7 @@ const geometrySchema = yup.object().shape({
   type: yup
     .string()
     .required()
-    .matches(/(Point)/),
+    .matches(/(^Point$)/),
   coordinates: yup.array().of(yup.number().required()).length(2)
 });
 
@@ -37,7 +37,7 @@ const schema = yup.object().shape({
   type: yup
     .string()
     .required()
-    .matches(/(FeatureCollection)/),
+    .matches(/(^FeatureCollection$)/),
   name: yup.string().notRequired(),
   crs: crsSchema.notRequired(),
   features: yup.array().of(featureSchema)
