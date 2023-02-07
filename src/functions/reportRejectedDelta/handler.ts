@@ -64,7 +64,7 @@ const reportRejectedDelta = async (event) => {
   switch (event.ReportType) {
     case 'calculateDelta':
       templateName = 'invalidGeoJSON.ejs';
-      emailSubject = `${subjectHeader} Digiroad kuntarajapinta: talletus hylätty / Digiroad municipality API: upload rejected`;
+      emailSubject = `${subjectHeader} Digiroad kuntarajapinta: lähetys hylätty / Digiroad municipality API: upload rejected`;
       if (process.env.STAGE_NAME === 'dev' || process.env.STAGE_NAME === 'test')
         recipients.push(process.env.OPERATOR_EMAIL);
       break;
