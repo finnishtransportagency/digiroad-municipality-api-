@@ -1,4 +1,8 @@
 import * as yup from 'yup';
+import {
+  allowedAdditionalSigns,
+  allowedTrafficSigns
+} from './trafficSignTypes';
 
 yup.addMethod(yup.object, 'oneOfSchemas', function (schemas) {
   return this.test(
@@ -25,14 +29,30 @@ yup.addMethod(yup.array, 'oneOfSchemasArray', function (schemas) {
   );
 });
 
-//NOT ACTUAL!
+const additionalSigns = yup.object().shape({
+  LK_TYYPPI: yup.string().required().oneOf(allowedAdditionalSigns),
+  ARVO: yup.number().notRequired(),
+  TEKSTI: yup.string().notRequired(),
+  KOKO: yup.number().oneOf([1, 2, 3]).notRequired(),
+  KALVON_TYYPPI: yup.number().oneOf([1, 2, 3]).notRequired(),
+  VARI: yup.number().oneOf([1, 2]).notRequired()
+});
+
 const trafficSignPropertiesSchema = yup.object().shape({
   type: yup
     .string()
     .required()
     .matches(/(TRAFFICSIGN)/),
   ID: yup.string().required(),
-  LM_TYYPPI: yup.number().required().oneOf([1, 2, 3, 99])
+  SUUNTIMA: yup.number().required().max(360).min(0),
+  LM_TYYPPI: yup.string().required().oneOf(allowedTrafficSigns),
+  ARVO: yup.number().notRequired(),
+  TEKSTI: yup.string().notRequired(),
+  LISATIETO: yup.string().notRequired(),
+  RAKENNE: yup.number().oneOf([1, 2, 3, 4, 5, 6]).notRequired(),
+  KUNTO: yup.number().oneOf([1, 2, 3, 4, 5]).notRequired(),
+  KOKO: yup.number().oneOf([1, 2, 3]).notRequired(),
+  LISAKILVET: yup.array().of(additionalSigns)
 });
 
 const obstaclePropertiesSchema = yup.object().shape({

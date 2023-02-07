@@ -1,7 +1,7 @@
 import { middyfy } from '@libs/lambda';
 import * as aws from 'aws-sdk';
 import { Feature, PayloadFeature } from '@functions/typing';
-import { schema } from './validationSchema';
+import { schema } from './validation/validationSchema';
 import isEqual from 'lodash.isequal';
 
 const calculateDelta = async (event) => {
