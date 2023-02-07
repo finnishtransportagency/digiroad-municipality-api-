@@ -3,7 +3,7 @@
 <% var totalFailed = created.length  + updated.length %>
 <% var total = Body.Created.length + Body.Updated.length %>
 <% var municipalityCapitalized = Municipality.charAt(0).toUpperCase() + Municipality.slice(1)%>
-<h3>Kuntarajapinta-raportti: <%= municipalityCapitalized%>:</h3>
+<h3>Kuntarajapinta-raportti: <%= municipalityCapitalized%></h3>
 <% if (recipients.length <= 1) { %>
 <h6> HUOM: Kunnan sähköpostia ei löytynyt. Tämä sähköposti on lähetetty vain operaattorille.</h6>
 <% } %>
@@ -48,7 +48,7 @@ width: 100%;">
     padding: 8px;width: 50%;">ID</th>
     <th style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;">Offset</th>
+    padding: 8px;width: 50%;">Etäisyys tielinkistä / Offset</th>
   </tr>
   <% created.forEach(function(feature, index){ %>
   <% if (index % 2 === 0) { %>
@@ -58,7 +58,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} meters` : ">20 m" %> </td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} m` : ">20 m" %> </td>
   </tr>
   <% } else { %>
   <tr style="background-color: #dddddd;">
@@ -67,7 +67,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} meters` : ">20 m" %> </td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} m` : ">20 m" %> </td>
   </tr>
   <% }}) %>
   <% } %>
