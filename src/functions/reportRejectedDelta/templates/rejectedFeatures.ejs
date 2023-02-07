@@ -2,24 +2,32 @@
 <% var updated=Body.Updated.filter( feature=> feature.properties.DR_REJECTED) %>
 <% var totalFailed = created.length  + updated.length %>
 <% var total = Body.Created.length + Body.Updated.length %>
-<h3>Kuntarajapinta raportti (<%= Municipality%>):</h3>
+<h3>Kuntarajapinta raportti: (<%= Municipality%>):</h3>
 <% if (recipients.length <= 1) { %>
-<h2> HUOM: Kunnan sähköpostia ei löytynyt. Tämä sähköposti lähetetty vain operaattorin sähköpostiin.</h2>
+<h6> HUOM: Kunnan sähköpostia ei löytynyt. Tämä sähköposti on lähetetty vain operaattorille.</h6>
 <% } %>
 <p>
-  Suurin sallitu etäisyys kunnan tielinkistä: <%=Body.metadata.OFFSET_LIMIT %> meteriä.
+  Suurin sallitu etäisyys tielinkistä: <%=Body.metadata.OFFSET_LIMIT %> meteriä.
+</p>
+<p>
+  Etäisyys tielinkistä >20m tarkoittaa että sopivaa tielinkkiä ei löytynyt 20 metrin säteellä.
+  Valtion tielinkkejä ei oteta huomioon.
 </p>
 <p><%=totalFailed %>/<%=total %> kohdetta hylätty.</p>
 <p>
-  Alla olevan taulukon kohteet hylätty, eikä niitä ole lisätty Digiroadiin.
+  Seuraavat kohteet hylättiin, eikä niitä lisätty Digiroadiin.
 </p>
 <p>--------------------------------------------------------------------------------------------</p>
 <h3>Municipality API report for municipality: <%= Municipality%></h3>
 <% if (recipients.length <= 1) { %>
-<h2> NOTE: No email address found for municipality. This email is only sent to the operator email.</h2>
+<h6> NOTE: No email address found for municipality. This email is only sent to the operator.</h6>
 <% } %>
 <p>
   Maximum allowed offset from the center of the Digiroad Link: <%=Body.metadata.OFFSET_LIMIT %> meters.
+</p>
+<p>
+  Offset >20m means that no applicable roadlink was found in a 20 meter radius.
+  Government managed roadlinks are not taken into account.
 </p>
 <p><%=totalFailed %>/<%=total %> features failed.</p>
 <p>
@@ -49,7 +57,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} meters` : "Out of range" %> </td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} meters` : ">20 m" %> </td>
   </tr>
   <% } else { %>
   <tr style="background-color: #dddddd;">
@@ -58,7 +66,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} meters` : "Out of range" %> </td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} meters` : ">20 m" %> </td>
   </tr>
   <% }}) %>
   <% } %>
@@ -83,7 +91,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} m` : ">10 m"%> </td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} m` : ">20 m"%> </td>
   </tr>
   <% } else { %>
   <tr style="background-color: #dddddd;">
@@ -92,7 +100,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} m` : ">10 m"%> </td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} m` : ">20 m"%> </td>
   </tr>
   <% }}) %>
   <% } %>
