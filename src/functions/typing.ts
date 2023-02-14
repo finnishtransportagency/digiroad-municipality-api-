@@ -20,7 +20,7 @@ export interface Feature {
 }
 
 export interface ObstacleProperties {
-  type: string;
+  TYPE: string;
   ID: string;
   EST_TYYPPI: number;
   DR_LINK_ID?: string;
@@ -30,13 +30,27 @@ export interface ObstacleProperties {
   DR_GEOMETRY?: jsts.org.locationtech.jts.geom.Coordinate;
 }
 
-//Not actual
+export interface additionalPanel {
+  LK_TYYPPI: string;
+  ARVO?: number;
+  TEKSTI?: string;
+  KOKO?: number;
+  KALVON_TYYPPI?: number;
+  VARI?: number;
+}
+
 export interface TrafficSignProperties {
-  type: string;
+  TYPE: string;
   ID: string;
-  bearing: number;
+  SUUNTIMA: number;
   LM_TYYPPI: string;
-  LM_TEKSTI: string;
+  ARVO?: number;
+  TEKSTI?: string;
+  LISATIETO?: string;
+  RAKENNE?: number;
+  KUNTO?: number;
+  KOKO?: number;
+  LISAKILVET?: Array<additionalPanel>;
   DR_LINK_ID?: number;
   DR_M_VALUE?: number;
   DR_OFFSET?: number;
@@ -56,6 +70,7 @@ export interface PayloadFeature {
 
 export interface FeatureRoadlinkMap {
   id: string;
+  type: string;
   roadlinks: Array<LinkObject>;
 }
 

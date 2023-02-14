@@ -13,11 +13,11 @@ const getParameter = async (name: string): Promise<string> => {
 
 const gerNearbyLinks = async (event) => {
   const client = new Client({
-    host: process.env.PGHOST,
-    port: parseInt(process.env.PGPORT),
-    database: process.env.PGDATABASE,
-    user: process.env.PGUSER,
-    password: await getParameter(process.env.PGPASSWORD_SSM_KEY)
+    host: 'localhost',
+    port: 5432,
+    database: 'digiroad2',
+    user: 'digiroad2',
+    password: 'digiroad2'
   });
   await client.connect();
 
@@ -33,10 +33,10 @@ const gerNearbyLinks = async (event) => {
       WHERE kgv_roadlink.municipalitycode = municipality_.id AND (kgv_roadlink.adminclass IN (2,3) OR kgv_roadlink.adminclass IS NULL)
     )
     
-    SELECT (value#>'{properties}'->>'ID')::TEXT AS ID, json_agg((st_astext(shape),linkid)) AS roadlinks
+    SELECT (value#>'{properties}'->>'ID')::TEXT AS ID, (value#>'{properties}'->>'TYPE')::TEXT AS TYPE, json_agg((st_astext(shape),linkid)) AS roadlinks
     FROM json_array_elements($2) AS features, acceptable_roadlinks
     WHERE ST_BUFFER(ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067), 10) && acceptable_roadlinks.shape 
-    GROUP BY ID
+    GROUP BY ID,TYPE
     `,
     values: [event.municipality, JSON.stringify(event.features)]
   };
@@ -56,6 +56,7 @@ const gerNearbyLinks = async (event) => {
         });
       });
       client.end();
+      console.log(res.rows);
       return res.rows;
     })
     .catch((error) => {

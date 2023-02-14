@@ -5,8 +5,13 @@ import { schema } from './validation/validationSchema';
 import isEqual from 'lodash.isequal';
 
 const calculateDelta = async (event) => {
-  const s3 = new aws.S3();
-  const lambda = new aws.Lambda();
+  const s3 = new aws.S3({
+    s3ForcePathStyle: true,
+    accessKeyId: 'S3RVER', // This specific key is required when working offline
+    secretAccessKey: 'S3RVER',
+    endpoint: new aws.Endpoint('http://localhost:4569')
+  });
+  const lambda = new aws.Lambda({ endpoint: 'http://localhost:3002' });
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
 
   const municipality: string = key.split('/')[1];
@@ -99,8 +104,8 @@ const calculateDelta = async (event) => {
       if (
         updateFeatures[i].properties.ID ===
           referenceFeatures[j].properties.ID &&
-        updateFeatures[i].properties.type ===
-          referenceFeatures[j].properties.type
+        updateFeatures[i].properties.TYPE ===
+          referenceFeatures[j].properties.TYPE
       ) {
         if (comparePoints(updateFeatures[i], referenceFeatures[j])) {
           updated.push(updateFeatures[i]);
@@ -119,8 +124,8 @@ const calculateDelta = async (event) => {
       if (
         updateFeatures[i].properties.ID ===
           referenceFeatures[j].properties.ID &&
-        updateFeatures[i].properties.type ===
-          referenceFeatures[j].properties.type
+        updateFeatures[i].properties.TYPE ===
+          referenceFeatures[j].properties.TYPE
       ) {
         found = true;
         break;
@@ -130,9 +135,9 @@ const calculateDelta = async (event) => {
       deleted.push(referenceFeatures[j]);
     }
   }
-  console.log(`Created: ${JSON.stringify(created)}`);
-  console.log(`Deleted: ${JSON.stringify(deleted)}`);
-  console.log(`Updated: ${JSON.stringify(updated)}`);
+  console.log(`Created: ${JSON.stringify(created.length)}`);
+  console.log(`Deleted: ${JSON.stringify(deleted.length)}`);
+  console.log(`Updated: ${JSON.stringify(updated.length)}`);
 
   const payLoad: PayloadFeature = {
     Created: created,

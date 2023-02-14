@@ -2,7 +2,12 @@ import { middyfy } from '@libs/lambda';
 import * as aws from 'aws-sdk';
 
 const storeMunicipalityData = async (event) => {
-  const s3 = new aws.S3();
+  const s3 = new aws.S3({
+    s3ForcePathStyle: true,
+    accessKeyId: 'S3RVER', // This specific key is required when working offline
+    secretAccessKey: 'S3RVER',
+    endpoint: new aws.Endpoint('http://localhost:4569')
+  });
   const now = new Date().toISOString().slice(0, 19);
   const municipality = event.headers.municipality;
   if (!municipality) {

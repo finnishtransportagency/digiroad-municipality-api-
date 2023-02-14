@@ -1,36 +1,25 @@
 import * as yup from 'yup';
 import {
-  allowedAdditionalSigns,
+  allowedAdditionalPanel,
   allowedTrafficSigns
-} from './trafficSignTypes';
+} from './trafficSignTypes.js';
 
-yup.addMethod(yup.object, 'oneOfSchemas', function (schemas) {
-  return this.test(
-    'one-of-schemas',
-    'Feature does not match one of the allowed schemas',
-    (item) => {
-      return schemas.some((schema) =>
-        schema.isValidSync(item, { strict: true })
-      );
-    }
+const trafficSignOrObstacle = yup.lazy((item) => {
+  if (trafficSignPropertiesSchema.isValidSync(item)) {
+    return trafficSignPropertiesSchema;
+  }
+  if (obstaclePropertiesSchema.isValidSync(item)) {
+    return obstaclePropertiesSchema;
+  }
+  return yup.mixed().test(
+    'Properties error',
+    (d) => `Properties mismatch: ${d.path}`,
+    () => false
   );
 });
 
-yup.addMethod(yup.array, 'oneOfSchemasArray', function (schemas) {
-  return this.test(
-    'one-of-schemas',
-    'Not all features match one of the allowed schemas',
-    (items) =>
-      items.every((item) => {
-        return schemas.some((schema) =>
-          schema.isValidSync(item, { strict: true })
-        );
-      })
-  );
-});
-
-const additionalSigns = yup.object().shape({
-  LK_TYYPPI: yup.string().required().oneOf(allowedAdditionalSigns),
+const additionalPanel = yup.object().shape({
+  LK_TYYPPI: yup.string().required().oneOf(allowedAdditionalPanel),
   ARVO: yup.number().notRequired(),
   TEKSTI: yup.string().notRequired(),
   KOKO: yup.number().oneOf([1, 2, 3]).notRequired(),
@@ -39,10 +28,10 @@ const additionalSigns = yup.object().shape({
 });
 
 const trafficSignPropertiesSchema = yup.object().shape({
-  type: yup
+  TYPE: yup
     .string()
     .required()
-    .matches(/(TRAFFICSIGN)/),
+    .matches(/(^TRAFFICSIGN$)/),
   ID: yup.string().required(),
   SUUNTIMA: yup.number().required().max(360).min(0),
   LM_TYYPPI: yup.string().required().oneOf(allowedTrafficSigns),
@@ -52,14 +41,14 @@ const trafficSignPropertiesSchema = yup.object().shape({
   RAKENNE: yup.number().oneOf([1, 2, 3, 4, 5, 6]).notRequired(),
   KUNTO: yup.number().oneOf([1, 2, 3, 4, 5]).notRequired(),
   KOKO: yup.number().oneOf([1, 2, 3]).notRequired(),
-  LISAKILVET: yup.array().of(additionalSigns)
+  LISAKILVET: yup.array().of(additionalPanel).notRequired().max(3)
 });
 
 const obstaclePropertiesSchema = yup.object().shape({
-  type: yup
+  TYPE: yup
     .string()
     .required()
-    .matches(/(OBSTACLE)/),
+    .matches(/(^OBSTACLE$)/),
   ID: yup.string().required(),
   EST_TYYPPI: yup.number().required().oneOf([1, 2])
 });
@@ -68,16 +57,13 @@ const pointGeometrySchema = yup.object().shape({
   type: yup
     .string()
     .required()
-    .matches(/(Point)/),
+    .matches(/(^Point$)/),
   coordinates: yup.array().of(yup.number().required()).length(2)
 });
 
 const pointFeatureSchema = yup.object().shape({
   type: yup.string().required(),
-  properties: yup
-    .object()
-    .oneOfSchemas([obstaclePropertiesSchema, trafficSignPropertiesSchema])
-    .required(),
+  properties: trafficSignOrObstacle,
   geometry: pointGeometrySchema.required()
 });
 
@@ -95,7 +81,7 @@ const schema = yup.object().shape({
   type: yup.string().required(),
   name: yup.string().notRequired(),
   crs: crsSchema.notRequired(),
-  features: yup.array().oneOfSchemasArray([pointFeatureSchema])
+  features: yup.array().of(pointFeatureSchema).required()
 });
 
 export { schema, obstaclePropertiesSchema };

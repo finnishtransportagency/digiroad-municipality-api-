@@ -21,7 +21,7 @@ export default function (
     feature.geometry.coordinates[0],
     feature.geometry.coordinates[1]
   );
-  const bearing = trafficSignProperties.bearing;
+  const bearing = trafficSignProperties.SUUNTIMA;
   const MAX_ANGLE_OFFSET = 25;
 
   const pointPairDistance = new PointPairDistance();

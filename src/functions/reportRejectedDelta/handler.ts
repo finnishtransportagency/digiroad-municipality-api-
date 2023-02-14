@@ -14,7 +14,13 @@ const getParameter = async (name: string): Promise<string> => {
 };
 
 const reportRejectedDelta = async (event) => {
-  const s3 = new aws.S3();
+  return;
+  const s3 = new aws.S3({
+    s3ForcePathStyle: true,
+    accessKeyId: 'S3RVER', // This specific key is required when working offline
+    secretAccessKey: 'S3RVER',
+    endpoint: new aws.Endpoint('http://localhost:4569')
+  });
   const now = new Date().toISOString().slice(0, 19);
   const municipality = event.Municipality;
   const params = {
@@ -36,7 +42,7 @@ const reportRejectedDelta = async (event) => {
   let templateName: string;
   let emailSubject: string;
 
-  const lambda = new aws.Lambda();
+  const lambda = new aws.Lambda({ endpoint: 'http://localhost:3002' });
 
   const fetchEmailRecipientParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-fetchEmailRecipient`,

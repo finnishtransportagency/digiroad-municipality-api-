@@ -15,6 +15,7 @@ const getParameter = async (name: string): Promise<string> => {
 };
 
 const execDelta2SQL = async (event) => {
+  return;
   const client = new Client({
     host: process.env.PGHOST,
     port: parseInt(process.env.PGPORT),

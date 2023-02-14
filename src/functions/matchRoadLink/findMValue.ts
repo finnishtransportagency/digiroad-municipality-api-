@@ -24,17 +24,18 @@ export default function (
   ) {
     return 180 + Math.atan2(start.x - end.x, start.y - end.y) * (180 / Math.PI);
   }
-
   let mValue = 0;
   for (let i = 0; i < linkCoordinates.length - 1; i++) {
     const startPoint = linkCoordinates[i];
     const endPoint = linkCoordinates[i + 1];
     const lineOnLink = geomFactory.createLineString([startPoint, endPoint]);
+    pointPairDistance.initialize();
     DistanceToPoint.computeDistance(
       lineOnLink,
       featureCoordinates,
       pointPairDistance
     );
+
     if (pointPairDistance.getDistance() !== distanceToFeature) {
       mValue += lineOnLink.getLength();
       continue;
@@ -60,12 +61,13 @@ export default function (
       The reason why M-value is calculated like this is to match the geometry-calculations that are done in Digiroad
       to reduce unneccesary copies of assets in the database. 
       */
+
     result.DR_M_VALUE = mValue + distance3D;
     result.DR_OFFSET = distanceToFeature;
     result.DR_REJECTED =
-      feature.properties.type === 'OBSTACLE'
+      feature.properties.TYPE === 'OBSTACLE'
         ? distanceToFeature >= MAX_OFFSET
-        : false;
+        : distanceToFeature >= 10;
     result.DR_GEOMETRY = closestPointOnLink;
     return result;
   }

@@ -69,7 +69,7 @@ export const allowedTrafficSigns = [
   'I9'
 ];
 
-export const allowedAdditionalSigns = [
+export const allowedAdditionalPanel = [
   'H1',
   'H2.1',
   'H2.2',
