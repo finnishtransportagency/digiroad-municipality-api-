@@ -3,10 +3,10 @@ import Coordinate from 'jsts/org/locationtech/jts/geom/Coordinate';
 import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
 import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance';
 
-import { ObstacleFeature, LinkObject } from '@functions/typing';
+import { Feature, LinkObject } from '@functions/typing';
 export default function (
   roadLinks: Array<LinkObject>,
-  obstacle: ObstacleFeature,
+  feature: Feature,
   geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory,
   MAX_OFFSET: number
 ) {
@@ -17,9 +17,9 @@ export default function (
     [];
   let closestPointOnLink: jsts.org.locationtech.jts.geom.Coordinate;
 
-  const obstacleCoordinates = new Coordinate(
-    obstacle.geometry.coordinates[0],
-    obstacle.geometry.coordinates[1]
+  const featureCoordinates = new Coordinate(
+    feature.geometry.coordinates[0],
+    feature.geometry.coordinates[1]
   );
 
   for (let i = 0; i < roadLinks.length; i++) {
@@ -33,7 +33,7 @@ export default function (
     const lineString = geomFactory.createLineString(coordinates);
     DistanceToPoint.computeDistance(
       lineString,
-      obstacleCoordinates,
+      featureCoordinates,
       pointPairDistance
     );
     const distance = pointPairDistance.getDistance();
@@ -46,11 +46,12 @@ export default function (
   }
   pointPairDistance.initialize();
   return findMValue(
+    feature,
     closestLinkCoordinates,
     closestLink,
     minDistance,
     closestPointOnLink,
-    obstacleCoordinates,
+    featureCoordinates,
     pointPairDistance,
     geomFactory,
     MAX_OFFSET

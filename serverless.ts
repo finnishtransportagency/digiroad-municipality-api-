@@ -13,7 +13,7 @@ import {
 const serverlessConfiguration: AWS = {
   service: 'DRKunta',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild', 'serverless-offline'],
+  plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-s3-local'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
