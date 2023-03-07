@@ -1,4 +1,4 @@
-export interface ObstacleGeoJSON {
+export interface GeoJSON {
   type: string;
   name?: string;
   crs?: {
@@ -7,38 +7,70 @@ export interface ObstacleGeoJSON {
       name?: string;
     };
   };
-  features: Array<ObstacleFeature>;
+  features: Array<Feature>;
 }
 
-export interface ObstacleFeature {
-  type: string;
-  properties: {
-    ID: string;
-    EST_TYYPPI: number;
-    DR_LINK_ID?: string;
-    DR_M_VALUE?: number;
-    DR_OFFSET?: number;
-    DR_REJECTED?: boolean;
-    DR_GEOMETRY?: jsts.org.locationtech.jts.geom.Coordinate;
-  };
+export interface Feature {
+  type?: string;
+  properties: ObstacleProperties | TrafficSignProperties;
   geometry: {
     type: string;
     coordinates: Array<number>;
   };
 }
 
+export interface ObstacleProperties {
+  TYPE: string;
+  ID: string;
+  EST_TYYPPI: number;
+  DR_LINK_ID?: string;
+  DR_M_VALUE?: number;
+  DR_OFFSET?: number;
+  DR_REJECTED?: boolean;
+  DR_GEOMETRY?: jsts.org.locationtech.jts.geom.Coordinate;
+}
+
+export interface additionalPanel {
+  LK_TYYPPI: string;
+  ARVO?: number;
+  TEKSTI?: string;
+  KOKO?: number;
+  KALVON_TYYPPI?: number;
+  VARI?: number;
+}
+
+export interface TrafficSignProperties {
+  TYPE: string;
+  ID: string;
+  SUUNTIMA: number;
+  LM_TYYPPI: string;
+  ARVO?: number;
+  TEKSTI?: string;
+  LISATIETO?: string;
+  RAKENNE?: number;
+  KUNTO?: number;
+  KOKO?: number;
+  LISAKILVET?: Array<additionalPanel>;
+  DR_LINK_ID?: number;
+  DR_M_VALUE?: number;
+  DR_OFFSET?: number;
+  DR_REJECTED?: boolean;
+  DR_GEOMETRY?: jsts.org.locationtech.jts.geom.Coordinate;
+}
+
 export interface PayloadFeature {
-  Created: Array<ObstacleFeature>;
-  Deleted: Array<ObstacleFeature>;
-  Updated: Array<ObstacleFeature>;
+  Created: Array<Feature>;
+  Deleted: Array<Feature>;
+  Updated: Array<Feature>;
   metadata?: {
     OFFSET_LIMIT?: number;
     municipality: string;
   };
 }
 
-export interface ObstacleRoadLinkMap {
+export interface FeatureRoadlinkMap {
   id: string;
+  type: string;
   roadlinks: Array<LinkObject>;
 }
 

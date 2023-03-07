@@ -1,20 +1,5 @@
-<% var municipalityCapitalized = Municipality.charAt(0).toUpperCase() + Municipality.slice(1)%>
-<h3>Kuntarajapinta-raportti: <%= municipalityCapitalized%></h3>
+<h3>Municipality API report</h3>
 <p>
-  Lähetetty GeoJSON hylättiin, mitään muutoksia ei tehty.
+  The uploaded GeoJSON has been rejected and thus no changes have been made:
 </p>
-<p>
-  Tarkista GeoJSON tiedoston syntaksi sekä arvot.
-</p>
-<h5>Virheviesti: </h5>
-<p><%= Body.Message %></p>
-<p>--------------------------------------------------------------------------</p>
-<h3>Municipality API report: <%= municipalityCapitalized%></h3>
-<p>
-  The uploaded GeoJSON has been rejected and thus no changes have been made.
-</p>
-<p>
-  Check the values and syntax of the GeoJSON file.
-</p>
-<h5>Error message: </h5>
 <p><%= Body.Message %></p>

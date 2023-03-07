@@ -2,33 +2,12 @@
 <% var updated=Body.Updated.filter( feature=> feature.properties.DR_REJECTED) %>
 <% var totalFailed = created.length  + updated.length %>
 <% var total = Body.Created.length + Body.Updated.length %>
-<% var municipalityCapitalized = Municipality.charAt(0).toUpperCase() + Municipality.slice(1)%>
-<h3>Kuntarajapinta-raportti: <%= municipalityCapitalized%></h3>
+<h3>Municipality API report for municipality: <%= Municipality%></h3>
 <% if (recipients.length <= 1) { %>
-<h6> HUOM: Kunnan sähköpostia ei löytynyt. Tämä sähköposti on lähetetty vain operaattorille.</h6>
-<% } %>
-<p>
-  Suurin sallittu etäisyys tielinkistä: <%=Body.metadata.OFFSET_LIMIT %> metriä.
-</p>
-<p>
-  Etäisyys tielinkistä >20m tarkoittaa että sopivaa tielinkkiä ei löytynyt ~20 metrin säteellä.
-  Valtion hallinnoimia tielinkkejä ei oteta huomioon.
-</p>
-<p><%=totalFailed %>/<%=total %> kohdetta hylätty.</p>
-<p>
-  Seuraavat kohteet hylättiin, eikä niitä lisätty Digiroadiin:
-</p>
-<p>--------------------------------------------------------------------------------------------</p>
-<h3>Municipality API report for municipality: <%= municipalityCapitalized%></h3>
-<% if (recipients.length <= 1) { %>
-<h6> NOTE: No email address found for municipality. This email is only sent to the operator.</h6>
+<h2> NOTE: No email adress found for municipality. This email is only sent to the operator email.</h2>
 <% } %>
 <p>
   Maximum allowed offset from the center of the Digiroad Link: <%=Body.metadata.OFFSET_LIMIT %> meters.
-</p>
-<p>
-  Offset >20m means that no applicable roadlink was found in a ~20 meter radius.
-  Government managed roadlinks are not taken into account.
 </p>
 <p><%=totalFailed %>/<%=total %> features failed.</p>
 <p>
@@ -40,7 +19,7 @@ width: 100%;">
   <% if(created.length > 0) { %>
   <tr>
     <th colspan=2 style="text-align: center;
-    padding: 8px;">Lisätyt / Created</th>
+    padding: 8px;">Created</th>
   </tr>
   <tr>
     <th style="border: 1px solid #dddddd;
@@ -48,7 +27,7 @@ width: 100%;">
     padding: 8px;width: 50%;">ID</th>
     <th style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;">Etäisyys tielinkistä / Offset</th>
+    padding: 8px;width: 50%;">Offset</th>
   </tr>
   <% created.forEach(function(feature, index){ %>
   <% if (index % 2 === 0) { %>
@@ -58,7 +37,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} m` : ">20 m" %> </td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} meters` : "Out of range" %> </td>
   </tr>
   <% } else { %>
   <tr style="background-color: #dddddd;">
@@ -67,14 +46,14 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} m` : ">20 m" %> </td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} meters` : "Out of range" %> </td>
   </tr>
   <% }}) %>
   <% } %>
   <% if(updated.length > 0) { %>
   <tr>
     <th colspan=2 style="text-align: center;
-      padding: 8px;">Päivitetyt / Updated</th>
+      padding: 8px;">Updated</th>
   </tr>
   <tr>
     <th style="border: 1px solid #dddddd;
@@ -82,7 +61,7 @@ width: 100%;">
       padding: 8px;width: 50%;">ID</th>
     <th style="border: 1px solid #dddddd;
       text-align: left;
-      padding: 8px;width: 50%;">Etäisyys tielinkistä / Offset</th>
+      padding: 8px;width: 50%;">Offset</th>
   </tr>
   <% updated.forEach(function(feature, index){ %>
   <% if (index % 2 === 0) { %>
@@ -92,7 +71,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} m` : ">20 m"%> </td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} meters` : "Out of range" %> </td>
   </tr>
   <% } else { %>
   <tr style="background-color: #dddddd;">
@@ -101,7 +80,7 @@ width: 100%;">
     padding: 8px;width: 50%;"><%=feature.properties.ID %></td>
     <td style="border: 1px solid #dddddd;
     text-align: left;
-    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} m` : ">20 m"%> </td>
+    padding: 8px;width: 50%;"><%= feature.properties.DR_OFFSET ? `${feature.properties.DR_OFFSET.toFixed(2)} meters` : "Out of range" %> </td>
   </tr>
   <% }}) %>
   <% } %>
