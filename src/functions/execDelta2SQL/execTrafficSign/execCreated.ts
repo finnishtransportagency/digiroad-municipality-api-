@@ -11,13 +11,13 @@ export default async function (
   const trafficSignProperties: TrafficSignProperties =
     feature.properties as TrafficSignProperties;
 
-  const assetTypeID = 220;
+  const assetTypeID = 300;
 
   const checkExistingAssetQuery = {
     text: `
       SELECT id
       FROM asset
-      WHERE external_id=($1) AND municipality_code=($2) AND asset_type_id=($3) AND valid_to IS NULL
+      WHERE external_id=($1) AND municipality_code=($2) AND asset_type_id=$3 AND valid_to IS NULL
     `,
     values: [trafficSignProperties.ID, municipality_code, assetTypeID]
   };
@@ -32,18 +32,21 @@ export default async function (
   const point = `Point(${trafficSignProperties.DR_GEOMETRY.x} ${trafficSignProperties.DR_GEOMETRY.y} 0 0 )`;
   const assetQuery = {
     text: `
-        INSERT INTO asset (id, created_date, geometry, created_by, asset_type_id, municipality_code, external_id) 
-        VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ST_GeomFromText(($1),3067), $2, $3, $4, $5);
+        INSERT INTO asset (id, created_date, geometry, created_by, bearing, asset_type_id, municipality_code, external_id) 
+        VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ST_GeomFromText(($1),3067), $2, $3, $4, $5, $6)
+        RETURNING id
         `,
     values: [
       point,
       dbmodifier,
+      trafficSignProperties.SUUNTIMA,
       assetTypeID,
       municipality_code,
       trafficSignProperties.ID
     ]
   };
-  await client.query(assetQuery);
+  const result = await client.query(assetQuery);
+  const assetID = result.rows[0].id;
 
   const lrmPositionQuery = {
     text: `
@@ -63,76 +66,161 @@ export default async function (
   };
   await client.query(assetLinkQuery);
 
-  const singleChoiceValueQuery = {
-    text: `
-        WITH _property AS (
-          SELECT id
-          FROM property 
-          WHERE public_id=($1)
-        ), _enumerated_value AS (
-          SELECT enumerated_value.id
-          FROM enumerated_value, _property
-          WHERE property_id = _property.id AND value=($2)
-        )
-
-        INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
-        VALUES (currval('PRIMARY_KEY_SEQ'), (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ($3))
-    `,
-    values: ['esterakennelma', trafficSignProperties.LM_TYYPPI, dbmodifier]
-  };
-  await client.query(singleChoiceValueQuery);
-
   const valueQuery = {
+    text: `
+      WITH _property AS (
+        SELECT id
+        FROM property 
+        WHERE public_id=($1)
+      )
+      
+      INSERT INTO text_property_value (id, asset_id, property_id, value_fi, created_date, created_by)
+      VALUES (nextval('PRIMARY_KEY_SEQ'),$2, (SELECT id FROM _property), $3 ,CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', $4)
+    `,
+    values: [
+      'trafficSigns_value',
+      assetID,
+      trafficSignProperties.ARVO,
+      dbmodifier
+    ]
+  };
+
+  await client.query(valueQuery);
+
+  async function numberQuery(publicId: string, value: number) {
+    const query = {
+      text: `
+      WITH _property AS (
+        SELECT id
+        FROM property 
+        WHERE public_id=($1)
+        )
+        
+        INSERT INTO number_property_value (id, asset_id, property_id, value)
+        VALUES (nextval('PRIMARY_KEY_SEQ'),$2, (SELECT id FROM _property), $3)
+        `,
+      values: [publicId, assetID, value]
+    };
+
+    await client.query(query);
+  }
+
+  await numberQuery('terrain_coordinates_x', feature.geometry.coordinates[0]);
+
+  await numberQuery('terrain_coordinates_y', feature.geometry.coordinates[1]);
+
+  const typeRegex = `^${trafficSignProperties.LM_TYYPPI} .*$`;
+
+  const typeQuery = {
     text: `
     WITH _property AS (
       SELECT id
       FROM property 
       WHERE public_id=($1)
-    )
-
-    INSERT INTO text_property_value (id, asset_id, property_id, value_fi, created_date, created_by,grouped_id)
-    VALUES (nextval('PRIMARY_KEY_SEQ'),currval('PRIMARY_KEY_SEQ), (SELECT id FROM _property), ($2) ,CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ($3))
+      ), _enumerated_value AS (
+        SELECT enumerated_value.id
+        FROM enumerated_value, _property
+      WHERE property_id = _property.id AND name_fi ~ ($2)
+      )
+      
+    INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
+        VALUES ($3, (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', $4)
     `,
-    values: ['trafficSigns_value', trafficSignProperties.ARVO, dbmodifier]
+    values: ['trafficSigns_type', typeRegex, assetID, dbmodifier]
   };
 
-  await client.query(valueQuery);
+  await client.query(typeQuery);
 
-  //terrainX
+  async function textQuery(publicId: string, value: string) {
+    if (!value) return;
+    console.log(publicId);
+    const query = {
+      text: `
+      WITH _property AS (
+        SELECT id
+        FROM property 
+        WHERE public_id=($1)
+      )
+      
+      INSERT INTO text_property_value (id, asset_id, property_id, value_fi, created_date, created_by)
+      VALUES (nextval('PRIMARY_KEY_SEQ'),$2, (SELECT id FROM _property), $3 ,CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', $4)
+        `,
+      values: [publicId, assetID, value, dbmodifier]
+    };
 
-  //terrainY
-
-  //type
-
-  if (trafficSignProperties.TEKSTI) {
-    return;
-  } // no else
-
-  if (trafficSignProperties.LISATIETO) {
-    return;
-  } // no else
-
-  if (trafficSignProperties.RAKENNE) {
-    return;
-  } else {
-    //enum value
+    await client.query(query);
   }
 
-  if (trafficSignProperties.KUNTO) {
-    return;
-  } else {
-    //enum value
+  await textQuery('main_sign_text', trafficSignProperties.TEKSTI);
+
+  await textQuery('trafficSigns_info', trafficSignProperties.LISATIETO);
+
+  async function singleChoiseQuery(publicId: string, value: number) {
+    const enumeratedValue = value ? value : 99;
+
+    const query = {
+      text: `
+        WITH _property AS (
+          SELECT id
+          FROM property 
+          WHERE public_id=($1)
+          ), _enumerated_value AS (
+            SELECT enumerated_value.id
+            FROM enumerated_value, _property
+            WHERE property_id = _property.id AND value=($2)
+            )
+            
+            INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
+            VALUES ($3, (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', $4)
+            `,
+      values: [publicId, enumeratedValue, assetID, dbmodifier]
+    };
+
+    await client.query(query);
   }
 
-  if (trafficSignProperties.KOKO) {
-    return;
-  } else {
-    //enum value
-  }
+  await singleChoiseQuery('structure', trafficSignProperties.RAKENNE);
 
-  for (const i in trafficSignProperties.LISAKILVET) {
-    return;
-  }
+  await singleChoiseQuery('condition', trafficSignProperties.KUNTO);
+
+  await singleChoiseQuery('size', trafficSignProperties.KOKO);
+
+  trafficSignProperties.LISAKILVET.forEach((panel, index) => {
+    const panelTypeRegex = `^${panel.LK_TYYPPI} .*$`;
+    const additionalPanelQuery = {
+      text: `
+    WITH ap_property AS (
+      SELECT id
+      FROM property 
+      WHERE public_id=($1)
+    ), _property AS (
+      SELECT id
+      FROM property 
+      WHERE public_id=($2)
+    ), _enumerated_value AS (
+      SELECT enumerated_value.value
+      FROM enumerated_value, _property
+      WHERE property_id = _property.id AND name_fi ~ ($3)
+    )
+
+    INSERT INTO additional_panel (asset_id, id, property_id, additional_sign_type, additional_sign_value, form_position, additional_sign_text, additional_sign_size, additional_sign_coating_type, additional_sign_panel_color)
+    VALUES ($4, nextval('PRIMARY_KEY_SEQ'), (SELECT id FROM ap_property), (SELECT value FROM _enumerated_value), $5,$6,$7,$8,$9, $10)
+    `,
+      values: [
+        'additional_panel',
+        'trafficSigns_type',
+        panelTypeRegex,
+        assetID,
+        panel.ARVO,
+        index + 1,
+        panel.TEKSTI,
+        panel.KOKO,
+        panel.KALVON_TYYPPI,
+        panel.VARI
+      ]
+    };
+    client.query(additionalPanelQuery);
+  });
 
   return;
 }

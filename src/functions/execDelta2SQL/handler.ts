@@ -6,6 +6,10 @@ import execCreatedObstacle from './execObstacle/execCreated';
 import execExpiredObstacle from './execObstacle/execExpired';
 import execUpdatedObstacle from './execObstacle/execUpdated';
 
+import execCreatedTrafficSign from './execTrafficSign/execCreated';
+import execUpdatedTrafficSign from './execTrafficSign/execUpdated';
+import execExpiredTrafficSign from './execTrafficSign/execExpired';
+
 const getParameter = async (name: string): Promise<string> => {
   const ssm = new SSM();
   const result = await ssm
@@ -15,15 +19,14 @@ const getParameter = async (name: string): Promise<string> => {
 };
 
 const execDelta2SQL = async (event) => {
-  return;
   const client = new Client({
-    host: process.env.PGHOST,
-    port: parseInt(process.env.PGPORT),
-    database: process.env.PGDATABASE,
-    user: process.env.PGUSER,
-    password: await getParameter(process.env.PGPASSWORD_SSM_KEY)
+    host: 'localhost',
+    port: 5432,
+    database: 'digiroad2',
+    user: 'digiroad2',
+    password: 'digiroad2'
   });
-  client.connect();
+  await client.connect();
 
   const municipality: string = event.metadata.municipality;
 
@@ -45,7 +48,8 @@ const execDelta2SQL = async (event) => {
     );
 
     for (const feature of event.Created) {
-      if (feature.properties.type === 'OBSTACLE') {
+      console.log(feature);
+      if (feature.properties.TYPE === 'OBSTACLE') {
         await execCreatedObstacle(
           feature,
           municipality_code,
@@ -53,12 +57,17 @@ const execDelta2SQL = async (event) => {
           client
         );
       }
-      if (feature.properties.type === 'TRAFFICSIGN') {
-        //TODO
+      if (feature.properties.TYPE === 'TRAFFICSIGN') {
+        await execCreatedTrafficSign(
+          feature,
+          municipality_code,
+          dbmodifier,
+          client
+        );
       }
     }
     for (const feature of event.Deleted) {
-      if (feature.properties.type === 'OBSTACLE') {
+      if (feature.properties.TYPE === 'OBSTACLE') {
         await execExpiredObstacle(
           feature,
           municipality_code,
@@ -66,12 +75,17 @@ const execDelta2SQL = async (event) => {
           client
         );
       }
-      if (feature.properties.type === 'TRAFFICSIGN') {
-        //TODO
+      if (feature.properties.TYPE === 'TRAFFICSIGN') {
+        await execExpiredTrafficSign(
+          feature,
+          municipality_code,
+          dbmodifier,
+          client
+        );
       }
     }
     for (const feature of event.Updated) {
-      if (feature.properties.type === 'OBSTACLE') {
+      if (feature.properties.TYPE === 'OBSTACLE') {
         await execUpdatedObstacle(
           feature,
           municipality_code,
@@ -79,8 +93,13 @@ const execDelta2SQL = async (event) => {
           client
         );
       }
-      if (feature.properties.type === 'TRAFFICSIGN') {
-        //TODO
+      if (feature.properties.TYPE === 'TRAFFICSIGN') {
+        await execUpdatedTrafficSign(
+          feature,
+          municipality_code,
+          dbmodifier,
+          client
+        );
       }
     }
 
