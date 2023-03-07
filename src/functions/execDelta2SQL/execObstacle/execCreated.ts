@@ -1,53 +1,56 @@
-import { ObstacleFeature } from '@functions/typing';
+import { Feature, ObstacleProperties } from '@functions/typing';
 import { Client } from 'pg';
-import execCreated from './execCreated';
+import execUpdated from './execUpdated';
 
 export default async function (
-  feature: ObstacleFeature,
+  feature: Feature,
   municipality_code: number,
   dbmodifier: string,
   client: Client
 ) {
-  const expireQuery = {
-    text: `
-        UPDATE asset
-        SET VALID_TO=CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', MODIFIED_BY=($1),modified_date=CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki'
-        WHERE external_id=($2) AND municipality_code=($3) AND valid_to IS NULL
-        RETURNING created_by, created_date
-        `,
-    values: [dbmodifier, feature.properties.ID, municipality_code]
-  };
-  const result = await client.query(expireQuery);
-  const createdData = result.rows[0];
+  const obstacleProperties: ObstacleProperties =
+    feature.properties as ObstacleProperties;
 
-  if (!createdData) {
-    await execCreated(feature, municipality_code, dbmodifier, client);
+  const assetTypeID = 220;
+
+  const checkExistingAssetQuery = {
+    text: `
+      SELECT id
+      FROM asset
+      WHERE external_id=($1) AND municipality_code=($2) AND asset_type_id=($3) AND valid_to IS NULL
+    `,
+    values: [obstacleProperties.ID, municipality_code, assetTypeID]
+  };
+
+  const checkExistingAssetResult = await client.query(checkExistingAssetQuery);
+
+  if (checkExistingAssetResult.rowCount > 0) {
+    await execUpdated(feature, municipality_code, dbmodifier, client);
     return;
   }
-  const point = `Point(${feature.properties.DR_GEOMETRY.x} ${feature.properties.DR_GEOMETRY.y} 0 0 )`;
-  const insertQuery = {
+
+  const point = `Point(${obstacleProperties.DR_GEOMETRY.x} ${obstacleProperties.DR_GEOMETRY.y} 0 0 )`;
+  const assetQuery = {
     text: `
-        INSERT INTO asset (id, modified_date, geometry, modified_by, asset_type_id, municipality_code, external_id, created_by, created_date) 
-        VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ST_GeomFromText(($1),3067), $2, $3, $4, $5, $6,$7);
+        INSERT INTO asset (id, created_date, geometry, created_by, asset_type_id, municipality_code, external_id) 
+        VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ST_GeomFromText(($1),3067), $2, $3, $4, $5);
         `,
     values: [
       point,
       dbmodifier,
-      220,
+      assetTypeID,
       municipality_code,
-      feature.properties.ID,
-      createdData.created_by,
-      createdData.created_date
+      obstacleProperties.ID
     ]
   };
-  await client.query(insertQuery);
+  await client.query(assetQuery);
 
   const lrmPositionQuery = {
     text: `
         INSERT INTO lrm_position (id, start_measure, link_id)
         VALUES (nextval('LRM_POSITION_PRIMARY_KEY_SEQ'), $1, $2)
         `,
-    values: [feature.properties.DR_M_VALUE, feature.properties.DR_LINK_ID]
+    values: [obstacleProperties.DR_M_VALUE, obstacleProperties.DR_LINK_ID]
   };
   await client.query(lrmPositionQuery);
 
@@ -59,6 +62,7 @@ export default async function (
     values: []
   };
   await client.query(assetLinkQuery);
+
   const singleChoiceValueQuery = {
     text: `
         WITH _property AS (
@@ -74,7 +78,7 @@ export default async function (
         INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
         VALUES (currval('PRIMARY_KEY_SEQ'), (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ($3))
     `,
-    values: ['esterakennelma', feature.properties.EST_TYYPPI, dbmodifier]
+    values: ['esterakennelma', obstacleProperties.EST_TYYPPI, dbmodifier]
   };
   await client.query(singleChoiceValueQuery);
   return;
