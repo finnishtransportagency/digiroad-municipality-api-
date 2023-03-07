@@ -76,12 +76,12 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
-      //drKuntaBucket: {
-      // Type: 'AWS::S3::Bucket',
-      // Properties: {
-      //   BucketName: `dr-kunta-${process.env.STAGE_NAME}-bucket`
-      // }
-      //},
+      drKuntaBucket: {
+        Type: 'AWS::S3::Bucket',
+        Properties: {
+          BucketName: `dr-kunta-${process.env.STAGE_NAME}-bucket`
+        }
+      },
       calculateDeltaRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
@@ -313,10 +313,6 @@ const serverlessConfiguration: AWS = {
   },
   package: { individually: true },
   custom: {
-    s3: {
-      host: 'localhost',
-      directory: '/temp'
-    },
     esbuild: {
       bundle: true,
       minify: false,

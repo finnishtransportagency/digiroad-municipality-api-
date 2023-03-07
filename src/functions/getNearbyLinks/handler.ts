@@ -13,11 +13,11 @@ const getParameter = async (name: string): Promise<string> => {
 
 const gerNearbyLinks = async (event) => {
   const client = new Client({
-    host: 'localhost',
-    port: 5432,
-    database: 'digiroad2',
-    user: 'digiroad2',
-    password: 'digiroad2'
+    host: process.env.PGHOST,
+    port: parseInt(process.env.PGPORT),
+    database: process.env.PGDATABASE,
+    user: process.env.PGUSER,
+    password: await getParameter(process.env.PGPASSWORD_SSM_KEY)
   });
   await client.connect();
 
@@ -56,7 +56,6 @@ const gerNearbyLinks = async (event) => {
         });
       });
       client.end();
-      console.log(res.rows);
       return res.rows;
     })
     .catch((error) => {

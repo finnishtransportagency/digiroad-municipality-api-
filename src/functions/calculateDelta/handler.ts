@@ -5,13 +5,8 @@ import { schema } from './validation/validationSchema';
 import isEqual from 'lodash.isequal';
 
 const calculateDelta = async (event) => {
-  const s3 = new aws.S3({
-    s3ForcePathStyle: true,
-    accessKeyId: 'S3RVER', // This specific key is required when working offline
-    secretAccessKey: 'S3RVER',
-    endpoint: new aws.Endpoint('http://localhost:4569')
-  });
-  const lambda = new aws.Lambda({ endpoint: 'http://localhost:3002' });
+  const s3 = new aws.S3();
+  const lambda = new aws.Lambda();
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
 
   const municipality: string = key.split('/')[1];
@@ -135,9 +130,9 @@ const calculateDelta = async (event) => {
       deleted.push(referenceFeatures[j]);
     }
   }
-  console.log(`Created: ${JSON.stringify(created.length)}`);
-  console.log(`Deleted: ${JSON.stringify(deleted.length)}`);
-  console.log(`Updated: ${JSON.stringify(updated.length)}`);
+  console.log(`Created: ${JSON.stringify(created)}`);
+  console.log(`Deleted: ${JSON.stringify(deleted)}`);
+  console.log(`Updated: ${JSON.stringify(updated)}`);
 
   const payLoad: PayloadFeature = {
     Created: created,

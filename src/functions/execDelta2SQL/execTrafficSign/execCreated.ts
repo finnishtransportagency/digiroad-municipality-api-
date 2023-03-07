@@ -133,7 +133,6 @@ export default async function (
 
   async function textQuery(publicId: string, value: string) {
     if (!value) return;
-    console.log(publicId);
     const query = {
       text: `
       WITH _property AS (

@@ -15,7 +15,7 @@ import FilterByBearing from './FilterByBearing';
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
 
-const lambda = new aws.Lambda({ endpoint: 'http://localhost:3002' });
+const lambda = new aws.Lambda();
 
 const matchRoadLinks = async (event) => {
   let rejectsAmount = 0;
@@ -49,8 +49,6 @@ const matchRoadLinks = async (event) => {
       (i) =>
         i.id === feature.properties.ID && i.type === feature.properties.TYPE
     )?.roadlinks;
-    console.log(JSON.stringify(feature.properties.ID));
-    console.log(allRoadLinks.length);
     if (roadLinks) {
       switch (feature.properties.TYPE) {
         case 'OBSTACLE':
@@ -68,6 +66,7 @@ const matchRoadLinks = async (event) => {
             geomFactory,
             MAX_OFFSET
           );
+          break;
       }
       if (!matchResults) {
         console.error('matchResults is undefined');
@@ -87,8 +86,6 @@ const matchRoadLinks = async (event) => {
       feature.properties.DR_REJECTED = true;
     }
   }
-  console.log('--------- EXEC2DATABASE-----CREATED----', event.Created);
-  console.log('--------- EXEC2DATABASE-----UPDATED----', event.Updated);
 
   const execDelta2SQLBody: PayloadFeature = {
     Created: event.Created.filter(

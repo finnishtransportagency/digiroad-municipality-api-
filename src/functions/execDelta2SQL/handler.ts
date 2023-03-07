@@ -20,13 +20,13 @@ const getParameter = async (name: string): Promise<string> => {
 
 const execDelta2SQL = async (event) => {
   const client = new Client({
-    host: 'localhost',
-    port: 5432,
-    database: 'digiroad2',
-    user: 'digiroad2',
-    password: 'digiroad2'
+    host: process.env.PGHOST,
+    port: parseInt(process.env.PGPORT),
+    database: process.env.PGDATABASE,
+    user: process.env.PGUSER,
+    password: await getParameter(process.env.PGPASSWORD_SSM_KEY)
   });
-  await client.connect();
+  client.connect();
 
   const municipality: string = event.metadata.municipality;
 
@@ -48,7 +48,6 @@ const execDelta2SQL = async (event) => {
     );
 
     for (const feature of event.Created) {
-      console.log(feature);
       if (feature.properties.TYPE === 'OBSTACLE') {
         await execCreatedObstacle(
           feature,
