@@ -33,10 +33,10 @@ const gerNearbyLinks = async (event) => {
       WHERE kgv_roadlink.municipalitycode = municipality_.id AND (kgv_roadlink.adminclass IN (2,3) OR kgv_roadlink.adminclass IS NULL)
     )
     
-    SELECT (value#>'{properties}'->>'ID')::TEXT AS ID, json_agg((st_astext(shape),linkid)) AS roadlinks
+    SELECT (value#>'{properties}'->>'ID')::TEXT AS ID, (value#>'{properties}'->>'TYPE')::TEXT AS TYPE, json_agg((st_astext(shape),linkid)) AS roadlinks
     FROM json_array_elements($2) AS features, acceptable_roadlinks
-    WHERE ST_BUFFER(ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067), 20) && acceptable_roadlinks.shape 
-    GROUP BY ID
+    WHERE ST_BUFFER(ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067), 10) && acceptable_roadlinks.shape 
+    GROUP BY ID,TYPE
     `,
     values: [event.municipality, JSON.stringify(event.features)]
   };

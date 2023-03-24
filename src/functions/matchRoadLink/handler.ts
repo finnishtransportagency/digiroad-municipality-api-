@@ -6,10 +6,11 @@ import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel';
 
 import {
   PayloadFeature,
-  ObstacleFeature,
+  Feature,
   LinkObject,
-  ObstacleRoadLinkMap
+  FeatureRoadlinkMap
 } from '@functions/typing';
+import filterByBearing from './filterByBearing';
 
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
@@ -19,11 +20,11 @@ const lambda = new aws.Lambda();
 const matchRoadLinks = async (event) => {
   let rejectsAmount = 0;
 
-  const obstacles: Array<ObstacleFeature> = event.Created.concat(event.Updated);
+  const features: Array<Feature> = event.Created.concat(event.Updated);
   const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
 
   const getNearbyLinksPayload = {
-    features: obstacles,
+    features: features,
     municipality: event.metadata.municipality
   };
   const getNearbyLinksParams = {
@@ -38,23 +39,35 @@ const matchRoadLinks = async (event) => {
       .promise();
     var allRoadLinks = JSON.parse(
       invocationResult.Payload.toString()
-    ) as Array<ObstacleRoadLinkMap>;
+    ) as Array<FeatureRoadlinkMap>;
   } catch (error) {
     console.error(error);
   }
-  for (let p = 0; p < obstacles.length; p++) {
-    const obstacle = obstacles[p];
+  for (let p = 0; p < features.length; p++) {
+    const feature = features[p];
     const roadLinks: Array<LinkObject> | undefined = allRoadLinks.find(
-      (i) => i.id === obstacle.properties.ID
+      (i) =>
+        i.id === feature.properties.ID && i.type === feature.properties.TYPE
     )?.roadlinks;
-
     if (roadLinks) {
-      const matchResults = findNearestLink(
-        roadLinks,
-        obstacle,
-        geomFactory,
-        MAX_OFFSET
-      );
+      switch (feature.properties.TYPE) {
+        case 'OBSTACLE':
+          var matchResults = findNearestLink(
+            roadLinks,
+            feature,
+            geomFactory,
+            MAX_OFFSET
+          );
+          break;
+        case 'TRAFFICSIGN':
+          var matchResults = filterByBearing(
+            roadLinks,
+            feature,
+            geomFactory,
+            MAX_OFFSET
+          );
+          break;
+      }
       if (!matchResults) {
         console.error('matchResults is undefined');
         return;
@@ -64,23 +77,23 @@ const matchRoadLinks = async (event) => {
         rejectsAmount++;
       }
 
-      obstacle.properties = {
-        ...obstacle.properties,
+      feature.properties = {
+        ...feature.properties,
         ...matchResults
       };
     } else {
       rejectsAmount++;
-      obstacle.properties.DR_REJECTED = true;
+      feature.properties.DR_REJECTED = true;
     }
   }
 
   const execDelta2SQLBody: PayloadFeature = {
     Created: event.Created.filter(
-      (feature: ObstacleFeature) => !feature.properties.DR_REJECTED
+      (feature: Feature) => !feature.properties.DR_REJECTED
     ),
     Deleted: event.Deleted,
     Updated: event.Updated.filter(
-      (feature: ObstacleFeature) => !feature.properties.DR_REJECTED
+      (feature: Feature) => !feature.properties.DR_REJECTED
     ),
     metadata: {
       OFFSET_LIMIT: MAX_OFFSET,
