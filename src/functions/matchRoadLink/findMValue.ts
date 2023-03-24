@@ -1,9 +1,4 @@
-import {
-  LinkObject,
-  matchResultObject,
-  LinkPoint,
-  Feature
-} from '@functions/typing';
+import { LinkObject, matchResultObject, Feature } from '@functions/typing';
 import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
 
 export default function (

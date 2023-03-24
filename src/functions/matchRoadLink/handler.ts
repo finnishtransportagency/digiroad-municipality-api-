@@ -10,7 +10,7 @@ import {
   LinkObject,
   FeatureRoadlinkMap
 } from '@functions/typing';
-import FilterByBearing from './FilterByBearing';
+import filterByBearing from './filterByBearing';
 
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
@@ -60,7 +60,7 @@ const matchRoadLinks = async (event) => {
           );
           break;
         case 'TRAFFICSIGN':
-          var matchResults = FilterByBearing(
+          var matchResults = filterByBearing(
             roadLinks,
             feature,
             geomFactory,
