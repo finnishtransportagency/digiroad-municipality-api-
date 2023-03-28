@@ -1,6 +1,11 @@
 import { middyfy } from '@libs/lambda';
 import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
-import { S3, ListObjectsV2Command, GetObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3,
+  ListObjectsV2Command,
+  GetObjectCommand,
+  DeleteObjectCommand
+} from '@aws-sdk/client-s3';
 import { Feature, PayloadFeature } from '@functions/typing';
 import { schema } from './validation/validationSchema';
 import isEqual from 'lodash.isequal';
@@ -32,8 +37,8 @@ const calculateDelta = async (event) => {
         Bucket: bucket,
         Key: objectKey
       };
-      const getObjectsCommand = new GetObjectCommand(getObjectParams);
-      const data = await s3.send(getObjectsCommand);
+      const getObjectCommand = new GetObjectCommand(getObjectParams);
+      const data = await s3.send(getObjectCommand);
 
       return data.Body.toString();
     } catch (e) {
@@ -66,11 +71,14 @@ const calculateDelta = async (event) => {
       invokeRejectedDeltaParams
     );
     await lambda.send(invokeRejectedDeltaCommand);
-    const params = {
+    const deleteObjectParams = {
       Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
       Key: updateKey
     };
-    await s3.deleteObject(params);
+
+    const deleteObjectCommand = new DeleteObjectCommand(deleteObjectParams);
+
+    await s3.send(deleteObjectCommand);
     throw new Error(`Object deleted because of invalid data: ${e.message}`);
   }
 
