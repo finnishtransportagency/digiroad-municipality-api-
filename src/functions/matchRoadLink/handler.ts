@@ -1,5 +1,5 @@
 import { middyfy } from '@libs/lambda';
-import * as aws from 'aws-sdk';
+import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
 import findNearestLink from './findNearestLink';
 import GeometryFactory from 'jsts/org/locationtech/jts/geom/GeometryFactory';
 import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel';
@@ -15,7 +15,7 @@ import filterByBearing from './filterByBearing';
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
 
-const lambda = new aws.Lambda();
+const lambda = new Lambda({});
 
 const matchRoadLinks = async (event) => {
   let rejectsAmount = 0;
@@ -30,13 +30,13 @@ const matchRoadLinks = async (event) => {
   const getNearbyLinksParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-getNearbyLinks`,
     InvocationType: 'RequestResponse',
-    Payload: JSON.stringify(getNearbyLinksPayload)
+    Payload: Buffer.from(JSON.stringify(getNearbyLinksPayload))
   };
 
+  const getNearbyLinksCommand = new InvokeCommand(getNearbyLinksParams);
+
   try {
-    const invocationResult = await lambda
-      .invoke(getNearbyLinksParams)
-      .promise();
+    const invocationResult = await lambda.send(getNearbyLinksCommand);
     var allRoadLinks = JSON.parse(
       invocationResult.Payload.toString()
     ) as Array<FeatureRoadlinkMap>;
@@ -104,9 +104,12 @@ const matchRoadLinks = async (event) => {
   const execDelta2SQLParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-execDelta2SQL`,
     InvocationType: 'Event',
-    Payload: JSON.stringify(execDelta2SQLBody)
+    Payload: Buffer.from(JSON.stringify(execDelta2SQLBody))
   };
-  await lambda.invoke(execDelta2SQLParams).promise();
+
+  const execDelta2SQLCommand = new InvokeCommand(execDelta2SQLParams);
+
+  await lambda.send(execDelta2SQLCommand);
 
   const reportRejectedDeltabody: PayloadFeature = {
     Created: event.Created,
@@ -121,14 +124,21 @@ const matchRoadLinks = async (event) => {
   const reportRejectedDeltaParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
     InvocationType: 'Event',
-    Payload: JSON.stringify({
-      ReportType:
-        rejectsAmount > 0 ? 'matchedWithFailures' : 'matchedSuccessfully',
-      Municipality: event.metadata.municipality,
-      Body: reportRejectedDeltabody
-    })
+    Payload: Buffer.from(
+      JSON.stringify({
+        ReportType:
+          rejectsAmount > 0 ? 'matchedWithFailures' : 'matchedSuccessfully',
+        Municipality: event.metadata.municipality,
+        Body: reportRejectedDeltabody
+      })
+    )
   };
-  await lambda.invoke(reportRejectedDeltaParams).promise();
+
+  const reportRejectedDeltaCommand = new InvokeCommand(
+    reportRejectedDeltaParams
+  );
+
+  await lambda.send(reportRejectedDeltaCommand);
 };
 
 export const main = middyfy(matchRoadLinks);

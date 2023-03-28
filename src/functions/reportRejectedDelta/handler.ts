@@ -1,20 +1,24 @@
 import { middyfy } from '@libs/lambda';
-import * as aws from 'aws-sdk';
-import { SSM } from 'aws-sdk';
+import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
+import { Upload } from '@aws-sdk/lib-storage';
+import { S3 } from '@aws-sdk/client-s3';
+import { SSM, GetParameterCommand } from '@aws-sdk/client-ssm';
 import nodemailer from 'nodemailer';
 import ejs from 'ejs';
 import * as path from 'path';
 
 const getParameter = async (name: string): Promise<string> => {
-  const ssm = new SSM();
-  const result = await ssm
-    .getParameter({ Name: name, WithDecryption: true })
-    .promise();
+  const ssm = new SSM({});
+  const getParametersCommand = new GetParameterCommand({
+    Name: name,
+    WithDecryption: true
+  });
+  const result = await ssm.send(getParametersCommand);
   return result.Parameter.Value;
 };
 
 const reportRejectedDelta = async (event) => {
-  const s3 = new aws.S3();
+  const s3 = new S3({});
   const now = new Date().toISOString().slice(0, 19);
   const municipality = event.Municipality;
   const params = {
@@ -23,7 +27,10 @@ const reportRejectedDelta = async (event) => {
     Body: JSON.stringify(event)
   };
 
-  await s3.upload(params).promise();
+  await new Upload({
+    client: s3,
+    params
+  }).done();
 
   var transporter = nodemailer.createTransport({
     host: 'email-smtp.eu-west-1.amazonaws.com',
@@ -36,18 +43,23 @@ const reportRejectedDelta = async (event) => {
   let templateName: string;
   let emailSubject: string;
 
-  const lambda = new aws.Lambda();
+  const lambda = new Lambda({});
 
   const fetchEmailRecipientParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-fetchEmailRecipient`,
     InvocationType: 'RequestResponse',
-    Payload: JSON.stringify({ municipality: event.Municipality })
+    Payload: Buffer.from(JSON.stringify({ municipality: event.Municipality }))
   };
+
+  const fetchEmailRecipientCommand = new InvokeCommand(
+    fetchEmailRecipientParams
+  );
+
   let recipients = [];
   try {
-    const fetchEmailRecipientResult = await lambda
-      .invoke(fetchEmailRecipientParams)
-      .promise();
+    const fetchEmailRecipientResult = await lambda.send(
+      fetchEmailRecipientCommand
+    );
     recipients = JSON.parse(
       fetchEmailRecipientResult.Payload.toString()
     ) as Array<string>;

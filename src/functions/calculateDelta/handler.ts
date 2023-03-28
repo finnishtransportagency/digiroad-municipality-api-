@@ -1,23 +1,24 @@
 import { middyfy } from '@libs/lambda';
-import * as aws from 'aws-sdk';
+import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
+import { S3, ListObjectsV2Command, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Feature, PayloadFeature } from '@functions/typing';
 import { schema } from './validation/validationSchema';
 import isEqual from 'lodash.isequal';
 
 const calculateDelta = async (event) => {
-  const s3 = new aws.S3();
-  const lambda = new aws.Lambda();
+  const s3 = new S3({});
+  const lambda = new Lambda({});
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
 
   const municipality: string = key.split('/')[1];
 
   try {
-    const params = {
+    const listObjectsparams = {
       Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
       Prefix: `update/${municipality}`
     };
-
-    var keys = await s3.listObjectsV2(params).promise();
+    const listObjectsCommand = new ListObjectsV2Command(listObjectsparams);
+    var keys = await s3.send(listObjectsCommand);
     const sortedKeyList = keys.Contents.sort((k) => -k.LastModified.getTime());
     var updateKey = sortedKeyList[0].Key;
     var refrenceKey = sortedKeyList.length > 1 ? sortedKeyList[1].Key : null; //null for first upload where a refrence object does not exist
@@ -27,14 +28,14 @@ const calculateDelta = async (event) => {
 
   async function getObject(bucket: string, objectKey: string) {
     try {
-      const params = {
+      const getObjectParams = {
         Bucket: bucket,
         Key: objectKey
       };
+      const getObjectsCommand = new GetObjectCommand(getObjectParams);
+      const data = await s3.send(getObjectsCommand);
 
-      const data = await s3.getObject(params).promise();
-
-      return data.Body.toString('utf-8');
+      return data.Body.toString();
     } catch (e) {
       throw new Error(`Could not retrieve file from S3: ${e.message}`);
     }
@@ -50,22 +51,26 @@ const calculateDelta = async (event) => {
     }
     updateObject = schema.cast(updateObject);
   } catch (e) {
-    await lambda
-      .invoke({
-        FunctionName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
-        InvocationType: 'Event',
-        Payload: JSON.stringify({
+    const invokeRejectedDeltaParams = {
+      FunctionName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
+      InvocationType: 'Event',
+      Payload: Buffer.from(
+        JSON.stringify({
           ReportType: 'calculateDelta',
           Municipality: municipality,
           Body: { Message: e.message }
         })
-      })
-      .promise();
+      )
+    };
+    const invokeRejectedDeltaCommand = new InvokeCommand(
+      invokeRejectedDeltaParams
+    );
+    await lambda.send(invokeRejectedDeltaCommand);
     const params = {
       Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
       Key: updateKey
     };
-    await s3.deleteObject(params).promise();
+    await s3.deleteObject(params);
     throw new Error(`Object deleted because of invalid data: ${e.message}`);
   }
 
@@ -142,11 +147,14 @@ const calculateDelta = async (event) => {
       municipality: municipality
     }
   };
-  const param = {
+  const invokeMatchRoadLinkParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-matchRoadLink`,
     InvocationType: 'Event',
-    Payload: JSON.stringify(payLoad)
+    Payload: Buffer.from(JSON.stringify(payLoad))
   };
-  await lambda.invoke(param).promise();
+  const invokeMatchRoadLinksCommand = new InvokeCommand(
+    invokeMatchRoadLinkParams
+  );
+  await lambda.send(invokeMatchRoadLinksCommand);
 };
 export const main = middyfy(calculateDelta);

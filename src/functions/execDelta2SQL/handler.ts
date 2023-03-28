@@ -1,5 +1,5 @@
 import { middyfy } from '@libs/lambda';
-import { SSM } from 'aws-sdk';
+import { SSM, GetParameterCommand } from '@aws-sdk/client-ssm';
 import { Client } from 'pg';
 
 import execCreatedObstacle from './execObstacle/execCreated';
@@ -11,10 +11,12 @@ import execUpdatedTrafficSign from './execTrafficSign/execUpdated';
 import execExpiredTrafficSign from './execTrafficSign/execExpired';
 
 const getParameter = async (name: string): Promise<string> => {
-  const ssm = new SSM();
-  const result = await ssm
-    .getParameter({ Name: name, WithDecryption: true })
-    .promise();
+  const ssm = new SSM({});
+  const getParametersCommand = new GetParameterCommand({
+    Name: name,
+    WithDecryption: true
+  });
+  const result = await ssm.send(getParametersCommand);
   return result.Parameter.Value;
 };
 
