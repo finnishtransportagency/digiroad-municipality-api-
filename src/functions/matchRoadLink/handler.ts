@@ -38,7 +38,7 @@ const matchRoadLinks = async (event) => {
   try {
     const invocationResult = await lambda.send(getNearbyLinksCommand);
     var allRoadLinks = JSON.parse(
-      invocationResult.Payload.toString()
+      Buffer.from(invocationResult.Payload).toString()
     ) as Array<FeatureRoadlinkMap>;
   } catch (error) {
     console.error(error);
