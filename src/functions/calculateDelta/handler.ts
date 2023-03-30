@@ -37,18 +37,19 @@ const calculateDelta = async (event) => {
         Bucket: bucket,
         Key: objectKey
       };
-      const getObjectCommand = new GetObjectCommand(getObjectParams);
-      const data = await s3.send(getObjectCommand);
-
-      return data.Body.toString();
+      const getObjectsCommand = new GetObjectCommand(getObjectParams);
+      const data = await s3.send(getObjectsCommand);
+      const object = await data.Body.transformToString();
+      return JSON.parse(object);
     } catch (e) {
       throw new Error(`Could not retrieve file from S3: ${e.message}`);
     }
   }
 
   try {
-    var updateObject = JSON.parse(
-      await getObject(`dr-kunta-${process.env.STAGE_NAME}-bucket`, updateKey)
+    var updateObject = await getObject(
+      `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+      updateKey
     );
     const valid = await schema.validate(updateObject);
     if (!valid) {
@@ -85,12 +86,7 @@ const calculateDelta = async (event) => {
   let referenceObject =
     refrenceKey === null
       ? { type: 'FeatureCollection', features: [] }
-      : JSON.parse(
-          await getObject(
-            `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-            refrenceKey
-          )
-        );
+      : await getObject(`dr-kunta-${process.env.STAGE_NAME}-bucket`, updateKey);
 
   referenceObject = schema.cast(referenceObject);
 
