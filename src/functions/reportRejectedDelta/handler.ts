@@ -61,7 +61,7 @@ const reportRejectedDelta = async (event) => {
       fetchEmailRecipientCommand
     );
     recipients = JSON.parse(
-      fetchEmailRecipientResult.Payload.toString()
+      Buffer.from(fetchEmailRecipientResult.Payload).toString()
     ) as Array<string>;
   } catch (error) {
     console.error(error);
