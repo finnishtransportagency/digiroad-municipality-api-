@@ -86,7 +86,10 @@ const calculateDelta = async (event) => {
   let referenceObject =
     refrenceKey === null
       ? { type: 'FeatureCollection', features: [] }
-      : await getObject(`dr-kunta-${process.env.STAGE_NAME}-bucket`, updateKey);
+      : await getObject(
+          `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+          refrenceKey
+        );
 
   referenceObject = schema.cast(referenceObject);
 
