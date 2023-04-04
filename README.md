@@ -9,7 +9,7 @@ For detailed instructions, please refer to the [documentation](https://www.serve
 ### Installation/deployment instructions
 
 - Run `npm i` to install the project dependencies
-- Run `sls package --stage <stage>` to create a package that contains the Lamba zip files as well as cloudformation templates
+- Run `sls package --stage <stage>` to create a package that contains the Lambda zip files as well as cloudformation templates
 - Run cloudformation-template-create-stack in AWS cloudformation if it is the first deployment
 - Upload packaged files into the created deployment s3 bucket. The path of the uploaded files should be `serverless/DRKunta/<stage>/<timestamp>`. The exact path can be found in the cloudformation-template-update-stack file, with the key "s3Key"
 - Run cloudformation-template-update-stack in AWS cloudformation
