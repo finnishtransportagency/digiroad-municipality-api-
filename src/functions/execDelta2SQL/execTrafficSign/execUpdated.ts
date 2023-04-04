@@ -117,8 +117,6 @@ export default async function (
 
   await numberQuery('terrain_coordinates_y', feature.geometry.coordinates[1]);
 
-  const typeRegex = `^${trafficSignProperties.LM_TYYPPI} .*$`;
-
   const typeQuery = {
     text: `
     WITH _property AS (
@@ -128,13 +126,18 @@ export default async function (
       ), _enumerated_value AS (
         SELECT enumerated_value.id
         FROM enumerated_value, _property
-      WHERE property_id = _property.id AND name_fi ~ ($2)
+      WHERE property_id = _property.id AND name_fi = ($2)
       )
       
     INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
         VALUES ($3, (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', $4)
     `,
-    values: ['trafficSigns_type', typeRegex, assetID, dbmodifier]
+    values: [
+      'trafficSigns_type',
+      trafficSignProperties.LM_TYYPPI,
+      assetID,
+      dbmodifier
+    ]
   };
 
   await client.query(typeQuery);

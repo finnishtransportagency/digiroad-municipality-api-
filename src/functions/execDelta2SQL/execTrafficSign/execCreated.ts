@@ -185,7 +185,6 @@ export default async function (
   await singleChoiseQuery('size', trafficSignProperties.KOKO);
 
   trafficSignProperties.LISAKILVET.forEach((panel, index) => {
-    const panelTypeRegex = `^${panel.LK_TYYPPI} .*$`;
     const additionalPanelQuery = {
       text: `
     WITH ap_property AS (
@@ -199,7 +198,7 @@ export default async function (
     ), _enumerated_value AS (
       SELECT enumerated_value.value
       FROM enumerated_value, _property
-      WHERE property_id = _property.id AND name_fi ~ ($3)
+      WHERE property_id = _property.id AND name_fi = ($3)
     )
 
     INSERT INTO additional_panel (asset_id, id, property_id, additional_sign_type, additional_sign_value, form_position, additional_sign_text, additional_sign_size, additional_sign_coating_type, additional_sign_panel_color)
@@ -208,7 +207,7 @@ export default async function (
       values: [
         'additional_panel',
         'trafficSigns_type',
-        panelTypeRegex,
+        panel.LK_TYYPPI,
         assetID,
         panel.ARVO,
         index + 1,
