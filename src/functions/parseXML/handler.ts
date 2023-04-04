@@ -111,7 +111,7 @@ const parseXML = async (event) => {
   const now = new Date().toISOString().slice(0, 19);
   const putParams = {
     Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    Key: `geojson/${municipality}/${now}`,
+    Key: `geojson/${municipality}/${now}.json`,
     Body: JSON.stringify(validatedGeoJSON)
   };
 
