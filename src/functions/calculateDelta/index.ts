@@ -9,7 +9,7 @@ export default {
         bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
         event: 's3:ObjectCreated:*',
         existing: true,
-        rules: [{ prefix: 'update/' }]
+        rules: [{ prefix: 'geojson/' }]
       }
     }
   ],
