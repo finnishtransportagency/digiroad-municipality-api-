@@ -8,7 +8,7 @@ export default function (esterakennelmat) {
       properties: {
         TYPE: 'OBSTACLE',
         ID: esterakennelma['inf:yksilointitieto'],
-        EST_TYYPPI: esterakennelma['inf:rakenne']
+        EST_TYYPPI: 1 //esterakennelma['inf:rakenne']
       },
       geometry: {
         type: 'Point',

@@ -10,7 +10,7 @@ export default function (liikennemerkit) {
         ID: liikennemerkki['inf:yksilointitieto'],
         SUUNTIMA: liikennemerkki['inf:suunta'],
         TEKSTI: liikennemerkki['inf:teksti'],
-        LM_TYYPPI: liikennemerkki['inf:liikennemerkkityyppi2020'].split(' ')[0]
+        LM_TYYPPI: liikennemerkki['inf:liikennemerkkityyppi2020']
       },
       geometry: {
         type: 'Point',
