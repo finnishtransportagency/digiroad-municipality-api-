@@ -5,7 +5,7 @@ export default {
   events: [
     {
      schedule: {
-      rate: ['rate(2 minutes)']
+      rate: ['cron(0 0 12 ? * TUE *)']
      }
     }
   ]
