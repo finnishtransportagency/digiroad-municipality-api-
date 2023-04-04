@@ -8,6 +8,7 @@ import {
   getNearbyLinks,
   fetchEmailRecipient,
   execDelta2SQL,
+  parseXML,
   fetchMunicipalityData
 } from '@functions/index';
 
@@ -67,6 +68,7 @@ const serverlessConfiguration: AWS = {
   },
   // import the function via paths
   functions: {
+    parseXML,
     storeMunicipalityData,
     calculateDelta,
     matchRoadLink,
@@ -129,6 +131,67 @@ const serverlessConfiguration: AWS = {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
                     Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-matchRoadLink`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: ['lambda:InvokeFunction'],
+                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      'logs:CreateLogGroup',
+                      'logs:CreateLogStream',
+                      'logs:PutLogEvents'
+                    ],
+                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-group:/aws/lambda/*`
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      parseXMLRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+          RoleName: `DRKunta-${process.env.STAGE_NAME}-parseXMLRole`,
+          AssumeRolePolicyDocument: {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: {
+                  Service: 'lambda.amazonaws.com'
+                },
+                Action: 'sts:AssumeRole'
+              }
+            ]
+          },
+          ManagedPolicyArns: [
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+          ],
+          Policies: [
+            {
+              PolicyName: `DRKunta-${process.env.STAGE_NAME}-parseXMLPolicy`,
+              PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      's3:PutObject',
+                      's3:PutObjectAcl',
+                      's3:ListBucket',
+                      's3:GetObject',
+                      's3:DeleteObject'
+                    ],
+                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/*`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: ['s3:ListBucket'],
+                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket`
                   },
                   {
                     Effect: 'Allow',
