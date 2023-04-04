@@ -20,7 +20,7 @@ const calculateDelta = async (event) => {
   try {
     const listObjectsparams = {
       Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-      Prefix: `update/${municipality}`
+      Prefix: `geojson/${municipality}`
     };
     const listObjectsCommand = new ListObjectsV2Command(listObjectsparams);
     var keys = await s3.send(listObjectsCommand);
