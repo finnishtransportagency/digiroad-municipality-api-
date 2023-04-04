@@ -7,7 +7,8 @@ import {
   reportRejectedDelta,
   getNearbyLinks,
   fetchEmailRecipient,
-  execDelta2SQL
+  execDelta2SQL,
+  fetchMunicipalityData
 } from '@functions/index';
 
 const serverlessConfiguration: AWS = {
@@ -72,7 +73,8 @@ const serverlessConfiguration: AWS = {
     reportRejectedDelta,
     getNearbyLinks,
     fetchEmailRecipient,
-    execDelta2SQL
+    execDelta2SQL,
+    fetchMunicipalityData
   },
   resources: {
     Resources: {
