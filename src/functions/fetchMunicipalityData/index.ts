@@ -5,7 +5,13 @@ export default {
   events: [
     {
       schedule: {
-        rate: ['cron(30 12 ? * TUE *)']
+        rate: ['cron(30 12 ? * TUE *)'],
+        input: {
+          municipality: 'espoo',
+          url: 'url.com',
+          user: 'kuntaUser',
+          password: 'password123'
+        }
       }
     }
   ]
