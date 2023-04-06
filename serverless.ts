@@ -86,6 +86,67 @@ const serverlessConfiguration: AWS = {
           BucketName: `dr-kunta-${process.env.STAGE_NAME}-bucket`
         }
       },
+      fetchMunicipalityDataRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+          RoleName: `DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataRole`,
+          AssumeRolePolicyDocument: {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: {
+                  Service: 'lambda.amazonaws.com'
+                },
+                Action: 'sts:AssumeRole'
+              }
+            ]
+          },
+          ManagedPolicyArns: [
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+          ],
+          Policies: [
+            {
+              PolicyName: `DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataPolicy`,
+              PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [
+                  {
+                    Effect: 'Allow',
+                    Action: ['ssm:GetParameter', 'ssm:GetParameters'],
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/drKunta/*`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      's3:PutObject',
+                      's3:PutObjectAcl',
+                      's3:ListBucket',
+                      's3:GetObject',
+                      's3:DeleteObject'
+                    ],
+                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/*`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: ['s3:ListBucket'],
+                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      'logs:CreateLogGroup',
+                      'logs:CreateLogStream',
+                      'logs:PutLogEvents'
+                    ],
+                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
       calculateDeltaRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
