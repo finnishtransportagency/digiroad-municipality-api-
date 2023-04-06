@@ -5,7 +5,7 @@ export default {
   events: [
     {
       schedule: {
-        rate: ['cron(30 12 ? * TUE *)'],
+        rate: ['cron(0 10 ? * TUE *)'],
         input: {
           municipality: 'espoo',
           url: 'url.com',
