@@ -20,6 +20,7 @@ const fetchMunicipalityData = async (event) => {
     apiKey: apiKey,
     url: url
   };
+  //Request according to event details, result inserted to s3 bucket /infrao
   console.log(result);
 };
 

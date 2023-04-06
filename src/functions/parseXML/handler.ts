@@ -61,7 +61,7 @@ const parseXML = async (event) => {
     var asJSON = parser.parse(xmlFile, true);
   } catch (error) {
     console.error(`XML could not be parsed: ${error.message}`);
-    sendReport(error.message);
+    await sendReport(error.message);
     return;
   }
   try {
@@ -84,7 +84,7 @@ const parseXML = async (event) => {
     }
   } catch (error) {
     console.error(`XML could not be parsed: ${error.message}`);
-    sendReport(error.message);
+    await sendReport(error.message);
     return;
   }
   const geoJSON = {
@@ -102,7 +102,7 @@ const parseXML = async (event) => {
   const valid = await schema.validate(geoJSON);
   if (!valid) {
     console.error('The xml could not be parsed to a valid GeoJSON');
-    sendReport('Could not be parsed');
+    await sendReport('Could not be parsed');
     return;
   }
 
