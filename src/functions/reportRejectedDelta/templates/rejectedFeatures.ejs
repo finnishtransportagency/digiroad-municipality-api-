@@ -4,9 +4,6 @@
 <% var total = Body.Created.length + Body.Updated.length %>
 <% var municipalityCapitalized = Municipality.charAt(0).toUpperCase() + Municipality.slice(1)%>
 <h3>Kuntarajapinta-raportti: <%= municipalityCapitalized%></h3>
-<% if (recipients.length <= 1) { %>
-<h6> HUOM: Kunnan sähköpostia ei löytynyt. Tämä sähköposti on lähetetty vain operaattorille.</h6>
-<% } %>
 <p>
   Suurin sallittu etäisyys tielinkistä: <%=Body.metadata.OFFSET_LIMIT %> metriä.
 </p>
@@ -20,9 +17,6 @@
 </p>
 <p>--------------------------------------------------------------------------------------------</p>
 <h3>Municipality API report for municipality: <%= municipalityCapitalized%></h3>
-<% if (recipients.length <= 1) { %>
-<h6> NOTE: No email address found for municipality. This email is only sent to the operator.</h6>
-<% } %>
 <p>
   Maximum allowed offset from the center of the Digiroad Link: <%=Body.metadata.OFFSET_LIMIT %> meters.
 </p>
