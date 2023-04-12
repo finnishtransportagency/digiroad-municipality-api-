@@ -6,7 +6,6 @@ import {
   matchRoadLink,
   reportRejectedDelta,
   getNearbyLinks,
-  fetchEmailRecipient,
   execDelta2SQL,
   parseXML,
   fetchMunicipalityData
@@ -74,7 +73,6 @@ const serverlessConfiguration: AWS = {
     matchRoadLink,
     reportRejectedDelta,
     getNearbyLinks,
-    fetchEmailRecipient,
     execDelta2SQL,
     fetchMunicipalityData
   },
@@ -399,11 +397,6 @@ const serverlessConfiguration: AWS = {
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
-                  {
-                    Effect: 'Allow',
-                    Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-fetchEmailRecipient`
-                  },
                   {
                     Effect: 'Allow',
                     Action: [

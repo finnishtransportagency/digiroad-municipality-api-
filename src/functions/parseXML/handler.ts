@@ -20,7 +20,7 @@ const parseXML = async (event) => {
       InvocationType: 'Event',
       Payload: Buffer.from(
         JSON.stringify({
-          ReportType: 'calculateDelta', //calculateDelta => Something else
+          ReportType: 'invalidData',
           Municipality: municipality,
           Body: { Message: message }
         })
@@ -43,6 +43,7 @@ const parseXML = async (event) => {
     var xmlFile = await result.Body.transformToString();
   } catch (error) {
     console.error(`Could not retrieve file from s3: ${error.message}`);
+    return;
   }
 
   const alwaysArray = [
@@ -56,24 +57,18 @@ const parseXML = async (event) => {
     }
   };
 
-  const parser = new XMLParser(options);
   try {
-    var asJSON = parser.parse(xmlFile, true);
-  } catch (error) {
-    console.error(`XML could not be parsed: ${error.message}`);
-    await sendReport(error.message);
-    return;
-  }
-  try {
+    const parser = new XMLParser(options);
+    const asJSON = parser.parse(xmlFile, true);
     const root = asJSON['inf:InfraoKohteet'];
     const toimituksenTiedot = root['inf:toimituksentiedot'];
     const toimitus = toimituksenTiedot['inf:Toimitus'];
     const featureMembers = root['gml:featureMembers'];
-    var liikennemerkit = featureMembers['inf:Liikennemerkki'];
-    var esterakennelmat = featureMembers['inf:Rakenne'];
-    var aineistonnimi = toimitus['inf:aineistonnimi'];
+    const liikennemerkit = featureMembers['inf:Liikennemerkki'];
+    const esterakennelmat = featureMembers['inf:Rakenne'];
+    const aineistonnimi = toimitus['inf:aineistonnimi'];
 
-    var features: Array<Feature> = [];
+    let features: Array<Feature> = [];
 
     if (liikennemerkit) {
       features = features.concat(parseTrafficsigns(liikennemerkit));
@@ -82,31 +77,28 @@ const parseXML = async (event) => {
     if (esterakennelmat) {
       features = features.concat(parseObstacles(esterakennelmat));
     }
+
+    const geoJSON = {
+      type: 'FeatureCollection',
+      name: aineistonnimi,
+      crs: {
+        type: 'name',
+        properties: {
+          name: 'urn:ogc:def:crs:EPSG::3067'
+        }
+      },
+      features: features
+    };
+
+    const valid = await schema.validate(geoJSON);
+    var validatedGeoJSON = schema.cast(valid);
   } catch (error) {
-    console.error(`XML could not be parsed: ${error.message}`);
+    console.error(
+      `XML could not be parsed into valid GeoJSON: ${error.message}`
+    );
     await sendReport(error.message);
     return;
   }
-  const geoJSON = {
-    type: 'FeatureCollection',
-    name: aineistonnimi,
-    crs: {
-      type: 'name',
-      properties: {
-        name: 'urn:ogc:def:crs:EPSG::3067'
-      }
-    },
-    features: features
-  };
-
-  const valid = await schema.validate(geoJSON);
-  if (!valid) {
-    console.error('The xml could not be parsed to a valid GeoJSON');
-    await sendReport('Could not be parsed');
-    return;
-  }
-
-  const validatedGeoJSON = schema.cast(valid);
 
   const now = new Date().toISOString().slice(0, 19);
   const putParams = {

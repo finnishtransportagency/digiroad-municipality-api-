@@ -62,7 +62,7 @@ const calculateDelta = async (event) => {
       InvocationType: 'Event',
       Payload: Buffer.from(
         JSON.stringify({
-          ReportType: 'calculateDelta',
+          ReportType: 'invalidData',
           Municipality: municipality,
           Body: { Message: e.message }
         })

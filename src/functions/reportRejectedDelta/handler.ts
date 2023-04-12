@@ -1,5 +1,4 @@
 import { middyfy } from '@libs/lambda';
-import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
 import { Upload } from '@aws-sdk/lib-storage';
 import { S3 } from '@aws-sdk/client-s3';
 import { SSM, GetParameterCommand } from '@aws-sdk/client-ssm';
@@ -43,51 +42,25 @@ const reportRejectedDelta = async (event) => {
   let templateName: string;
   let emailSubject: string;
 
-  const lambda = new Lambda({});
-
-  const fetchEmailRecipientParams = {
-    FunctionName: `DRKunta-${process.env.STAGE_NAME}-fetchEmailRecipient`,
-    InvocationType: 'RequestResponse',
-    Payload: Buffer.from(JSON.stringify({ municipality: event.Municipality }))
-  };
-
-  const fetchEmailRecipientCommand = new InvokeCommand(
-    fetchEmailRecipientParams
-  );
-
-  let recipients = [];
-  try {
-    const fetchEmailRecipientResult = await lambda.send(
-      fetchEmailRecipientCommand
-    );
-    recipients = JSON.parse(
-      Buffer.from(fetchEmailRecipientResult.Payload).toString()
-    ) as Array<string>;
-  } catch (error) {
-    console.error(error);
-  }
-  event.recipients = recipients;
-
   const subjectHeader =
     process.env.STAGE_NAME === 'dev' || process.env.STAGE_NAME === 'test'
       ? '[TEST]'
       : '';
 
   switch (event.ReportType) {
-    case 'calculateDelta':
-      templateName = 'invalidGeoJSON.ejs';
+    case 'invalidData':
+      templateName = 'invalidData.ejs';
       emailSubject = `${subjectHeader} Digiroad kuntarajapinta: lähetys hylätty / Digiroad municipality API: upload rejected`;
-      if (process.env.STAGE_NAME === 'dev' || process.env.STAGE_NAME === 'test')
-        recipients.push(process.env.OPERATOR_EMAIL);
       break;
     case 'matchedWithFailures':
       templateName = 'rejectedFeatures.ejs';
       emailSubject = `${subjectHeader} Digiroad kuntarajapinta: joitain kohteita ei voitu päivittää / Digiroad municipality API: some features could not be updated`;
-      recipients.push(process.env.OPERATOR_EMAIL);
       break;
     case 'matchedSuccessfully':
       return;
   }
+
+  const recipients = [process.env.OPERATOR_EMAIL];
 
   const municipalityEmail = await ejs.renderFile(
     path.resolve(__dirname, './templates/' + templateName),
