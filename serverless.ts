@@ -113,6 +113,13 @@ const serverlessConfiguration: AWS = {
                 Statement: [
                   {
                     Effect: 'Allow',
+                    Action: ['ssm:DescribeParameters'],
+                    Resource: [
+                      `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:*`
+                    ]
+                  },
+                  {
+                    Effect: 'Allow',
                     Action: [
                       'ssm:GetParameter',
                       'ssm:GetParameters',
@@ -209,6 +216,13 @@ const serverlessConfiguration: AWS = {
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
+                  {
+                    Effect: 'Allow',
+                    Action: ['ssm:DescribeParameters'],
+                    Resource: [
+                      `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:*`
+                    ]
+                  },
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
@@ -390,8 +404,15 @@ const serverlessConfiguration: AWS = {
                 Statement: [
                   {
                     Effect: 'Allow',
+                    Action: ['ssm:DescribeParameters'],
+                    Resource: [
+                      `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:*`
+                    ]
+                  },
+                  {
+                    Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/${process.env.PGPASSWORD_SSM_KEY}`
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/${process.env.STAGE_NAME}/${process.env.PGPASSWORD_SSM_KEY}`
                   },
                   {
                     Effect: 'Allow',
@@ -507,6 +528,13 @@ const serverlessConfiguration: AWS = {
                       's3:DeleteObject'
                     ],
                     Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/*`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: ['ssm:DescribeParameters'],
+                    Resource: [
+                      `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:*`
+                    ]
                   },
                   {
                     Effect: 'Allow',
