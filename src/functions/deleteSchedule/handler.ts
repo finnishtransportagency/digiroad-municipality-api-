@@ -27,8 +27,8 @@ const deleteSchedule = async (event) => {
   const getParameterCommand = new GetParameterCommand(parameterInput);
 
   try {
-    scheduler.send(getScheduleCommand);
-    ssm.send(getParameterCommand);
+    await scheduler.send(getScheduleCommand);
+    await ssm.send(getParameterCommand);
   } catch (error) {
     console.error(error);
     return {
@@ -40,8 +40,8 @@ const deleteSchedule = async (event) => {
   const deleteScheduleCommand = new DeleteScheduleCommand(scheduleInput);
   const deleteParameterCommand = new DeleteParameterCommand(parameterInput);
 
-  scheduler.send(deleteScheduleCommand);
-  ssm.send(deleteParameterCommand);
+  await scheduler.send(deleteScheduleCommand);
+  await ssm.send(deleteParameterCommand);
 
   return {
     statusCode: 200
