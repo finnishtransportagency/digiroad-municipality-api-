@@ -21,7 +21,8 @@ const createSchedule = async (event) => {
   const getParameterResult = await ssm.send(getParameterCommand);
 
   const getScheduleCommand = new GetScheduleCommand({
-    Name: `DRKunta-${process.env.STAGE_NAME}-${event.municipality}`
+    Name: `DRKunta-${process.env.STAGE_NAME}-${event.municipality}`,
+    GroupName: 'DRKunta'
   });
 
   const getScheduleResult = await scheduler.send(getScheduleCommand);
