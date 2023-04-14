@@ -130,13 +130,8 @@ const serverlessConfiguration: AWS = {
                   },
                   {
                     Effect: 'Allow',
-                    Action: [
-                      'scheduler:ListSchedules',
-                      'scheduler:GetSchedule',
-                      'scheduler:CreateSchedule',
-                      'scheduler:UpdateSchedule'
-                    ],
-                    Resource: `arn:aws:scheduler:us-west-2:${process.env.AWS_ACCOUNT_ID}:schedule/DRKunta-dev/DRKunta-${process.env.STAGE_NAME}-*`
+                    Action: ['scheduler:CreateSchedule'],
+                    Resource: `arn:aws:scheduler:us-west-2:${process.env.AWS_ACCOUNT_ID}:schedule/DRKunta-dev/*`
                   },
                   {
                     Effect: 'Allow',
