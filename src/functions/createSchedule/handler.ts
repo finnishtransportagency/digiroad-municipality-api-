@@ -22,7 +22,7 @@ const createSchedule = async (event) => {
 
   const putParameterInput = {
     Name: `/DRKunta/${process.env.STAGE_NAME}/${event.body.municipality}`,
-    Value: event.key,
+    Value: event.body.key,
     Type: 'String'
   };
 
