@@ -7,3 +7,4 @@ export { default as execDelta2SQL } from './execDelta2SQL';
 export { default as parseXML } from './parseXML';
 export { default as fetchMunicipalityData } from './fetchMunicipalityData';
 export { default as createSchedule } from './createSchedule';
+export { default as listSchedules } from './listSchedules';

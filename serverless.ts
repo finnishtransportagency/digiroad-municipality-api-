@@ -9,7 +9,8 @@ import {
   execDelta2SQL,
   parseXML,
   fetchMunicipalityData,
-  createSchedule
+  createSchedule,
+  listSchedules
 } from '@functions/index';
 
 const serverlessConfiguration: AWS = {
@@ -78,7 +79,8 @@ const serverlessConfiguration: AWS = {
     getNearbyLinks,
     execDelta2SQL,
     fetchMunicipalityData,
-    createSchedule
+    createSchedule,
+    listSchedules
   },
   resources: {
     Resources: {

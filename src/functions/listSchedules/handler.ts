@@ -4,7 +4,7 @@ import {
   ListSchedulesCommand
 } from '@aws-sdk/client-scheduler';
 
-const createSchedule = async (event) => {
+const listSchedules = async (event) => {
   const scheduler = new SchedulerClient({});
 
   const listScheduleInput = {
@@ -28,4 +28,4 @@ const createSchedule = async (event) => {
   }
 };
 
-export const main = middyfy(createSchedule);
+export const main = middyfy(listSchedules);
