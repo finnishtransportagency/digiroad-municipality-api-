@@ -1,38 +1,13 @@
 import { middyfy } from '@libs/lambda';
-import {
-  SSM,
-  GetParameterCommand,
-  PutParameterCommand
-} from '@aws-sdk/client-ssm';
+import { SSM, PutParameterCommand } from '@aws-sdk/client-ssm';
 import {
   SchedulerClient,
-  CreateScheduleCommand,
-  GetScheduleCommand
+  CreateScheduleCommand
 } from '@aws-sdk/client-scheduler';
 
 const createSchedule = async (event) => {
   const scheduler = new SchedulerClient({});
   const ssm = new SSM({});
-
-  const getParameterCommand = new GetParameterCommand({
-    Name: `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`,
-    WithDecryption: true
-  });
-  const getParameterResult = await ssm.send(getParameterCommand);
-
-  const getScheduleCommand = new GetScheduleCommand({
-    Name: `DRKunta-${process.env.STAGE_NAME}-${event.municipality}`,
-    GroupName: 'DRKunta'
-  });
-
-  const getScheduleResult = await scheduler.send(getScheduleCommand);
-
-  if (getParameterResult.Parameter || getScheduleResult.Arn) {
-    return {
-      statusCode: 400,
-      body: 'Resource already exists'
-    };
-  }
 
   const putParameterInput = {
     Name: `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`,
@@ -56,12 +31,19 @@ const createSchedule = async (event) => {
       Mode: 'off'
     }
   };
-
   const putParameterCommand = new PutParameterCommand(putParameterInput);
   const creteScheduleCommand = new CreateScheduleCommand(createScheduleInput);
 
-  await ssm.send(putParameterCommand);
-  await scheduler.send(creteScheduleCommand);
+  try {
+    await ssm.send(putParameterCommand);
+    await scheduler.send(creteScheduleCommand);
+  } catch (e) {
+    console.error(e);
+    return {
+      statusCode: 400,
+      message: 'Schedule already exists'
+    };
+  }
   return {
     statusCode: 201
   };
