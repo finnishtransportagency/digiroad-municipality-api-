@@ -17,7 +17,8 @@ const deleteSchedule = async (event) => {
   const ssm = new SSM({});
 
   const scheduleInput = {
-    Name: `DRKunta-${process.env.STAGE_NAME}-${municipality}`
+    Name: `DRKunta-${process.env.STAGE_NAME}-${municipality}`,
+    GroupName: `DRKunta-${process.env.STAGE_NAME}`
   };
   const parameterInput = {
     Name: `/DRKunta/${process.env.STAGE_NAME}/${municipality}`
