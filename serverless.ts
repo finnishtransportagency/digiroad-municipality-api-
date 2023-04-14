@@ -124,7 +124,8 @@ const serverlessConfiguration: AWS = {
                     Action: [
                       'ssm:GetParameter',
                       'ssm:GetParameters',
-                      'ssm:PutParameter'
+                      'ssm:PutParameter',
+                      'ssm:DeleteParameter'
                     ],
                     Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/DRKunta/${process.env.STAGE_NAME}/*`
                   },

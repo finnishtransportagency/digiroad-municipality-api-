@@ -1,5 +1,9 @@
 import { middyfy } from '@libs/lambda';
-import { SSM, PutParameterCommand } from '@aws-sdk/client-ssm';
+import {
+  SSM,
+  PutParameterCommand,
+  DeleteParameterCommand
+} from '@aws-sdk/client-ssm';
 import {
   SchedulerClient,
   CreateScheduleCommand
@@ -36,8 +40,24 @@ const createSchedule = async (event) => {
 
   try {
     await ssm.send(putParameterCommand);
+  } catch (e) {
+    console.error(e);
+    return {
+      statusCode: 400,
+      message: 'Schedule already exists'
+    };
+  }
+
+  try {
     await scheduler.send(creteScheduleCommand);
   } catch (e) {
+    const deleteParameterInput = {
+      Name: `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`
+    };
+    const deleteParameterCommand = new DeleteParameterCommand(
+      deleteParameterInput
+    );
+    await ssm.send(deleteParameterCommand);
     console.error(e);
     return {
       statusCode: 400,
