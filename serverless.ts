@@ -118,7 +118,7 @@ const serverlessConfiguration: AWS = {
                       'ssm:GetParameters',
                       'ssm:PutParameter'
                     ],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/drKunta/${process.env.STAGE_NAME}/*`
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/DRKunta/${process.env.STAGE_NAME}/*`
                   },
                   {
                     Effect: 'Allow',
@@ -128,7 +128,7 @@ const serverlessConfiguration: AWS = {
                       'scheduler:CreateSchedule',
                       'scheduler:UpdateSchedule'
                     ],
-                    Resource: `arn:aws:scheduler:us-west-2:${process.env.AWS_ACCOUNT_ID}:schedule/DrKunta/DrKunta-${process.env.STAGE_NAME}-*`
+                    Resource: `arn:aws:scheduler:us-west-2:${process.env.AWS_ACCOUNT_ID}:schedule/DRKunta/DRKunta-${process.env.STAGE_NAME}-*`
                   },
                   {
                     Effect: 'Allow',
@@ -212,7 +212,7 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/drKunta/${process.env.STAGE_NAME}/*`
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/DRKunta/${process.env.STAGE_NAME}/*`
                   },
                   {
                     Effect: 'Allow',

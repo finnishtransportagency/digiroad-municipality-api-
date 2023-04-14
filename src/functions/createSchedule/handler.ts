@@ -15,13 +15,13 @@ const createSchedule = async (event) => {
   const ssm = new SSM({});
 
   const getParameterCommand = new GetParameterCommand({
-    Name: `DrKunta-${process.env.STAGE_NAME}-${event.municipality}`,
+    Name: `DRKunta-${process.env.STAGE_NAME}-${event.municipality}`,
     WithDecryption: true
   });
   const getParameterResult = await ssm.send(getParameterCommand);
 
   const getScheduleCommand = new GetScheduleCommand({
-    Name: `DrKunta-${process.env.STAGE_NAME}-${event.municipality}`
+    Name: `DRKunta-${process.env.STAGE_NAME}-${event.municipality}`
   });
 
   const getScheduleResult = await scheduler.send(getScheduleCommand);
@@ -34,14 +34,14 @@ const createSchedule = async (event) => {
   }
 
   const putParameterInput = {
-    Name: `/drKunta/${process.env.STAGE_NAME}/${event.municipality}`,
+    Name: `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`,
     Value: event.key,
     Type: 'String'
   };
 
   const createScheduleInput = {
-    Name: `DrKunta-${process.env.STAGE_NAME}-${event.municipality}`,
-    GroupName: `DrKunta-${process.env.STAGE_NAME}`,
+    Name: `DRKunta-${process.env.STAGE_NAME}-${event.municipality}`,
+    GroupName: `DRKunta-${process.env.STAGE_NAME}`,
     ScheduleExpression: 'cron(0 10 ? * TUE *)',
     Target: {
       Arn: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityData`,
