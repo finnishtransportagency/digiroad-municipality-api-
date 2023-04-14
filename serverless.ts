@@ -8,7 +8,8 @@ import {
   getNearbyLinks,
   execDelta2SQL,
   parseXML,
-  fetchMunicipalityData
+  fetchMunicipalityData,
+  createSchedule
 } from '@functions/index';
 
 const serverlessConfiguration: AWS = {
@@ -74,7 +75,8 @@ const serverlessConfiguration: AWS = {
     reportRejectedDelta,
     getNearbyLinks,
     execDelta2SQL,
-    fetchMunicipalityData
+    fetchMunicipalityData,
+    createSchedule
   },
   resources: {
     Resources: {
@@ -82,6 +84,113 @@ const serverlessConfiguration: AWS = {
         Type: 'AWS::S3::Bucket',
         Properties: {
           BucketName: `dr-kunta-${process.env.STAGE_NAME}-bucket`
+        }
+      },
+      createScheduleRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+          RoleName: `DRKunta-${process.env.STAGE_NAME}-createScheduleRole`,
+          AssumeRolePolicyDocument: {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: {
+                  Service: 'lambda.amazonaws.com'
+                },
+                Action: 'sts:AssumeRole',
+                Condition: {
+                  StringEquals: {
+                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
+                  }
+                }
+              }
+            ]
+          },
+          ManagedPolicyArns: [
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+          ],
+          Policies: [
+            {
+              PolicyName: `DRKunta-${process.env.STAGE_NAME}-createSchedulePolicy`,
+              PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      'ssm:GetParameter',
+                      'ssm:GetParameters',
+                      'ssm:PutParameter'
+                    ],
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/drKunta/${process.env.STAGE_NAME}/*`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      'scheduler:ListSchedules',
+                      'scheduler:GetSchedule',
+                      'scheduler:CreateSchedule',
+                      'scheduler:UpdateSchedule'
+                    ]
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      'logs:CreateLogGroup',
+                      'logs:CreateLogStream',
+                      'logs:PutLogEvents'
+                    ],
+                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      fetchMunicipalityDataScheduleRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+          RoleName: `DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataScheduleRole`,
+          AssumeRolePolicyDocument: {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: {
+                  Service: 'scheduler.amazonaws.com'
+                },
+                Action: 'sts:AssumeRole',
+                Condition: {
+                  StringEquals: {
+                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
+                  }
+                }
+              }
+            ]
+          },
+          ManagedPolicyArns: [
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+          ],
+          Policies: [
+            {
+              PolicyName: `DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataSchedulePolicy`,
+              PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [
+                  {
+                    Effect: 'Allow',
+                    Action: ['lambda:InvokeFunction'],
+                    Resource: [
+                      `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityData:*`,
+                      `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityData`
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
         }
       },
       fetchMunicipalityDataRole: {
@@ -96,7 +205,12 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'lambda.amazonaws.com'
                 },
-                Action: 'sts:AssumeRole'
+                Action: 'sts:AssumeRole',
+                Condition: {
+                  StringEquals: {
+                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
+                  }
+                }
               }
             ]
           },
@@ -112,18 +226,12 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/drKunta/*`
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/drKunta/${process.env.STAGE_NAME}/*`
                   },
                   {
                     Effect: 'Allow',
-                    Action: [
-                      's3:PutObject',
-                      's3:PutObjectAcl',
-                      's3:ListBucket',
-                      's3:GetObject',
-                      's3:DeleteObject'
-                    ],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/*`
+                    Action: ['s3:PutObject', 's3:PutObjectAcl'],
+                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/infrao/*`
                   },
                   {
                     Effect: 'Allow',
@@ -157,7 +265,12 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'lambda.amazonaws.com'
                 },
-                Action: 'sts:AssumeRole'
+                Action: 'sts:AssumeRole',
+                Condition: {
+                  StringEquals: {
+                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
+                  }
+                }
               }
             ]
           },
@@ -173,13 +286,11 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: [
-                      's3:PutObject',
-                      's3:PutObjectAcl',
                       's3:ListBucket',
                       's3:GetObject',
                       's3:DeleteObject'
                     ],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/*`
+                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/geojson/*`
                   },
                   {
                     Effect: 'Allow',
@@ -223,7 +334,12 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'lambda.amazonaws.com'
                 },
-                Action: 'sts:AssumeRole'
+                Action: 'sts:AssumeRole',
+                Condition: {
+                  StringEquals: {
+                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
+                  }
+                }
               }
             ]
           },
@@ -238,14 +354,13 @@ const serverlessConfiguration: AWS = {
                 Statement: [
                   {
                     Effect: 'Allow',
-                    Action: [
-                      's3:PutObject',
-                      's3:PutObjectAcl',
-                      's3:ListBucket',
-                      's3:GetObject',
-                      's3:DeleteObject'
-                    ],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/*`
+                    Action: ['s3:ListBucket', 's3:GetObject'],
+                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/infrao/*`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: ['s3:PutObject', 's3:PutObjectAcl'],
+                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/geojson/*`
                   },
                   {
                     Effect: 'Allow',
@@ -284,7 +399,12 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'lambda.amazonaws.com'
                 },
-                Action: 'sts:AssumeRole'
+                Action: 'sts:AssumeRole',
+                Condition: {
+                  StringEquals: {
+                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
+                  }
+                }
               }
             ]
           },
@@ -300,7 +420,7 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/*`
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/${process.env.PGPASSWORD_SSM_KEY}`
                   },
                   {
                     Effect: 'Allow',
@@ -329,7 +449,12 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'lambda.amazonaws.com'
                 },
-                Action: 'sts:AssumeRole'
+                Action: 'sts:AssumeRole',
+                Condition: {
+                  StringEquals: {
+                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
+                  }
+                }
               }
             ]
           },
@@ -384,7 +509,12 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'lambda.amazonaws.com'
                 },
-                Action: 'sts:AssumeRole'
+                Action: 'sts:AssumeRole',
+                Condition: {
+                  StringEquals: {
+                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
+                  }
+                }
               }
             ]
           },
@@ -420,7 +550,12 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/*`
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/${process.env.SMTP_USERNAME_SSM_KEY}`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: ['ssm:GetParameter', 'ssm:GetParameters'],
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/${process.env.SMTP_PASSWORD_SSM_KEY}`
                   }
                 ]
               }
