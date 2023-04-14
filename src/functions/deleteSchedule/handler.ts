@@ -11,7 +11,7 @@ import {
 } from '@aws-sdk/client-scheduler';
 
 const deleteSchedule = async (event) => {
-  const municipality = event.pathParameters.id;
+  const municipality = event.pathParameters.municipality;
 
   const scheduler = new SchedulerClient({});
   const ssm = new SSM({});
