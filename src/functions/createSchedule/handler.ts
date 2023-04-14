@@ -13,7 +13,7 @@ const createSchedule = async (event) => {
   const scheduler = new SchedulerClient({});
   const ssm = new SSM({});
 
-  if (!event.municipality || !event.key || !event.url) {
+  if (!event.body.municipality || !event.body.key || !event.body.url) {
     return {
       statusCode: 400,
       body: 'Invalid input'
@@ -21,21 +21,21 @@ const createSchedule = async (event) => {
   }
 
   const putParameterInput = {
-    Name: `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`,
+    Name: `/DRKunta/${process.env.STAGE_NAME}/${event.body.municipality}`,
     Value: event.key,
     Type: 'String'
   };
 
   const createScheduleInput = {
-    Name: `DRKunta-${process.env.STAGE_NAME}-${event.municipality}`,
+    Name: `DRKunta-${process.env.STAGE_NAME}-${event.body.municipality}`,
     GroupName: `DRKunta-${process.env.STAGE_NAME}`,
     ScheduleExpression: 'cron(0 10 ? * TUE *)',
     Target: {
       Arn: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityData`,
       RoleArn: `arn:aws:iam::${process.env.AWS_ACCOUNT_ID}:role/DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataScheduleRole`,
       Input: `{
-        "municipality": "${event.municipality}",
-        "url": "${event.url}"
+        "municipality": "${event.body.municipality}",
+        "url": "${event.body.url}"
         }`
     },
     FlexibleTimeWindow: {
@@ -59,7 +59,7 @@ const createSchedule = async (event) => {
     await scheduler.send(creteScheduleCommand);
   } catch (e) {
     const deleteParameterInput = {
-      Name: `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`
+      Name: `/DRKunta/${process.env.STAGE_NAME}/${event.body.municipality}`
     };
     const deleteParameterCommand = new DeleteParameterCommand(
       deleteParameterInput
