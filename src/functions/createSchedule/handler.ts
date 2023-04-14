@@ -21,14 +21,14 @@ const createSchedule = async (event) => {
     ScheduleExpression: 'cron(0 10 ? * TUE *)',
     Target: {
       Arn: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityData`,
-      RoleArn: `arn:aws:iam::${process.env.AWS_ACCOUNT_ID}:role/service-role/DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataScheduleRole`,
+      RoleArn: `arn:aws:iam::${process.env.AWS_ACCOUNT_ID}:role/DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataScheduleRole`,
       Input: `{
         "municipality": "${event.municipality}",
         "url": "${event.url}",
         }`
     },
     FlexibleTimeWindow: {
-      Mode: 'off'
+      Mode: 'OFF'
     }
   };
   const putParameterCommand = new PutParameterCommand(putParameterInput);
