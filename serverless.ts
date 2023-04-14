@@ -132,7 +132,8 @@ const serverlessConfiguration: AWS = {
                       'scheduler:GetSchedule',
                       'scheduler:CreateSchedule',
                       'scheduler:UpdateSchedule'
-                    ]
+                    ],
+                    Resource: `arn:aws:scheduler:us-west-2:${process.env.AWS_ACCOUNT_ID}:schedule/DrKunta/DrKunta-${process.env.STAGE_NAME}-*`
                   },
                   {
                     Effect: 'Allow',
