@@ -23,7 +23,7 @@ const listSchedules = async (event) => {
     console.error(e);
     return {
       statusCode: 400,
-      message: 'Could not find schedules'
+      body: 'Could not find schedules'
     };
   }
 };

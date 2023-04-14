@@ -16,7 +16,7 @@ const createSchedule = async (event) => {
   if (!event.municipality || !event.key || !event.url) {
     return {
       statusCode: 400,
-      message: 'Invalid input'
+      body: 'Invalid input'
     };
   }
 
@@ -51,7 +51,7 @@ const createSchedule = async (event) => {
     console.error(e);
     return {
       statusCode: 400,
-      message: 'Schedule already exists'
+      body: 'Schedule already exists'
     };
   }
 
@@ -68,7 +68,7 @@ const createSchedule = async (event) => {
     console.error(e);
     return {
       statusCode: 400,
-      message: 'Schedule already exists'
+      body: 'Schedule already exists'
     };
   }
   return {

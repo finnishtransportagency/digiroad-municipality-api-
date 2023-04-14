@@ -33,7 +33,7 @@ const deleteSchedule = async (event) => {
     console.error(error);
     return {
       statusCode: 400,
-      message: 'No schedule defined for municipality'
+      body: 'No schedule defined for municipality'
     };
   }
 
