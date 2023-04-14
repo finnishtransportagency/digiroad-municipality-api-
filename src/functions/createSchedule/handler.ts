@@ -15,7 +15,7 @@ const createSchedule = async (event) => {
   const ssm = new SSM({});
 
   const getParameterCommand = new GetParameterCommand({
-    Name: `DRKunta/${process.env.STAGE_NAME}/${event.municipality}`,
+    Name: `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`,
     WithDecryption: true
   });
   const getParameterResult = await ssm.send(getParameterCommand);
