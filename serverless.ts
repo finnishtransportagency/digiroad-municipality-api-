@@ -131,7 +131,7 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['scheduler:CreateSchedule'],
-                    Resource: `arn:aws:scheduler:us-west-2:${process.env.AWS_ACCOUNT_ID}:schedule/DRKunta-dev/*`
+                    Resource: `arn:aws:scheduler:eu-west-1:${process.env.AWS_ACCOUNT_ID}:schedule/DRKunta-dev/DRKunta-${process.env.STAGE_NAME}-*`
                   },
                   {
                     Effect: 'Allow',
@@ -141,6 +141,12 @@ const serverlessConfiguration: AWS = {
                       'logs:PutLogEvents'
                     ],
                     Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
+                  },
+                  {
+                    Action: ['iam:PassRole'],
+                    Resource:
+                      'arn:aws:iam::475079312496:role/DRKunta-dev-fetchMunicipalityDataScheduleRole',
+                    Effect: 'Allow'
                   }
                 ]
               }

@@ -24,7 +24,7 @@ const createSchedule = async (event) => {
       RoleArn: `arn:aws:iam::${process.env.AWS_ACCOUNT_ID}:role/DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataScheduleRole`,
       Input: `{
         "municipality": "${event.municipality}",
-        "url": "${event.url}",
+        "url": "${event.url}"
         }`
     },
     FlexibleTimeWindow: {
