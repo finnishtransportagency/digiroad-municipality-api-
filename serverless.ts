@@ -98,12 +98,7 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'lambda.amazonaws.com'
                 },
-                Action: 'sts:AssumeRole',
-                Condition: {
-                  StringEquals: {
-                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
-                  }
-                }
+                Action: 'sts:AssumeRole'
               }
             ]
           },
@@ -162,12 +157,7 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'scheduler.amazonaws.com'
                 },
-                Action: 'sts:AssumeRole',
-                Condition: {
-                  StringEquals: {
-                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
-                  }
-                }
+                Action: 'sts:AssumeRole'
               }
             ]
           },
@@ -206,12 +196,7 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'lambda.amazonaws.com'
                 },
-                Action: 'sts:AssumeRole',
-                Condition: {
-                  StringEquals: {
-                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
-                  }
-                }
+                Action: 'sts:AssumeRole'
               }
             ]
           },
@@ -266,12 +251,7 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'lambda.amazonaws.com'
                 },
-                Action: 'sts:AssumeRole',
-                Condition: {
-                  StringEquals: {
-                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
-                  }
-                }
+                Action: 'sts:AssumeRole'
               }
             ]
           },
@@ -335,12 +315,7 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'lambda.amazonaws.com'
                 },
-                Action: 'sts:AssumeRole',
-                Condition: {
-                  StringEquals: {
-                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
-                  }
-                }
+                Action: 'sts:AssumeRole'
               }
             ]
           },
@@ -400,12 +375,7 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'lambda.amazonaws.com'
                 },
-                Action: 'sts:AssumeRole',
-                Condition: {
-                  StringEquals: {
-                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
-                  }
-                }
+                Action: 'sts:AssumeRole'
               }
             ]
           },
@@ -450,12 +420,7 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'lambda.amazonaws.com'
                 },
-                Action: 'sts:AssumeRole',
-                Condition: {
-                  StringEquals: {
-                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
-                  }
-                }
+                Action: 'sts:AssumeRole'
               }
             ]
           },
@@ -510,12 +475,7 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   Service: 'lambda.amazonaws.com'
                 },
-                Action: 'sts:AssumeRole',
-                Condition: {
-                  StringEquals: {
-                    'aws:SourceAccount': `${process.env.AWS_ACCOUNT_ID}`
-                  }
-                }
+                Action: 'sts:AssumeRole'
               }
             ]
           },
