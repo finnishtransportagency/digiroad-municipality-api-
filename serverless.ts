@@ -22,7 +22,7 @@ const serverlessConfiguration: AWS = {
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
-      apiKeys: `${process.env.API_KEY}`
+      apiKeys: [`${process.env.API_KEY}`]
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
