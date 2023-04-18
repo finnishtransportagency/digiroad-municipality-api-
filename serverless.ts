@@ -1,7 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 
 import {
-  storeMunicipalityData,
   calculateDelta,
   matchRoadLink,
   reportRejectedDelta,
@@ -40,40 +39,11 @@ const serverlessConfiguration: AWS = {
     vpc: {
       securityGroupIds: [process.env.SECURITYGROUPID],
       subnetIds: [process.env.SUBNETAID, process.env.SUBNETBID]
-    },
-    iam: {
-      deploymentRole: `arn:aws:iam::${process.env.AWS_ACCOUNT_ID}:role/CloudFormationExecutionRole`,
-      role: {
-        statements: [
-          {
-            Effect: 'Allow',
-            Action: [
-              's3:PutObject',
-              's3:PutObjectAcl',
-              's3:ListBucket',
-              's3:GetObject',
-              's3:DeleteObject'
-            ],
-            Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/*`
-          },
-          {
-            Effect: 'Allow',
-            Action: ['s3:ListBucket'],
-            Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket`
-          },
-          {
-            Effect: 'Allow',
-            Action: ['lambda:InvokeFunction'],
-            Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-calculateDelta`
-          }
-        ]
-      }
     }
   },
   // import the function via paths
   functions: {
     parseXML,
-    storeMunicipalityData,
     calculateDelta,
     matchRoadLink,
     reportRejectedDelta,
