@@ -10,7 +10,8 @@ import {
   parseXML,
   fetchMunicipalityData,
   createSchedule,
-  listSchedules
+  listSchedules,
+  deleteSchedule
 } from '@functions/index';
 
 const serverlessConfiguration: AWS = {
@@ -80,7 +81,8 @@ const serverlessConfiguration: AWS = {
     execDelta2SQL,
     fetchMunicipalityData,
     createSchedule,
-    listSchedules
+    listSchedules,
+    deleteSchedule
   },
   resources: {
     Resources: {
@@ -151,6 +153,70 @@ const serverlessConfiguration: AWS = {
                     Resource:
                       'arn:aws:iam::475079312496:role/DRKunta-dev-fetchMunicipalityDataScheduleRole',
                     Effect: 'Allow'
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      deleteScheduleRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+          RoleName: `DRKunta-${process.env.STAGE_NAME}-deleteScheduleRole`,
+          AssumeRolePolicyDocument: {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: {
+                  Service: 'lambda.amazonaws.com'
+                },
+                Action: 'sts:AssumeRole'
+              }
+            ]
+          },
+          ManagedPolicyArns: [
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+          ],
+          Policies: [
+            {
+              PolicyName: `DRKunta-${process.env.STAGE_NAME}-deleteSchedulePolicy`,
+              PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [
+                  {
+                    Effect: 'Allow',
+                    Action: ['ssm:DescribeParameters'],
+                    Resource: [
+                      `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:*`
+                    ]
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      'ssm:GetParameter',
+                      'ssm:GetParameters',
+                      'ssm:DeleteParameter'
+                    ],
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/DRKunta/${process.env.STAGE_NAME}/*`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      'scheduler:GetSchedule',
+                      'scheduler:DeleteSchedule'
+                    ],
+                    Resource: `arn:aws:scheduler:eu-west-1:${process.env.AWS_ACCOUNT_ID}:schedule/DRKunta-dev/DRKunta-${process.env.STAGE_NAME}-*`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      'logs:CreateLogGroup',
+                      'logs:CreateLogStream',
+                      'logs:PutLogEvents'
+                    ],
+                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
                   }
                 ]
               }

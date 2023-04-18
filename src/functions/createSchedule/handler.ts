@@ -13,6 +13,13 @@ const createSchedule = async (event) => {
   const scheduler = new SchedulerClient({});
   const ssm = new SSM({});
 
+  if (!event.municipality || !event.key || !event.url) {
+    return {
+      statusCode: 400,
+      message: 'Invalid input'
+    };
+  }
+
   const putParameterInput = {
     Name: `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`,
     Value: event.key,
