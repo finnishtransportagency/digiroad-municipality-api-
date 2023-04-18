@@ -7,7 +7,8 @@ export default {
     {
       http: {
         method: 'delete',
-        path: 'admin/remove/{municipality}'
+        path: 'admin/remove/{municipality}',
+        private: true
       }
     }
   ]

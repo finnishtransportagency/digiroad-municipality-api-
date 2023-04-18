@@ -7,7 +7,8 @@ export default {
     {
       http: {
         method: 'get',
-        path: 'admin/list'
+        path: 'admin/list',
+        private: true
       }
     }
   ]
