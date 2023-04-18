@@ -21,7 +21,8 @@ const serverlessConfiguration: AWS = {
     runtime: 'nodejs18.x',
     apiGateway: {
       minimumCompressionSize: 1024,
-      shouldStartNameWithService: true
+      shouldStartNameWithService: true,
+      apiKeys: `${process.env.API_KEY}`
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
