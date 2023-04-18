@@ -499,7 +499,7 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/${process.env.PGPASSWORD_SSM_KEY}`
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter${process.env.PGPASSWORD_SSM_KEY}`
                   },
                   {
                     Effect: 'Allow',
