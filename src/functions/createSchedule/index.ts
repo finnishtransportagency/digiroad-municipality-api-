@@ -7,7 +7,8 @@ export default {
     {
       http: {
         method: 'post',
-        path: 'admin/add'
+        path: 'admin/add',
+        private: true
       }
     }
   ]
