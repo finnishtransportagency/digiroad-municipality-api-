@@ -156,6 +156,51 @@ const serverlessConfiguration: AWS = {
           ]
         }
       },
+      listSchedulesRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+          RoleName: `DRKunta-${process.env.STAGE_NAME}-listSchedulesRole`,
+          AssumeRolePolicyDocument: {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: {
+                  Service: 'lambda.amazonaws.com'
+                },
+                Action: 'sts:AssumeRole'
+              }
+            ]
+          },
+          ManagedPolicyArns: [
+            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
+          ],
+          Policies: [
+            {
+              PolicyName: `DRKunta-${process.env.STAGE_NAME}-listSchedulesPolicy`,
+              PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [
+                  {
+                    Effect: 'Allow',
+                    Action: ['scheduler:ListSchedules'],
+                    Resource: `arn:aws:scheduler:eu-west-1:${process.env.AWS_ACCOUNT_ID}:schedule/DRKunta-dev/*`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: [
+                      'logs:CreateLogGroup',
+                      'logs:CreateLogStream',
+                      'logs:PutLogEvents'
+                    ],
+                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
       fetchMunicipalityDataScheduleRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
