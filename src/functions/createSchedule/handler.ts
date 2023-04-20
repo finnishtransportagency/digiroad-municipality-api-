@@ -1,5 +1,6 @@
 import { middyfy } from '@libs/lambda';
 import validator from '@middy/validator';
+import { transpileSchema } from '@middy/validator/transpile';
 import {
   SSM,
   PutParameterCommand,
@@ -95,5 +96,5 @@ const createSchedule = async (event) => {
 };
 
 export const main = middyfy(createSchedule).use(
-  validator({ eventSchema: inputSchema })
+  validator({ eventSchema: transpileSchema(inputSchema) })
 );
