@@ -1,4 +1,5 @@
 import { middyfy } from '@libs/lambda';
+import validator from '@middy/validator';
 import {
   SSM,
   PutParameterCommand,
@@ -8,6 +9,23 @@ import {
   SchedulerClient,
   CreateScheduleCommand
 } from '@aws-sdk/client-scheduler';
+
+const inputSchema = {
+  type: 'object',
+  properties: {
+    body: {
+      type: 'object',
+      properties: {
+        municipality: { type: 'string', pattern: '^[a-z]{2,18}$' },
+        key: { type: 'string', pattern: '^[a-zA-Z0-9]*$' },
+        url: {
+          type: 'string'
+        }
+      },
+      required: ['municipality', 'key', 'url']
+    }
+  }
+};
 
 const createSchedule = async (event) => {
   const scheduler = new SchedulerClient({});
@@ -76,4 +94,6 @@ const createSchedule = async (event) => {
   };
 };
 
-export const main = middyfy(createSchedule);
+export const main = middyfy(createSchedule).use(
+  validator({ eventSchema: inputSchema })
+);
