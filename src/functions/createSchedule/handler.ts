@@ -1,5 +1,6 @@
 import { middyfy } from '@libs/lambda';
 import validator from '@middy/validator';
+import httpErrorHandler from '@middy/http-error-handler';
 import { transpileSchema } from '@middy/validator/transpile';
 import {
   SSM,
@@ -127,6 +128,6 @@ const createSchedule = async (event) => {
   };
 };
 
-export const main = middyfy(createSchedule).use(
-  validator({ eventSchema: transpileSchema(inputSchema) })
-);
+export const main = middyfy(createSchedule)
+  .use(validator({ eventSchema: transpileSchema(inputSchema) }))
+  .use(httpErrorHandler());
