@@ -15,9 +15,15 @@ const listSchedules = async (event) => {
 
   try {
     const response = await scheduler.send(listScheduleCommand);
+    const schedules = response.Schedules.map((schedule) => {
+      return {
+        Name: schedule.Name,
+        Created: schedule.CreationDate
+      };
+    });
     return {
       statusCode: 200,
-      body: JSON.stringify(response)
+      body: JSON.stringify(schedules)
     };
   } catch (e) {
     console.error(e);
