@@ -13,7 +13,9 @@ const getParameter = async (name: string): Promise<string> => {
 
 const fetchMunicipalityData = async (event) => {
   const municipality: string = event.municipality;
-  const apiKey = await getParameter(event.authentication);
+  const apiKey = await getParameter(
+    `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`
+  );
   const url = event.url;
   const result = {
     municipality: municipality,
