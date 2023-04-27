@@ -19,7 +19,8 @@ const listSchedules = async (event) => {
     const result = [];
     for (const schedule of listScheduleResponse.Schedules) {
       const getScheduleInput = {
-        Name: schedule.Name
+        Name: schedule.Name,
+        GroupName: `DRKunta-${process.env.STAGE_NAME}`
       };
       const getScheduleCommand = new GetScheduleCommand(getScheduleInput);
       const getScheduleResponse = await scheduler.send(getScheduleCommand);
