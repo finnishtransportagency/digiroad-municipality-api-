@@ -57,7 +57,7 @@ const createSchedule = async (event) => {
   const toCron = (schedule) => {
     let time: string;
     if (schedule.dayOfWeek && schedule.time) {
-      time = `cron(0 ${(schedule.time % 7) + 1} ? * ${schedule.dayOfWeek} *)`;
+      time = `cron(0 ${schedule.time} ? * ${(schedule.dayOfWeek % 7) + 1} *)`;
     } else if (schedule.dayOfMonth && schedule.time) {
       time = `cron(0 ${schedule.time} ${schedule.dayOfMonth} * ? *)`;
     } else {

@@ -5,7 +5,7 @@ import {
   GetScheduleCommand
 } from '@aws-sdk/client-scheduler';
 
-const listSchedules = async (event) => {
+const listSchedules = async () => {
   const scheduler = new SchedulerClient({});
 
   const listScheduleInput = {
