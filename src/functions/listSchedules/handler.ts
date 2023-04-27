@@ -28,7 +28,7 @@ const listSchedules = async (event) => {
         name: getScheduleResponse.Name,
         created: getScheduleResponse.CreationDate,
         schedule: getScheduleResponse.ScheduleExpression,
-        input: getScheduleResponse.Target.Input
+        input: JSON.parse(getScheduleResponse.Target.Input)
       };
       result.push(scheduleObject);
     }
