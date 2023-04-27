@@ -1,7 +1,8 @@
 import { middyfy } from '@libs/lambda';
 import {
   SchedulerClient,
-  ListSchedulesCommand
+  ListSchedulesCommand,
+  GetScheduleCommand
 } from '@aws-sdk/client-scheduler';
 
 const listSchedules = async (event) => {
@@ -14,16 +15,26 @@ const listSchedules = async (event) => {
   const listScheduleCommand = new ListSchedulesCommand(listScheduleInput);
 
   try {
-    const response = await scheduler.send(listScheduleCommand);
-    const schedules = response.Schedules.map((schedule) => {
-      return {
-        Name: schedule.Name,
-        Created: schedule.CreationDate
+    const listScheduleResponse = await scheduler.send(listScheduleCommand);
+    const result = [];
+    for (const schedule of listScheduleResponse.Schedules) {
+      const getScheduleInput = {
+        Name: schedule.Name
       };
-    });
+      const getScheduleCommand = new GetScheduleCommand(getScheduleInput);
+      const getScheduleResponse = await scheduler.send(getScheduleCommand);
+      const scheduleObject = {
+        name: getScheduleResponse.Name,
+        created: getScheduleResponse.CreationDate,
+        schedule: getScheduleResponse.ScheduleExpression,
+        target: getScheduleResponse.Target
+      };
+      result.push(scheduleObject);
+    }
+
     return {
       statusCode: 200,
-      body: JSON.stringify(schedules)
+      body: JSON.stringify(result)
     };
   } catch (e) {
     console.error(e);

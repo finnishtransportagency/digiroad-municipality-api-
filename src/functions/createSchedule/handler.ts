@@ -26,7 +26,7 @@ const inputSchema = {
         schedule: {
           type: 'object',
           properties: {
-            dayOfWeek: { type: 'integer', minimum: 0, maximum: 6 },
+            dayOfWeek: { type: 'integer', minimum: 1, maximum: 7 },
             dayOfMonth: { type: 'integer', minimum: 1, maximum: 31 },
             time: { type: 'integer', minimum: 0, maximum: 23 }
           }
@@ -57,7 +57,7 @@ const createSchedule = async (event) => {
   const toCron = (schedule) => {
     let time: string;
     if (schedule.dayOfWeek && schedule.time) {
-      time = `cron(0 ${schedule.time} ? * ${schedule.dayOfWeek} *)`;
+      time = `cron(0 ${(schedule.time % 7) + 1} ? * ${schedule.dayOfWeek} *)`;
     } else if (schedule.dayOfMonth && schedule.time) {
       time = `cron(0 ${schedule.time} ${schedule.dayOfMonth} * ? *)`;
     } else {
