@@ -28,7 +28,7 @@ const listSchedules = async (event) => {
         name: getScheduleResponse.Name,
         created: getScheduleResponse.CreationDate,
         schedule: getScheduleResponse.ScheduleExpression,
-        target: getScheduleResponse.Target
+        input: getScheduleResponse.Target.Input
       };
       result.push(scheduleObject);
     }
