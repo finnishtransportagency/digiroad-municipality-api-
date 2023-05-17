@@ -32,8 +32,13 @@ const gerNearbyLinks = async (event) => {
     ), acceptable_roadlinks AS (
       SELECT linkid, shape
       FROM kgv_roadlink, municipality_
-      WHERE kgv_roadlink.municipalitycode = municipality_.id AND (kgv_roadlink.adminclass IN (2,3) OR kgv_roadlink.adminclass IS NULL)
+      WHERE kgv_roadlink.municipalitycode = municipality_.id AND not EXISTS(
+      SELECT 1
+      FROM administrative_class 
+      WHERE administrative_class.link_id = kgv_roadlink.linkid and administrative_class.administrative_class = 1
+      ) and kgv_roadlink.adminclass != 1
     )
+    
     
     SELECT (value#>'{properties}'->>'ID')::TEXT AS ID, (value#>'{properties}'->>'TYPE')::TEXT AS TYPE, json_agg((st_astext(shape),linkid)) AS roadlinks
     FROM json_array_elements($2) AS features, acceptable_roadlinks
