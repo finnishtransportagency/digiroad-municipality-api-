@@ -124,7 +124,8 @@ const createSchedule = async (event) => {
     };
   }
   return {
-    statusCode: 201
+    statusCode: 201,
+    body: `Successfully added schedule for ${event.body.municipality}`
   };
 };
 
