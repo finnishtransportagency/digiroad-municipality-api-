@@ -20,9 +20,8 @@ const inputSchema = {
       properties: {
         municipality: { type: 'string', pattern: '^[a-z]{2,18}$' },
         key: { type: 'string', pattern: '^[a-zA-Z0-9]*$' },
-        url: {
-          type: 'string'
-        },
+        url: { type: 'string' },
+        format: { type: 'string', pattern: '^(json|xml)$' },
         schedule: {
           type: 'object',
           properties: {
@@ -32,7 +31,7 @@ const inputSchema = {
           }
         }
       },
-      required: ['municipality', 'key', 'url']
+      required: ['municipality', 'key', 'url', 'format']
     }
   }
 };
@@ -87,7 +86,8 @@ const createSchedule = async (event) => {
       RoleArn: `arn:aws:iam::${process.env.AWS_ACCOUNT_ID}:role/DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataScheduleRole`,
       Input: `{
         "municipality": "${event.body.municipality}",
-        "url": "${event.body.url}"
+        "url": "${event.body.url}",
+        "format": "${event.body.format}"
         }`
     },
     FlexibleTimeWindow: {
