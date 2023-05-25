@@ -45,7 +45,8 @@ const deleteSchedule = async (event) => {
   await ssm.send(deleteParameterCommand);
 
   return {
-    statusCode: 200
+    statusCode: 200,
+    body: `Successfully deleted schedule for ${municipality}`
   };
 };
 
