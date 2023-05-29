@@ -16,7 +16,7 @@ For detailed instructions, please refer to the [documentation](https://www.serve
 
 ### Usage
 
-Usage requires an API-key, which are municipality specific.
+Creating or deleting schedules requires an API-key.
 
 ### Project structure
 
