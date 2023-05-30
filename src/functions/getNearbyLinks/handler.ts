@@ -36,7 +36,7 @@ const gerNearbyLinks = async (event) => {
       SELECT 1
       FROM administrative_class 
       WHERE administrative_class.link_id = kgv_roadlink.linkid and administrative_class.administrative_class = 1
-      ) and kgv_roadlink.adminclass != 1
+      ) and (kgv_roadlink.adminclass != 1 OR kgv_roadlink.adminclass is NULL)
     )
     
     
