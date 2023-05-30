@@ -13,6 +13,7 @@ const parseXML = async (event) => {
   const lambda = new Lambda({});
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
   const municipality: string = key.split('/')[1];
+  const assetType: string = key.split('/')[2];
 
   const sendReport = async (message: string) => {
     const invokeRejectedDeltaParams = {
@@ -103,7 +104,7 @@ const parseXML = async (event) => {
   const now = new Date().toISOString().slice(0, 19);
   const putParams = {
     Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    Key: `geojson/${municipality}/${now}.json`,
+    Key: `geojson/${municipality}/${assetType}/${now}.json`,
     Body: JSON.stringify(validatedGeoJSON)
   };
 

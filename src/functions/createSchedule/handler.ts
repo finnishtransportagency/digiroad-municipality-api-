@@ -22,6 +22,13 @@ const inputSchema = {
         key: { type: 'string', pattern: '^[a-zA-Z0-9]*$' },
         url: { type: 'string' },
         format: { type: 'string', pattern: '^(json|xml)$' },
+        assetTypes: {
+          type: 'object',
+          properties: {
+            obstacles: { type: 'string' },
+            traficSigns: { type: 'string' }
+          }
+        },
         schedule: {
           type: 'object',
           properties: {
@@ -31,7 +38,7 @@ const inputSchema = {
           }
         }
       },
-      required: ['municipality', 'key', 'url', 'format']
+      required: ['municipality', 'key', 'url', 'format', 'assetTypes']
     }
   }
 };
