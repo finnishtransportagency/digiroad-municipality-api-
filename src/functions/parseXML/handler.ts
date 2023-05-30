@@ -62,22 +62,22 @@ const parseXML = async (event) => {
     const featureMembers = featureCollection.featureMember;
 
     const features: Array<Feature> = [];
+    if (featureMembers) {
+      for (const feature of featureMembers) {
+        if (feature.Liikennemerkki) {
+          features.push(parseTrafficsign(feature.Liikennemerkki));
+          continue;
+        }
 
-    for (const feature of featureMembers) {
-      if (feature.Liikennemerkki) {
-        features.push(parseTrafficsign(feature.Liikennemerkki));
-        continue;
-      }
-
-      if (
-        feature.Rakenne &&
-        feature.Rakenne.rakenne === 'kulkuesteet (pollarit, puomit)'
-      ) {
-        features.push(parseObstacle(feature.Rakenne));
-        continue;
+        if (
+          feature.Rakenne &&
+          feature.Rakenne.rakenne === 'kulkuesteet (pollarit, puomit)'
+        ) {
+          features.push(parseObstacle(feature.Rakenne));
+          continue;
+        }
       }
     }
-
     const geoJSON = {
       type: 'FeatureCollection',
       name: `${municipality}-Kuntarajapinta`,
