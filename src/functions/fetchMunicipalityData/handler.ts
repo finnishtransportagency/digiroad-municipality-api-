@@ -21,28 +21,30 @@ const fetchMunicipalityData = async (event) => {
   );
 
   if (event.format === 'xml') {
-    const url =
-      event.url +
-      '/collections/infrao:Rakenne/items?f=gml&crs=http://www.opengis.net/def/crs/EPSG/0/3067';
+    for (var assetType of Object.entries(event.assetTypes)) {
+      const url =
+        event.url +
+        `/collections/${assetType[1]}/items?f=gml&crs=http://www.opengis.net/def/crs/EPSG/0/3067&limit=-1`;
 
-    const { data, status } = await axios.get(url, {
-      headers: {
-        'x-api-key': apiKey
-      }
-    });
-    console.log(status);
-    const now = new Date().toISOString().slice(0, 19);
+      const { data, status } = await axios.get(url, {
+        headers: {
+          'x-api-key': apiKey
+        }
+      });
+      console.log(status);
+      const now = new Date().toISOString().slice(0, 19);
 
-    const putParams = {
-      Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-      Key: `infrao/${event.municipality}/${now}.xml`,
-      Body: data
-    };
+      const putParams = {
+        Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+        Key: `infrao/${event.municipality}/${assetType[0]}/${now}.xml`,
+        Body: data
+      };
 
-    await new Upload({
-      client: s3,
-      params: putParams
-    }).done();
+      await new Upload({
+        client: s3,
+        params: putParams
+      }).done();
+    }
   }
   return;
 };
