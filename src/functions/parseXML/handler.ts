@@ -46,7 +46,7 @@ const parseXML = async (event) => {
     return;
   }
 
-  const alwaysArray = ['InfraoKohteet.FeatureCollection.featureMember'];
+  const alwaysArray = ['FeatureCollection.featureMember'];
   //Assures that even if there is only one of a feature it makes it an array
   const options = {
     isArray: (_name, jpath) => {
