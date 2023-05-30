@@ -4,8 +4,8 @@ import { Upload } from '@aws-sdk/lib-storage';
 import { S3, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
 import { XMLParser } from 'fast-xml-parser';
-import parseObstacles from './datatypes/parseObstacles';
-import parseTrafficsigns from './datatypes/parseTrafficsigns';
+import parseObstacle from './datatypes/parseObstacles';
+import parseTrafficsign from './datatypes/parseTrafficsigns';
 import { schema } from './validationSchemas/validationSchema';
 
 const parseXML = async (event) => {
@@ -46,41 +46,41 @@ const parseXML = async (event) => {
     return;
   }
 
-  const alwaysArray = [
-    'inf:InfraoKohteet.gml:featureMembers.inf:Rakenne',
-    'inf:InfraoKohteet.gml:featureMembers.inf:Liikennemerkki'
-  ];
+  const alwaysArray = ['InfraoKohteet.FeatureCollection.featureMember'];
   //Assures that even if there is only one of a feature it makes it an array
   const options = {
     isArray: (_name, jpath) => {
       if (alwaysArray.indexOf(jpath) !== -1) return true;
-    }
+    },
+    removeNSPrefix: true
   };
 
   try {
     const parser = new XMLParser(options);
     const asJSON = parser.parse(xmlFile, true);
-    const root = asJSON['inf:InfraoKohteet'];
-    const toimituksenTiedot = root['inf:toimituksentiedot'];
-    const toimitus = toimituksenTiedot['inf:Toimitus'];
-    const featureMembers = root['gml:featureMembers'];
-    const liikennemerkit = featureMembers['inf:Liikennemerkki'];
-    const esterakennelmat = featureMembers['inf:Rakenne'];
-    const aineistonnimi = toimitus['inf:aineistonnimi'];
+    const featureCollection = asJSON.FeatureCollection;
+    const featureMembers = featureCollection.featureMembers;
 
-    let features: Array<Feature> = [];
+    const features: Array<Feature> = [];
 
-    if (liikennemerkit) {
-      features = features.concat(parseTrafficsigns(liikennemerkit));
-    }
+    for (const feature of featureMembers) {
+      if (feature.Liikennemerkki) {
+        features.push(parseTrafficsign(feature.Liikennemerkki));
+        continue;
+      }
 
-    if (esterakennelmat) {
-      features = features.concat(parseObstacles(esterakennelmat));
+      if (
+        feature.Rakenne &&
+        feature.Rakenne.rakenne === 'kulkuesteet (pollarit, puomit)'
+      ) {
+        features.push(parseObstacle(feature.Rakenne));
+        continue;
+      }
     }
 
     const geoJSON = {
       type: 'FeatureCollection',
-      name: aineistonnimi,
+      name: `${municipality}-Kuntarajapinta`,
       crs: {
         type: 'name',
         properties: {
