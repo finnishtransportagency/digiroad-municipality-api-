@@ -59,7 +59,7 @@ const parseXML = async (event) => {
     const parser = new XMLParser(options);
     const asJSON = parser.parse(xmlFile, true);
     const featureCollection = asJSON.FeatureCollection;
-    const featureMembers = featureCollection.featureMembers;
+    const featureMembers = featureCollection.featureMember;
 
     const features: Array<Feature> = [];
 
