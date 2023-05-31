@@ -26,7 +26,7 @@ const inputSchema = {
           type: 'object',
           properties: {
             obstacles: { type: 'string' },
-            traficSigns: { type: 'string' }
+            trafficSigns: { type: 'string' }
           }
         },
         schedule: {
@@ -87,7 +87,8 @@ const createSchedule = async (event) => {
       Input: `{
         "municipality": "${event.body.municipality}",
         "url": "${event.body.url}",
-        "format": "${event.body.format}"
+        "format": "${event.body.format}",
+        "assetTypes": ${JSON.stringify(event.body.assetTypes)}
         }`
     },
     FlexibleTimeWindow: {
