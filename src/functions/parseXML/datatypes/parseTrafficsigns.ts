@@ -1,5 +1,3 @@
-import { Feature } from '@functions/typing';
-
 export default function (liikennemerkki) {
   const feature = {
     type: 'Feature',
@@ -8,7 +6,7 @@ export default function (liikennemerkki) {
       ID: liikennemerkki['yksilointitieto'],
       SUUNTIMA: liikennemerkki['suunta'],
       TEKSTI: liikennemerkki['teksti'],
-      LM_TYYPPI: liikennemerkki['liikennemerkkityyppi2020']
+      LM_TYYPPI: 'D6 Yhdistetty pyörätie ja jalkakäytävä' //For testing
     },
     geometry: {
       type: 'Point',
