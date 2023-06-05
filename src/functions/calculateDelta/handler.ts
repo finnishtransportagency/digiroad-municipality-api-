@@ -7,7 +7,10 @@ import {
   DeleteObjectCommand
 } from '@aws-sdk/client-s3';
 import { Feature, PayloadFeature } from '@functions/typing';
-import { schema } from './validation/validationSchema';
+import {
+  obstaclesSchema,
+  trafficSignsSchema
+} from './validation/validationSchema';
 import isEqual from 'lodash.isequal';
 
 const calculateDelta = async (event) => {
@@ -45,6 +48,16 @@ const calculateDelta = async (event) => {
     } catch (e) {
       throw new Error(`Could not retrieve file from S3: ${e.message}`);
     }
+  }
+  let schema;
+  if (assetType === 'obstacles') {
+    schema = obstaclesSchema;
+  }
+  if (assetType === 'trafficSigns') {
+    schema = trafficSignsSchema;
+  }
+  if (!schema) {
+    throw new Error('Unknown assetType');
   }
 
   try {

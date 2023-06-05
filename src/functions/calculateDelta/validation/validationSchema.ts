@@ -4,20 +4,6 @@ import {
   allowedTrafficSigns
 } from './trafficSignTypes.js';
 
-const trafficSignOrObstacle = yup.lazy((item) => {
-  if (trafficSignPropertiesSchema.isValidSync(item)) {
-    return trafficSignPropertiesSchema;
-  }
-  if (obstaclePropertiesSchema.isValidSync(item)) {
-    return obstaclePropertiesSchema;
-  }
-  return yup.mixed().test(
-    'Properties error',
-    (d) => `Properties mismatch: ${d.path}`,
-    () => false
-  );
-});
-
 const additionalPanel = yup.object().shape({
   LK_TYYPPI: yup.string().required().oneOf(allowedAdditionalPanel),
   ARVO: yup.number().notRequired(),
@@ -61,9 +47,15 @@ const pointGeometrySchema = yup.object().shape({
   coordinates: yup.array().of(yup.number().required()).length(2)
 });
 
-const pointFeatureSchema = yup.object().shape({
+const obstacleFeatureSchema = yup.object().shape({
   type: yup.string().required(),
-  properties: trafficSignOrObstacle,
+  properties: obstaclePropertiesSchema,
+  geometry: pointGeometrySchema.required()
+});
+
+const trafficSignFeatureSchema = yup.object().shape({
+  type: yup.string().required(),
+  properties: trafficSignPropertiesSchema,
   geometry: pointGeometrySchema.required()
 });
 
@@ -77,11 +69,18 @@ const crsSchema = yup.object().shape({
     .notRequired()
 });
 
-const schema = yup.object().shape({
+const obstaclesSchema = yup.object().shape({
   type: yup.string().required(),
   name: yup.string().notRequired(),
   crs: crsSchema.notRequired(),
-  features: yup.array().of(pointFeatureSchema).required()
+  features: yup.array().of(obstacleFeatureSchema).required()
 });
 
-export { schema, obstaclePropertiesSchema };
+const trafficSignsSchema = yup.object().shape({
+  type: yup.string().required(),
+  name: yup.string().notRequired(),
+  crs: crsSchema.notRequired(),
+  features: yup.array().of(trafficSignFeatureSchema).required()
+});
+
+export { trafficSignsSchema, obstaclesSchema, obstaclePropertiesSchema };
