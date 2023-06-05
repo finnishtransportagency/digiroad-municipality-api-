@@ -6,7 +6,10 @@ import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
 import { XMLParser } from 'fast-xml-parser';
 import parseObstacle from './datatypes/parseObstacles';
 import parseTrafficsign from './datatypes/parseTrafficsigns';
-import { schema } from './validationSchemas/validationSchema';
+import {
+  obstaclesSchema,
+  trafficSignsSchema
+} from './validationSchemas/validationSchema';
 
 const parseXML = async (event) => {
   const s3 = new S3({});
@@ -48,14 +51,23 @@ const parseXML = async (event) => {
   }
 
   const alwaysArray = ['FeatureCollection.featureMember'];
-  //Assures that even if there is only one of a feature it makes it an array
+  //Assures that even if there is only one feature it makes it an array
   const options = {
     isArray: (_name, jpath) => {
       if (alwaysArray.indexOf(jpath) !== -1) return true;
     },
     removeNSPrefix: true
   };
-
+  let schema;
+  if (assetType === 'obstacles') {
+    schema = obstaclesSchema;
+  }
+  if (assetType === 'trafficSigns') {
+    schema = trafficSignsSchema;
+  }
+  if (!schema) {
+    throw new Error('Unknown assetType');
+  }
   try {
     const parser = new XMLParser(options);
     const asJSON = parser.parse(xmlFile, true);
