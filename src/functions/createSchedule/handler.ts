@@ -27,7 +27,10 @@ const inputSchema = {
           properties: {
             obstacles: { type: 'string' },
             trafficSigns: { type: 'string' }
-          }
+          },
+          minProperties: 1,
+          maxProperties: 2,
+          additionalProperties: false
         },
         schedule: {
           type: 'object',
