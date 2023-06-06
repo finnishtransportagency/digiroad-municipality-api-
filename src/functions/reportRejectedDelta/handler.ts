@@ -60,7 +60,7 @@ const reportRejectedDelta = async (event) => {
       return;
   }
 
-  const recipients = [process.env.OPERATOR_EMAIL];
+  const recipients = process.env.OPERATOR_EMAIL.split(',');
 
   const municipalityEmail = await ejs.renderFile(
     path.resolve(__dirname, './templates/' + templateName),
