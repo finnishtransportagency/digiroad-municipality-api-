@@ -1,6 +1,7 @@
 import { middyfy } from '@libs/lambda';
 import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
 import { S3, GetObjectCommand } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 import findNearestLink from './findNearestLink';
 import GeometryFactory from 'jsts/org/locationtech/jts/geom/GeometryFactory';
 import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel';
@@ -112,10 +113,26 @@ const matchRoadLinks = async (event) => {
     }
   };
 
+  const now = new Date().toISOString().slice(0, 19);
+  const putParams = {
+    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    Key: `matchRoadLink/${delta.metadata.municipality}/${now}.json`,
+    Body: JSON.stringify(execDelta2SQLBody)
+  };
+
+  await new Upload({
+    client: s3,
+    params: putParams
+  }).done();
+
   const execDelta2SQLParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-execDelta2SQL`,
     InvocationType: 'Event',
-    Payload: Buffer.from(JSON.stringify(execDelta2SQLBody))
+    Payload: Buffer.from(
+      JSON.stringify({
+        key: `matchRoadLink/${delta.metadata.municipality}/${now}.json`
+      })
+    )
   };
 
   const execDelta2SQLCommand = new InvokeCommand(execDelta2SQLParams);

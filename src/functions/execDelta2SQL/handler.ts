@@ -1,5 +1,6 @@
 import { middyfy } from '@libs/lambda';
 import { SSM, GetParameterCommand } from '@aws-sdk/client-ssm';
+import { S3, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Client } from 'pg';
 
 import execCreatedObstacle from './execObstacle/execCreated';
@@ -19,8 +20,18 @@ const getParameter = async (name: string): Promise<string> => {
   const result = await ssm.send(getParametersCommand);
   return result.Parameter.Value;
 };
+const s3 = new S3({});
 
 const execDelta2SQL = async (event) => {
+  const getObjectParams = {
+    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    Key: event.key
+  };
+  const getObjectsCommand = new GetObjectCommand(getObjectParams);
+  const data = await s3.send(getObjectsCommand);
+  const object = await data.Body.transformToString();
+  const delta = JSON.parse(object);
+
   const client = new Client({
     host: process.env.PGHOST,
     port: parseInt(process.env.PGPORT),
@@ -30,7 +41,7 @@ const execDelta2SQL = async (event) => {
   });
   client.connect();
 
-  const municipality: string = event.metadata.municipality;
+  const municipality: string = delta.metadata.municipality;
 
   const dbmodifier = `municipality-api-${municipality}`;
 
@@ -49,7 +60,7 @@ const execDelta2SQL = async (event) => {
       ).rows[0].id
     );
 
-    for (const feature of event.Created) {
+    for (const feature of delta.Created) {
       if (feature.properties.TYPE === 'OBSTACLE') {
         await execCreatedObstacle(
           feature,
@@ -67,7 +78,7 @@ const execDelta2SQL = async (event) => {
         );
       }
     }
-    for (const feature of event.Deleted) {
+    for (const feature of delta.Deleted) {
       if (feature.properties.TYPE === 'OBSTACLE') {
         await execExpiredObstacle(
           feature,
@@ -85,7 +96,7 @@ const execDelta2SQL = async (event) => {
         );
       }
     }
-    for (const feature of event.Updated) {
+    for (const feature of delta.Updated) {
       if (feature.properties.TYPE === 'OBSTACLE') {
         await execUpdatedObstacle(
           feature,
