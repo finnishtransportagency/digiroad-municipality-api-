@@ -42,7 +42,7 @@ const gerNearbyLinks = async (event) => {
     
     SELECT (value#>'{properties}'->>'ID')::TEXT AS ID, (value#>'{properties}'->>'TYPE')::TEXT AS TYPE, json_agg((st_astext(shape),linkid)) AS roadlinks
     FROM json_array_elements($2) AS features, acceptable_roadlinks
-    WHERE ST_BUFFER(ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067), 10) && acceptable_roadlinks.shape 
+    WHERE ST_BUFFER(ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067), 5) && acceptable_roadlinks.shape 
     GROUP BY ID,TYPE
     `,
     values: [event.municipality, JSON.stringify(event.features)]
