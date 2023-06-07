@@ -1,5 +1,6 @@
 import { middyfy } from '@libs/lambda';
 import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
+import { S3, GetObjectCommand } from '@aws-sdk/client-s3';
 import findNearestLink from './findNearestLink';
 import GeometryFactory from 'jsts/org/locationtech/jts/geom/GeometryFactory';
 import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel';
@@ -16,16 +17,26 @@ import filterByBearing from './filterByBearing';
 const MAX_OFFSET = 2;
 
 const lambda = new Lambda({});
+const s3 = new S3({});
 
 const matchRoadLinks = async (event) => {
+  const getObjectParams = {
+    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    Key: event.key
+  };
+  const getObjectsCommand = new GetObjectCommand(getObjectParams);
+  const data = await s3.send(getObjectsCommand);
+  const object = await data.Body.transformToString();
+  const delta = JSON.parse(object);
+
   let rejectsAmount = 0;
 
-  const features: Array<Feature> = event.Created.concat(event.Updated);
+  const features: Array<Feature> = delta.Created.concat(delta.Updated);
   const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
 
   const getNearbyLinksPayload = {
     features: features,
-    municipality: event.metadata.municipality
+    municipality: delta.metadata.municipality
   };
   const getNearbyLinksParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-getNearbyLinks`,
@@ -88,16 +99,16 @@ const matchRoadLinks = async (event) => {
   }
 
   const execDelta2SQLBody: PayloadFeature = {
-    Created: event.Created.filter(
+    Created: delta.Created.filter(
       (feature: Feature) => !feature.properties.DR_REJECTED
     ),
-    Deleted: event.Deleted,
-    Updated: event.Updated.filter(
+    Deleted: delta.Deleted,
+    Updated: delta.Updated.filter(
       (feature: Feature) => !feature.properties.DR_REJECTED
     ),
     metadata: {
       OFFSET_LIMIT: MAX_OFFSET,
-      municipality: event.metadata.municipality
+      municipality: delta.metadata.municipality
     }
   };
 
@@ -112,12 +123,12 @@ const matchRoadLinks = async (event) => {
   await lambda.send(execDelta2SQLCommand);
 
   const reportRejectedDeltabody: PayloadFeature = {
-    Created: event.Created,
-    Deleted: event.Deleted,
-    Updated: event.Updated,
+    Created: delta.Created,
+    Deleted: delta.Deleted,
+    Updated: delta.Updated,
     metadata: {
       OFFSET_LIMIT: MAX_OFFSET,
-      municipality: event.metadata.municipality
+      municipality: delta.metadata.municipality
     }
   };
 
@@ -128,7 +139,7 @@ const matchRoadLinks = async (event) => {
       JSON.stringify({
         ReportType:
           rejectsAmount > 0 ? 'matchedWithFailures' : 'matchedSuccessfully',
-        Municipality: event.metadata.municipality,
+        Municipality: delta.metadata.municipality,
         Body: reportRejectedDeltabody
       })
     )

@@ -6,6 +6,7 @@ import {
   GetObjectCommand,
   DeleteObjectCommand
 } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 import { Feature, PayloadFeature } from '@functions/typing';
 import {
   obstaclesSchema,
@@ -168,10 +169,25 @@ const calculateDelta = async (event) => {
       municipality: municipality
     }
   };
+
+  const now = new Date().toISOString().slice(0, 19);
+  const putParams = {
+    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    Key: `calculateDelta/${municipality}/${now}.json`,
+    Body: JSON.stringify(payLoad)
+  };
+
+  await new Upload({
+    client: s3,
+    params: putParams
+  }).done();
+
   const invokeMatchRoadLinkParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-matchRoadLink`,
     InvocationType: 'Event',
-    Payload: Buffer.from(JSON.stringify(payLoad))
+    Payload: Buffer.from(
+      JSON.stringify({ key: `calculateDelta/${municipality}/${now}.json` })
+    )
   };
   const invokeMatchRoadLinksCommand = new InvokeCommand(
     invokeMatchRoadLinkParams
