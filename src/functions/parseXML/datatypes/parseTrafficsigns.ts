@@ -1,4 +1,12 @@
-export default function (liikennemerkki) {
+import { oldTrafficSignMapping } from './trafficSignMapping';
+
+export default function (liikennemerkki, now) {
+  if (liikennemerkki.loppuHetki && liikennemerkki.loppuHetki < now) return;
+  const trafficSignType =
+    liikennemerkki.liikennemerkkityyppi2020 !== 'ei tiedossa'
+      ? liikennemerkki.liikennemerkkityyppi2020
+      : oldTrafficSignMapping[liikennemerkki.liikennemerkkityyppi];
+  if (!trafficSignType) return;
   const feature = {
     type: 'Feature',
     properties: {

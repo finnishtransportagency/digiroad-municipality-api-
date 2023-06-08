@@ -1,6 +1,6 @@
-import { Feature } from '@functions/typing';
-
-export default function (rakenne) {
+export default function (rakenne, now) {
+  if (rakenne.rakenne !== 'kulkuesteet (pollarit, puomit)') return;
+  if (rakenne.loppuHetki && rakenne.loppuHetki < now) return;
   const feature = {
     type: 'Feature',
     properties: {
