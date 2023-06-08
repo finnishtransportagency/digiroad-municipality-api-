@@ -63,8 +63,6 @@ const gerNearbyLinks = async (event) => {
         });
       });
       client.end();
-
-      console.log(Buffer.byteLength(JSON.stringify(res.rows)));
       return res.rows;
     })
     .catch((error) => {
