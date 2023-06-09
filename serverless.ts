@@ -524,6 +524,11 @@ const serverlessConfiguration: AWS = {
                     Effect: 'Allow',
                     Action: ['s3:ListBucket', 's3:GetObject'],
                     Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/matchRoadLink/*`
+                  },
+                  {
+                    Effect: 'Allow',
+                    Action: ['s3:PutObject', 's3:PutObjectAcl'],
+                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/getRoadLinks/*`
                   }
                 ]
               }
