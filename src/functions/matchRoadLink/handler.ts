@@ -21,14 +21,25 @@ const lambda = new Lambda({});
 const s3 = new S3({});
 
 const matchRoadLinks = async (event) => {
-  const getObjectParams = {
-    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    Key: event.key
-  };
-  const getObjectsCommand = new GetObjectCommand(getObjectParams);
-  const data = await s3.send(getObjectsCommand);
-  const object = await data.Body.transformToString();
-  const delta = JSON.parse(object);
+  async function getObject(bucket: string, objectKey: string) {
+    try {
+      const getObjectParams = {
+        Bucket: bucket,
+        Key: objectKey
+      };
+      const getObjectsCommand = new GetObjectCommand(getObjectParams);
+      const data = await s3.send(getObjectsCommand);
+      const object = await data.Body.transformToString();
+      return JSON.parse(object);
+    } catch (e) {
+      throw new Error(`Could not retrieve file from S3: ${e.message}`);
+    }
+  }
+
+  const delta = await getObject(
+    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    event.key
+  );
 
   let rejectsAmount = 0;
 
@@ -46,15 +57,17 @@ const matchRoadLinks = async (event) => {
   };
 
   const getNearbyLinksCommand = new InvokeCommand(getNearbyLinksParams);
+  const invocationResult = await lambda.send(getNearbyLinksCommand);
 
-  try {
-    const invocationResult = await lambda.send(getNearbyLinksCommand);
-    var allRoadLinks = JSON.parse(
-      Buffer.from(invocationResult.Payload).toString()
-    ) as Array<FeatureRoadlinkMap>;
-  } catch (error) {
-    console.error(error);
-  }
+  const allRoadLinksS3Key = JSON.parse(
+    Buffer.from(invocationResult.Payload).toString()
+  ).key;
+
+  const allRoadLinks: Array<FeatureRoadlinkMap> = await getObject(
+    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    allRoadLinksS3Key
+  );
+
   for (let p = 0; p < features.length; p++) {
     const feature = features[p];
     const roadLinks: Array<LinkObject> | undefined = allRoadLinks.find(

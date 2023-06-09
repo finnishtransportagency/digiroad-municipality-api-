@@ -1,6 +1,8 @@
 import { middyfy } from '@libs/lambda';
 import { SSM, GetParameterCommand } from '@aws-sdk/client-ssm';
-import { Client, QueryResult } from 'pg';
+import { S3 } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
+import { Client } from 'pg';
 import { Geometry, LineString, Point } from 'wkx';
 
 const getParameter = async (name: string): Promise<string> => {
@@ -13,6 +15,7 @@ const getParameter = async (name: string): Promise<string> => {
   return result.Parameter.Value;
 };
 
+const s3 = new S3({});
 const gerNearbyLinks = async (event) => {
   const client = new Client({
     host: process.env.PGHOST,
@@ -47,29 +50,35 @@ const gerNearbyLinks = async (event) => {
     `,
     values: [event.municipality, JSON.stringify(event.features)]
   };
-  return client
-    .query(query)
-    .then((res: QueryResult) => {
-      res.rows.forEach((row) => {
-        row.roadlinks.forEach((roadlink) => {
-          const feature = Geometry.parse(
-            `SRID=3067;${roadlink.f1}`
-          ) as LineString;
-          const pointObjects: Array<Point> = feature.points;
-          roadlink.linkId = roadlink.f2;
-          roadlink.points = pointObjects;
-          delete roadlink.f1;
-          delete roadlink.f2;
-        });
-      });
-      client.end();
-      return res.rows;
-    })
-    .catch((error) => {
-      client.end();
-      console.error('Query failed:', error);
-      return;
+
+  const res = await client.query(query);
+  client.end();
+
+  res.rows.forEach((row) => {
+    row.roadlinks.forEach((roadlink) => {
+      const feature = Geometry.parse(`SRID=3067;${roadlink.f1}`) as LineString;
+      const pointObjects: Array<Point> = feature.points;
+      roadlink.linkId = roadlink.f2;
+      roadlink.points = pointObjects;
+      delete roadlink.f1;
+      delete roadlink.f2;
     });
+  });
+
+  const now = new Date().toISOString().slice(0, 19);
+  const S3ObjectKey = `getNearbyLinks/${event.municipality}/${now}.json`;
+  const putParams = {
+    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    Key: S3ObjectKey,
+    Body: JSON.stringify(res.rows)
+  };
+
+  await new Upload({
+    client: s3,
+    params: putParams
+  }).done();
+
+  return { key: S3ObjectKey };
 };
 
 export const main = middyfy(gerNearbyLinks);
