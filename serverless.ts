@@ -588,7 +588,10 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['s3:ListBucket', 's3:GetObject'],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/calculateDelta/*`
+                    Resource: [
+                      `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/calculateDelta/*`,
+                      `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/getNearbyLinks/*`
+                    ]
                   },
                   {
                     Effect: 'Allow',
