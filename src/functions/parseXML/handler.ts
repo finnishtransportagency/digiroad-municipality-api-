@@ -12,6 +12,7 @@ import {
 } from './validationSchemas/validationSchema';
 
 const parseXML = async (event) => {
+  const now = new Date().toISOString().slice(0, 19);
   const s3 = new S3({});
   const lambda = new Lambda({});
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
@@ -78,15 +79,14 @@ const parseXML = async (event) => {
     if (featureMembers) {
       for (const feature of featureMembers) {
         if (feature.Liikennemerkki) {
-          features.push(parseTrafficsign(feature.Liikennemerkki));
+          const trafficSign = parseTrafficsign(feature.Liikennemerkki, now);
+          if (trafficSign) features.push(trafficSign);
           continue;
         }
 
-        if (
-          feature.Rakenne &&
-          feature.Rakenne.rakenne === 'kulkuesteet (pollarit, puomit)'
-        ) {
-          features.push(parseObstacle(feature.Rakenne));
+        if (feature.Rakenne) {
+          const obstacle = parseObstacle(feature.Rakenne, now);
+          if (obstacle) features.push(obstacle);
           continue;
         }
       }
@@ -113,7 +113,6 @@ const parseXML = async (event) => {
     return;
   }
 
-  const now = new Date().toISOString().slice(0, 19);
   const putParams = {
     Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
     Key: `geojson/${municipality}/${assetType}/${now}.json`,
