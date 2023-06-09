@@ -6,7 +6,7 @@ export default function (liikennemerkki) {
       ID: liikennemerkki['yksilointitieto'],
       SUUNTIMA: liikennemerkki['suunta'],
       TEKSTI: liikennemerkki['teksti'],
-      LM_TYYPPI: 'D6 Yhdistetty pyörätie ja jalkakäytävä' //For testing
+      LM_TYYPPI: 'D6' //For testing
     },
     geometry: {
       type: 'Point',
