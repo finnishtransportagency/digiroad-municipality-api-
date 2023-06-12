@@ -26,10 +26,9 @@ const reportRejectedDelta = async (event) => {
   let templateName: string;
   let emailSubject: string;
 
-  const subjectHeader =
-    process.env.STAGE_NAME === 'dev' || process.env.STAGE_NAME === 'test'
-      ? '[TEST]'
-      : '';
+  let subjectHeader = '';
+  if (process.env.STAGE_NAME === 'dev') subjectHeader = '[DEV]';
+  if (process.env.STAGE_NAME === 'test') subjectHeader = '[TEST]';
 
   switch (event.ReportType) {
     case 'invalidData':
@@ -45,7 +44,7 @@ const reportRejectedDelta = async (event) => {
   }
 
   const recipients = process.env.OPERATOR_EMAIL.split(',');
-
+  event.Body.stage = process.env.STAGE_NAME;
   const municipalityEmail = await ejs.renderFile(
     path.resolve(__dirname, './templates/' + templateName),
     event

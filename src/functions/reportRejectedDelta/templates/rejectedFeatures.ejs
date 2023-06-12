@@ -4,5 +4,7 @@
 </p>
 <p>Tietolajin tyyppi: <%=Body.assetType %></p>
 <p><%=Body.rejectsAmount %>/<%=Body.assetsAmount %> kohdetta hylätty. (Uudet sekä päivitetyt)</p>
-<p> <%=Body.deletedAmount %> kohdetta poistettu </p>
-<p>Tarkista lokit s3:sesta, "logs/<%=Municipality%>/<%=Body.now %>"</p>
+<p> <%=Body.deletesAmount %> kohdetta poistettu </p>
+<p>Tarkista lokit s3:sesta</p>
+<p>Bucket: dr-kunta-<%= Body.stage %>-bucket</p>
+<p>Kansio/tiedosto: logs/<%=Municipality%>/<%=Body.now %></p>
