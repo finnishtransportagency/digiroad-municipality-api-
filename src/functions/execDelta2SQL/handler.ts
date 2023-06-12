@@ -68,15 +68,16 @@ const execDelta2SQL = async (event) => {
           dbmodifier,
           client
         );
+        continue;
       }
       if (feature.properties.TYPE === 'TRAFFICSIGN') {
-        console.log(feature);
         await execCreatedTrafficSign(
           feature,
           municipality_code,
           dbmodifier,
           client
         );
+        continue;
       }
     }
     for (const feature of delta.Deleted) {
@@ -87,6 +88,7 @@ const execDelta2SQL = async (event) => {
           dbmodifier,
           client
         );
+        continue;
       }
       if (feature.properties.TYPE === 'TRAFFICSIGN') {
         await execExpiredTrafficSign(
@@ -95,6 +97,7 @@ const execDelta2SQL = async (event) => {
           dbmodifier,
           client
         );
+        continue;
       }
     }
     for (const feature of delta.Updated) {
@@ -105,6 +108,7 @@ const execDelta2SQL = async (event) => {
           dbmodifier,
           client
         );
+        continue;
       }
       if (feature.properties.TYPE === 'TRAFFICSIGN') {
         await execUpdatedTrafficSign(
@@ -113,6 +117,7 @@ const execDelta2SQL = async (event) => {
           dbmodifier,
           client
         );
+        continue;
       }
     }
 

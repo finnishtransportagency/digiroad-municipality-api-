@@ -119,6 +119,7 @@ export default async function (
         SELECT enumerated_value.id
         FROM enumerated_value, _property
       WHERE property_id = _property.id AND name_fi ~ ($2)
+      LIMIT 1
       )
       
     INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
