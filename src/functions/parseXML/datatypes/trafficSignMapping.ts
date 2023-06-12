@@ -265,8 +265,8 @@ export const oldTrafficSignMapping = {
   '774 c. Suoramyyntipaikka': 'G37 Suoramyyntipaikka',
   '774 d. Käsityöpaja': 'G38 Käsityöpaja',
   '774 e. Kotieläinpiha': 'G39 Kotieläinpiha',
-  '774 f. Ratsastuspaikka': 'G40 Ratsastuspaikka'
-  /*'811. Kohde risteävällä tiellä': 'H1 Kohde risteävässä suunnassa',
+  '774 f. Ratsastuspaikka': 'G40 Ratsastuspaikka',
+  '811. Kohde risteävällä tiellä': 'H1 Kohde risteävässä suunnassa',
   '812. Kohde nuolen suunnassa': 'H2.1 Kohde nuolen suunnassa',
   '813. Kohde nuolen suunnassa': 'H2.2 Kohde nuolen suunnassa',
   '814. Vaikutusalueen pituus': 'H3 Vaikutusalueen pituus',
@@ -317,5 +317,4 @@ export const oldTrafficSignMapping = {
   '871. Tekstillinen lisäkilpi': 'H24 Tekstillinen lisäkilpi',
   '872. Tekstillinen lisäkilpi Huoltoajo sallittu': 'H25 Huoltoajo sallittu',
   '880. Hätäpuhelin ja sammutin': 'H26 Hätäpuhelin ja sammutin'
-  */
 };

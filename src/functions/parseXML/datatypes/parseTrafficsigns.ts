@@ -7,6 +7,8 @@ export default function (liikennemerkki, now) {
       ? liikennemerkki.liikennemerkkityyppi2020
       : oldTrafficSignMapping[liikennemerkki.liikennemerkkityyppi];
   if (!trafficSignType) return;
+  if (trafficSignType[0] === 'H') return; //Temp. H =>  Additional panel, implementation depends how additional panels will be defined
+
   const feature = {
     type: 'Feature',
     properties: {
