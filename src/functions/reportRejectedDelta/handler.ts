@@ -1,6 +1,4 @@
 import { middyfy } from '@libs/lambda';
-import { Upload } from '@aws-sdk/lib-storage';
-import { S3 } from '@aws-sdk/client-s3';
 import { SSM, GetParameterCommand } from '@aws-sdk/client-ssm';
 import nodemailer from 'nodemailer';
 import ejs from 'ejs';
@@ -17,20 +15,6 @@ const getParameter = async (name: string): Promise<string> => {
 };
 
 const reportRejectedDelta = async (event) => {
-  const s3 = new S3({});
-  const now = new Date().toISOString().slice(0, 19);
-  const municipality = event.Municipality;
-  const params = {
-    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    Key: `logs/${municipality}/${now}`,
-    Body: JSON.stringify(event)
-  };
-
-  await new Upload({
-    client: s3,
-    params
-  }).done();
-
   var transporter = nodemailer.createTransport({
     host: 'email-smtp.eu-west-1.amazonaws.com',
     port: 587,

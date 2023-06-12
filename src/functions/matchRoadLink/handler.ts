@@ -182,11 +182,11 @@ const matchRoadLinks = async (event) => {
   await lambda.send(execDelta2SQLCommand);
 
   const reportRejectedDeltabody = {
-    municipality: delta.metadata.municipality,
     assetType: delta.metadata.assetType,
     rejectsAmount: rejectsAmount,
     assetsAmount: delta.Created.length + delta.Updated.length,
-    deletesAmount: delta.Deleted.length
+    deletesAmount: delta.Deleted.length,
+    now: now
   };
 
   const reportRejectedDeltaParams = {
