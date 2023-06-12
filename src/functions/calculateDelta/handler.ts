@@ -166,7 +166,8 @@ const calculateDelta = async (event) => {
     Deleted: deleted,
     Updated: updated,
     metadata: {
-      municipality: municipality
+      municipality: municipality,
+      assetType: assetType
     }
   };
 

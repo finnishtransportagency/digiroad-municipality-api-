@@ -126,6 +126,31 @@ const matchRoadLinks = async (event) => {
     }
   };
 
+  const logsBody = {
+    Rejected: {
+      Created: delta.Created.filter(
+        (feature: Feature) => !feature.properties.DR_REJECTED
+      ),
+      Updated: delta.Updated.filter(
+        (feature: Feature) => !feature.properties.DR_REJECTED
+      )
+    },
+    Accepted: {
+      Created: delta.Created.filter(
+        (feature: Feature) => !feature.properties.DR_REJECTED
+      ),
+      Deleted: delta.Deleted,
+      Updated: delta.Updated.filter(
+        (feature: Feature) => !feature.properties.DR_REJECTED
+      )
+    },
+    metadata: {
+      OFFSET_LIMIT: MAX_OFFSET,
+      municipality: delta.metadata.municipality,
+      assetType: delta.metadata.assetType
+    }
+  };
+
   const now = new Date().toISOString().slice(0, 19);
   const putParams = {
     Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
@@ -133,10 +158,14 @@ const matchRoadLinks = async (event) => {
     Body: JSON.stringify(execDelta2SQLBody)
   };
 
-  await new Upload({
-    client: s3,
-    params: putParams
-  }).done();
+  const putLogsParams = {
+    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    Key: `logs/${delta.metadata.municipality}/${now}.json`,
+    Body: JSON.stringify(logsBody)
+  };
+
+  await new Upload({ client: s3, params: putLogsParams }).done();
+  await new Upload({ client: s3, params: putParams }).done();
 
   const execDelta2SQLParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-execDelta2SQL`,
@@ -152,14 +181,12 @@ const matchRoadLinks = async (event) => {
 
   await lambda.send(execDelta2SQLCommand);
 
-  const reportRejectedDeltabody: PayloadFeature = {
-    Created: delta.Created,
-    Deleted: delta.Deleted,
-    Updated: delta.Updated,
-    metadata: {
-      OFFSET_LIMIT: MAX_OFFSET,
-      municipality: delta.metadata.municipality
-    }
+  const reportRejectedDeltabody = {
+    municipality: delta.metadata.municipality,
+    assetType: delta.metadata.assetType,
+    rejectsAmount: rejectsAmount,
+    assetsAmount: delta.Created.length + delta.Updated.length,
+    deletesAmount: delta.Deleted.length
   };
 
   const reportRejectedDeltaParams = {
