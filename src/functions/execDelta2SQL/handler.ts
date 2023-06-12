@@ -70,6 +70,7 @@ const execDelta2SQL = async (event) => {
         );
       }
       if (feature.properties.TYPE === 'TRAFFICSIGN') {
+        console.log(feature);
         await execCreatedTrafficSign(
           feature,
           municipality_code,
