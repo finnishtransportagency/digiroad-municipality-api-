@@ -16,7 +16,7 @@ const getParameter = async (name: string): Promise<string> => {
 };
 
 const s3 = new S3({});
-const gerNearbyLinks = async (event) => {
+const getNearbyLinks = async (event) => {
   const client = new Client({
     host: process.env.PGHOST,
     port: parseInt(process.env.PGPORT),
@@ -33,7 +33,7 @@ const gerNearbyLinks = async (event) => {
       FROM municipality
       WHERE LOWER(name_fi) = LOWER($1)
     ), acceptable_roadlinks AS (
-      SELECT linkid, shape
+      SELECT linkid, shape, directiontype
       FROM kgv_roadlink, municipality_
       WHERE kgv_roadlink.municipalitycode = municipality_.id AND not EXISTS(
       SELECT 1
@@ -43,7 +43,7 @@ const gerNearbyLinks = async (event) => {
     )
     
     
-    SELECT (value#>'{properties}'->>'ID')::TEXT AS ID, (value#>'{properties}'->>'TYPE')::TEXT AS TYPE, json_agg((st_astext(shape),linkid)) AS roadlinks
+    SELECT (value#>'{properties}'->>'ID')::TEXT AS ID, (value#>'{properties}'->>'TYPE')::TEXT AS TYPE, json_agg((st_astext(shape),linkid,directiontype)) AS roadlinks
     FROM json_array_elements($2) AS features, acceptable_roadlinks
     WHERE ST_BUFFER(ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067), 5) && acceptable_roadlinks.shape 
     GROUP BY ID,TYPE
@@ -81,4 +81,4 @@ const gerNearbyLinks = async (event) => {
   return { key: S3ObjectKey };
 };
 
-export const main = middyfy(gerNearbyLinks);
+export const main = middyfy(getNearbyLinks);

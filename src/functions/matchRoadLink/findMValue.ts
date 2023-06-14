@@ -11,7 +11,8 @@ export default function (
   pointPairDistance: jsts.org.locationtech.jts.algorithm.distance.PointPairDistance,
   geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory,
   MAX_OFFSET: number,
-  roadAngle?: number
+  roadAngle?: number,
+  towardsDigitizing?: boolean
 ) {
   function getAngle(
     start: jsts.org.locationtech.jts.geom.Coordinate,
@@ -56,7 +57,8 @@ export default function (
       The reason why M-value is calculated like this is to match the geometry-calculations that are done in Digiroad
       to reduce unneccesary copies of assets in the database. 
       */
-
+    if (feature.properties.TYPE === 'TRAFFICSIGN')
+      result.TOWARDSDIGITIZING = towardsDigitizing;
     result.DR_M_VALUE = mValue + distance3D;
     result.DR_OFFSET = distanceToFeature;
     result.DR_REJECTED =
