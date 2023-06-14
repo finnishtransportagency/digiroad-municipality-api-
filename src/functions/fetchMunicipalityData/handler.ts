@@ -3,6 +3,7 @@ import { SSM, GetParameterCommand } from '@aws-sdk/client-ssm';
 import { S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import axios from 'axios';
+import { XMLParser, XMLBuilder } from 'fast-xml-parser';
 
 const s3 = new S3({});
 const getParameter = async (name: string): Promise<string> => {
@@ -15,6 +16,21 @@ const getParameter = async (name: string): Promise<string> => {
   return result.Parameter.Value;
 };
 
+const mergeData = (dataArray: Array<any>) => {
+  const parser = new XMLParser();
+  dataArray.forEach((data) => parser.parse(data));
+  const result = parser.parse(dataArray[0]);
+  for (var i = 1; i < dataArray.length; i++) {
+    const chunk = parser.parse(dataArray[i]);
+    result['sf:FeatureCollection']['sf:featureMember'].push(
+      ...chunk['sf:FeatureCollection']['sf:featureMember']
+    );
+  }
+  const builder = new XMLBuilder({});
+  const xmlResult = builder.build(result);
+  return xmlResult;
+};
+
 const fetchMunicipalityData = async (event) => {
   const apiKey = await getParameter(
     `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`
@@ -22,22 +38,39 @@ const fetchMunicipalityData = async (event) => {
 
   if (event.format === 'xml') {
     for (var assetType of Object.entries(event.assetTypes)) {
-      const url =
-        event.url +
-        `/collections/${assetType[1]}/items?f=gml&crs=http://www.opengis.net/def/crs/EPSG/0/3067&limit=-1`;
+      var offset = 0;
+      const dataArray = [];
+      var empty = false;
+      while (!empty) {
+        const url =
+          event.url +
+          `/collections/${
+            assetType[1]
+          }/items?f=gml&crs=http://www.opengis.net/def/crs/EPSG/0/3067&limit=5000&offset=${
+            offset * 5000
+          }`;
 
-      const { data, status } = await axios.get(url, {
-        headers: {
-          'x-api-key': apiKey
+        const { data, status } = await axios.get(url, {
+          headers: {
+            'x-api-key': apiKey
+          }
+        });
+        if (!data.includes('sf:featureMember')) {
+          empty = true;
+          break;
         }
-      });
-      console.log(status);
+        dataArray.push(data);
+        offset += 1;
+      }
+
+      const payload = mergeData(dataArray);
+
       const now = new Date().toISOString().slice(0, 19);
 
       const putParams = {
         Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
         Key: `infrao/${event.municipality}/${assetType[0]}/${now}.xml`,
-        Body: data
+        Body: payload
       };
 
       await new Upload({
