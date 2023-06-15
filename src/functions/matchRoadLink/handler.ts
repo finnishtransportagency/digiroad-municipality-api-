@@ -129,10 +129,10 @@ const matchRoadLinks = async (event) => {
   const logsBody = {
     Rejected: {
       Created: delta.Created.filter(
-        (feature: Feature) => !feature.properties.DR_REJECTED
+        (feature: Feature) => feature.properties.DR_REJECTED
       ),
       Updated: delta.Updated.filter(
-        (feature: Feature) => !feature.properties.DR_REJECTED
+        (feature: Feature) => feature.properties.DR_REJECTED
       )
     },
     Accepted: {
