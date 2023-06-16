@@ -81,7 +81,7 @@ const parseXML = async (event) => {
         for (const feature of featureMembers) {
           const obstacle = parseObstacle(feature.Rakenne, now);
           if (obstacle && schema.isValidSync(obstacle))
-            features.push(schema.cast.obstacle);
+            features.push(schema.cast(obstacle));
         }
       }
       if (assetType === 'trafficSigns') {
