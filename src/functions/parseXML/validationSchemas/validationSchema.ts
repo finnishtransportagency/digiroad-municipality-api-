@@ -59,28 +59,4 @@ const trafficSignFeatureSchema = yup.object().shape({
   geometry: pointGeometrySchema.required()
 });
 
-const crsSchema = yup.object().shape({
-  type: yup.string().notRequired(),
-  properties: yup
-    .object()
-    .shape({
-      name: yup.string().notRequired()
-    })
-    .notRequired()
-});
-
-const obstaclesSchema = yup.object().shape({
-  type: yup.string().required(),
-  name: yup.string().notRequired(),
-  crs: crsSchema.notRequired(),
-  features: yup.array().of(obstacleFeatureSchema).required()
-});
-
-const trafficSignsSchema = yup.object().shape({
-  type: yup.string().required(),
-  name: yup.string().notRequired(),
-  crs: crsSchema.notRequired(),
-  features: yup.array().of(trafficSignFeatureSchema).required()
-});
-
-export { trafficSignsSchema, obstaclesSchema, obstaclePropertiesSchema };
+export { trafficSignFeatureSchema, obstacleFeatureSchema };

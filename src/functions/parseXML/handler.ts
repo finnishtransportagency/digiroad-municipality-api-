@@ -7,8 +7,8 @@ import { XMLParser } from 'fast-xml-parser';
 import parseObstacle from './datatypes/parseObstacles';
 import parseTrafficsign from './datatypes/parseTrafficsigns';
 import {
-  obstaclesSchema,
-  trafficSignsSchema
+  trafficSignFeatureSchema,
+  obstacleFeatureSchema
 } from './validationSchemas/validationSchema';
 
 const parseXML = async (event) => {
@@ -61,10 +61,10 @@ const parseXML = async (event) => {
   };
   let schema;
   if (assetType === 'obstacles') {
-    schema = obstaclesSchema;
+    schema = obstacleFeatureSchema;
   }
   if (assetType === 'trafficSigns') {
-    schema = trafficSignsSchema;
+    schema = trafficSignFeatureSchema;
   }
   if (!schema) {
     throw new Error('Unknown assetType');
@@ -77,21 +77,22 @@ const parseXML = async (event) => {
 
     const features: Array<Feature> = [];
     if (featureMembers) {
-      for (const feature of featureMembers) {
-        if (feature.Liikennemerkki) {
-          const trafficSign = parseTrafficsign(feature.Liikennemerkki, now);
-          if (trafficSign) features.push(trafficSign);
-          continue;
-        }
-
-        if (feature.Rakenne) {
+      if (assetType === 'obstacles') {
+        for (const feature of featureMembers) {
           const obstacle = parseObstacle(feature.Rakenne, now);
-          if (obstacle) features.push(obstacle);
-          continue;
+          if (obstacle && schema.isValidSync(obstacle))
+            features.push(schema.cast.obstacle);
+        }
+      }
+      if (assetType === 'trafficSigns') {
+        for (const feature of featureMembers) {
+          const trafficSign = parseTrafficsign(feature.Liikennemerkki, now);
+          if (trafficSign && schema.isValidSync(trafficSign))
+            features.push(schema.cast(trafficSign));
         }
       }
     }
-    const geoJSON = {
+    var geoJSON = {
       type: 'FeatureCollection',
       name: `${municipality}-Kuntarajapinta`,
       crs: {
@@ -102,9 +103,6 @@ const parseXML = async (event) => {
       },
       features: features
     };
-
-    const valid = await schema.validate(geoJSON);
-    var validatedGeoJSON = schema.cast(valid);
   } catch (error) {
     console.error(
       `XML could not be parsed into valid GeoJSON: ${error.message}`
@@ -116,7 +114,7 @@ const parseXML = async (event) => {
   const putParams = {
     Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
     Key: `geojson/${municipality}/${assetType}/${now}.json`,
-    Body: JSON.stringify(validatedGeoJSON)
+    Body: JSON.stringify(geoJSON)
   };
 
   await new Upload({
