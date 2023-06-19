@@ -60,8 +60,10 @@ const getNearbyLinks = async (event) => {
       const pointObjects: Array<Point> = feature.points;
       roadlink.linkId = roadlink.f2;
       roadlink.points = pointObjects;
+      roadlink.directiontype = roadlink.f3;
       delete roadlink.f1;
       delete roadlink.f2;
+      delete roadlink.f3;
     });
   });
 

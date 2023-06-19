@@ -115,7 +115,8 @@ export default function (
       pointPairDistance,
       geomFactory,
       MAX_OFFSET,
-      minRoadAngle
+      minRoadAngle,
+      towardsDigitizing
     );
   } else {
     return findNearestLink(
