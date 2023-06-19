@@ -74,21 +74,30 @@ const parseXML = async (event) => {
     const asJSON = parser.parse(xmlFile, true);
     const featureCollection = asJSON.FeatureCollection;
     const featureMembers = featureCollection.featureMember;
-
+    let rejectsAmount = 0;
+    const rejectedFeatures: Array<string> = [];
     const features: Array<Feature> = [];
     if (featureMembers) {
       if (assetType === 'obstacles') {
         for (const feature of featureMembers) {
           const obstacle = parseObstacle(feature.Rakenne, now);
-          if (obstacle && schema.isValidSync(obstacle))
+          if (obstacle && schema.isValidSync(obstacle)) {
             features.push(schema.cast(obstacle));
+          } else {
+            rejectsAmount++;
+            rejectedFeatures.push(feature.Rakenne['yksilointitieto']);
+          }
         }
       }
       if (assetType === 'trafficSigns') {
         for (const feature of featureMembers) {
           const trafficSign = parseTrafficsign(feature.Liikennemerkki, now);
-          if (trafficSign && schema.isValidSync(trafficSign))
+          if (trafficSign && schema.isValidSync(trafficSign)) {
             features.push(schema.cast(trafficSign));
+          } else {
+            rejectsAmount++;
+            rejectedFeatures.push(feature.Liikennemerkki['yksilointitieto']);
+          }
         }
       }
     }
@@ -101,7 +110,11 @@ const parseXML = async (event) => {
           name: 'urn:ogc:def:crs:EPSG::3067'
         }
       },
-      features: features
+      features: features,
+      invalidInfrao: {
+        sum: rejectsAmount,
+        IDs: rejectedFeatures
+      }
     };
   } catch (error) {
     console.error(

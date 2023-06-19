@@ -8,6 +8,10 @@ export interface GeoJSON {
     };
   };
   features: Array<Feature>;
+  invalidInfrao: {
+    sum: number;
+    IDs: Array<string>;
+  };
 }
 
 export interface Feature {
@@ -66,6 +70,10 @@ export interface PayloadFeature {
     OFFSET_LIMIT?: number;
     municipality: string;
     assetType?: string;
+  };
+  invalidInfrao?: {
+    sum: number;
+    IDs: Array<string>;
   };
 }
 

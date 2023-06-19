@@ -157,9 +157,6 @@ const calculateDelta = async (event) => {
       deleted.push(referenceFeatures[j]);
     }
   }
-  console.log(`Created: ${JSON.stringify(created)}`);
-  console.log(`Deleted: ${JSON.stringify(deleted)}`);
-  console.log(`Updated: ${JSON.stringify(updated)}`);
 
   const payLoad: PayloadFeature = {
     Created: created,
@@ -168,7 +165,8 @@ const calculateDelta = async (event) => {
     metadata: {
       municipality: municipality,
       assetType: assetType
-    }
+    },
+    invalidInfrao: updateObject.invalidInfrao
   };
 
   const now = new Date().toISOString().slice(0, 19);

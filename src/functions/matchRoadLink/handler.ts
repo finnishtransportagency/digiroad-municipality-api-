@@ -144,6 +144,7 @@ const matchRoadLinks = async (event) => {
         (feature: Feature) => !feature.properties.DR_REJECTED
       )
     },
+    invalidInfrao: delta.invalidInfrao,
     metadata: {
       OFFSET_LIMIT: MAX_OFFSET,
       municipality: delta.metadata.municipality,
@@ -186,6 +187,7 @@ const matchRoadLinks = async (event) => {
     rejectsAmount: rejectsAmount,
     assetsAmount: delta.Created.length + delta.Updated.length,
     deletesAmount: delta.Deleted.length,
+    invalidInfrao: delta.invalidInfrao,
     now: now
   };
 
@@ -195,7 +197,9 @@ const matchRoadLinks = async (event) => {
     Payload: Buffer.from(
       JSON.stringify({
         ReportType:
-          rejectsAmount > 0 ? 'matchedWithFailures' : 'matchedSuccessfully',
+          rejectsAmount > 0 || delta.invalidInfrao.sum > 0
+            ? 'matchedWithFailures'
+            : 'matchedSuccessfully',
         Municipality: delta.metadata.municipality,
         Body: reportRejectedDeltabody
       })

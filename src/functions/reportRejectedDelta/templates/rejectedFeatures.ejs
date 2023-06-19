@@ -3,7 +3,8 @@
 <p>
 </p>
 <p>Tietolajin tyyppi: <%=Body.assetType %></p>
-<p><%=Body.rejectsAmount %>/<%=Body.assetsAmount %> kohdetta hylätty. (Uudet sekä päivitetyt)</p>
+<p><%=Body.rejectsAmount %>/<%=Body.assetsAmount %> kohdetta hylätty sijainnin takia. (Uudet sekä päivitetyt)</p>
+<p><%=Body.invalidInfrao.sum %> kohdetta hylätty datan perusteella</p>
 <p> <%=Body.deletesAmount %> kohdetta poistettu </p>
 <p>Tarkista lokit s3:sesta</p>
 <p>Bucket: dr-kunta-<%= Body.stage %>-bucket</p>
