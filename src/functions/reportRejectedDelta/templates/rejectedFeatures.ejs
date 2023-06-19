@@ -4,8 +4,11 @@
 </p>
 <p>Tietolajin tyyppi: <%=Body.assetType %></p>
 <p><%=Body.rejectsAmount %>/<%=Body.assetsAmount %> kohdetta hylätty sijainnin takia. (Uudet sekä päivitetyt)</p>
-<p><%=Body.invalidInfrao.sum %> kohdetta hylätty datan perusteella</p>
-<p> <%=Body.deletesAmount %> kohdetta poistettu </p>
+<p><%=Body.invalidInfrao.sum %> kohdetta hylätty kohteen ominaisuustietojen perusteella</p>
+<% if(Body.assetType === 'obstacles'){%>
+<p>Huom! Rakenteiden kohdalla tämä koskee myös rakenteita jotka eivät ole tyyppiä <strong>kulkuesteet (pollarit, puomit)</strong></p>
+<% } %>
+<p> <%=Body.deletesAmount %> kohdetta poistettu (mukaan lukien ennestään hylätyt kohteet)</p>
 <p>Tarkista lokit s3:sesta</p>
 <p>Bucket: dr-kunta-<%= Body.stage %>-bucket</p>
 <p>Kansio/tiedosto: logs/<%=Municipality%>/<%=Body.now %></p>
