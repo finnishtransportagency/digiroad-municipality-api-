@@ -60,6 +60,7 @@ export interface TrafficSignProperties {
   DR_OFFSET?: number;
   DR_REJECTED?: boolean;
   DR_GEOMETRY?: jsts.org.locationtech.jts.geom.Coordinate;
+  TOWARDSDIGITIZING?: boolean;
 }
 
 export interface PayloadFeature {
@@ -96,6 +97,7 @@ export interface LinkPoint {
 export interface LinkObject {
   linkId: string;
   points: Array<LinkPoint>;
+  directiontype: number;
 }
 
 export interface matchResultObject {
@@ -106,4 +108,5 @@ export interface matchResultObject {
   DR_OFFSET: number;
   DR_REJECTED: boolean;
   DR_GEOMETRY: jsts.org.locationtech.jts.geom.Coordinate;
+  TOWARDSDIGITIZING?: boolean;
 }

@@ -47,13 +47,17 @@ export default async function (
   };
   const result = await client.query(assetQuery);
   const assetID = result.rows[0].id;
-
+  const sideCode = trafficSignProperties.TOWARDSDIGITIZING ? 1 : 2;
   const lrmPositionQuery = {
     text: `
-        INSERT INTO lrm_position (id, start_measure, link_id)
-        VALUES (nextval('LRM_POSITION_PRIMARY_KEY_SEQ'), $1, $2)
+        INSERT INTO lrm_position (id, side_code,start_measure, link_id)
+        VALUES (nextval('LRM_POSITION_PRIMARY_KEY_SEQ'), $1, $2, $3)
         `,
-    values: [trafficSignProperties.DR_M_VALUE, trafficSignProperties.DR_LINK_ID]
+    values: [
+      sideCode,
+      trafficSignProperties.DR_M_VALUE,
+      trafficSignProperties.DR_LINK_ID
+    ]
   };
   await client.query(lrmPositionQuery);
 

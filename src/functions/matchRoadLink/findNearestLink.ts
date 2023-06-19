@@ -8,7 +8,8 @@ export default function (
   roadLinks: Array<LinkObject>,
   feature: Feature,
   geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory,
-  MAX_OFFSET: number
+  MAX_OFFSET: number,
+  towardsDigitizing?: boolean
 ) {
   const pointPairDistance = new PointPairDistance();
   let minDistance = Number.MAX_VALUE;
@@ -54,6 +55,8 @@ export default function (
     featureCoordinates,
     pointPairDistance,
     geomFactory,
-    MAX_OFFSET
+    MAX_OFFSET,
+    undefined,
+    towardsDigitizing
   );
 }

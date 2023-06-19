@@ -55,13 +55,17 @@ export default async function (
   };
   const assetResult = await client.query(assetQuery);
   const assetID = assetResult.rows[0].id;
-
+  const sideCode = trafficSignProperties.TOWARDSDIGITIZING ? 1 : 2;
   const lrmPositionQuery = {
     text: `
-        INSERT INTO lrm_position (id, start_measure, link_id)
-        VALUES (nextval('LRM_POSITION_PRIMARY_KEY_SEQ'), $1, $2)
+        INSERT INTO lrm_position (id, side_code,start_measure, link_id)
+        VALUES (nextval('LRM_POSITION_PRIMARY_KEY_SEQ'), $1, $2, $3)
         `,
-    values: [trafficSignProperties.DR_M_VALUE, trafficSignProperties.DR_LINK_ID]
+    values: [
+      sideCode,
+      trafficSignProperties.DR_M_VALUE,
+      trafficSignProperties.DR_LINK_ID
+    ]
   };
   await client.query(lrmPositionQuery);
 
@@ -126,7 +130,8 @@ export default async function (
       ), _enumerated_value AS (
         SELECT enumerated_value.id
         FROM enumerated_value, _property
-      WHERE property_id = _property.id AND name_fi = ($2)
+      WHERE property_id = _property.id AND name_fi ~ ($2)
+      LIMIT 1
       )
       
     INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)

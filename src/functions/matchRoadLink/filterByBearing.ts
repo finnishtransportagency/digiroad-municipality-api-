@@ -22,6 +22,12 @@ export default function (
     feature.geometry.coordinates[1]
   );
   const bearing = trafficSignProperties.SUUNTIMA;
+  const towardsDigitizing = bearing > 270 || bearing <= 90;
+  const adjustedBearing = towardsDigitizing
+    ? bearing
+    : bearing > 90 && bearing < 180
+    ? bearing + 180
+    : Math.abs(bearing - 180);
   const MAX_ANGLE_OFFSET = 25;
 
   const pointPairDistance = new PointPairDistance();
@@ -36,6 +42,10 @@ export default function (
     return 180 + Math.atan2(start.x - end.x, start.y - end.y) * (180 / Math.PI);
   }
 
+  function angleDifference(p1: number, p2: number) {
+    return 180 - Math.abs(Math.abs(p1 - p2) - 180);
+  }
+
   for (let i = 0; i < roadLinks.length; i++) {
     const roadlink = roadLinks[i];
     const roadlinkPoints = roadlink.points;
@@ -44,12 +54,18 @@ export default function (
       const endPoint = roadlinkPoints[j + 1];
       const angle = getAngle(startPoint, endPoint);
       const angleReverse = (angle + 180) % 360;
-      if (
-        (bearing > angle - MAX_ANGLE_OFFSET &&
-          bearing < angle + MAX_ANGLE_OFFSET) ||
-        (bearing > angleReverse - MAX_ANGLE_OFFSET &&
-          bearing < angleReverse + MAX_ANGLE_OFFSET)
-      ) {
+      let accepted = false;
+      if (roadlink.directiontype === 0) {
+        accepted =
+          angleDifference(adjustedBearing, angle) <= MAX_ANGLE_OFFSET ||
+          Math.abs(adjustedBearing - angleReverse) <= MAX_ANGLE_OFFSET;
+      } else {
+        accepted =
+          angleDifference(adjustedBearing, angle) <= MAX_ANGLE_OFFSET &&
+          ((roadlink.directiontype === 1 && towardsDigitizing) ||
+            (roadlink.directiontype === 2 && !towardsDigitizing));
+      }
+      if (accepted) {
         const startCoordinates = new Coordinate(
           startPoint.x,
           startPoint.y,
@@ -87,6 +103,7 @@ export default function (
     }
   }
   pointPairDistance.initialize();
+  trafficSignProperties.SUUNTIMA = adjustedBearing;
   if (minDistance < 10) {
     return findMValue(
       feature,
@@ -101,6 +118,12 @@ export default function (
       minRoadAngle
     );
   } else {
-    return findNearestLink(roadLinks, feature, geomFactory, MAX_OFFSET);
+    return findNearestLink(
+      roadLinks,
+      feature,
+      geomFactory,
+      MAX_OFFSET,
+      towardsDigitizing
+    );
   }
 }
