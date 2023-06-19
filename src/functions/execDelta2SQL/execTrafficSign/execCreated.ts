@@ -47,7 +47,7 @@ export default async function (
   };
   const result = await client.query(assetQuery);
   const assetID = result.rows[0].id;
-  const sideCode = trafficSignProperties.TOWARDSDIGITIZING ? 1 : 2;
+  const sideCode = trafficSignProperties.TOWARDSDIGITIZING ? 2 : 3;
   const lrmPositionQuery = {
     text: `
         INSERT INTO lrm_position (id, side_code,start_measure, link_id)
