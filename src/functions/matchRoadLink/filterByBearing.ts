@@ -105,6 +105,7 @@ export default function (
   pointPairDistance.initialize();
   trafficSignProperties.SUUNTIMA = adjustedBearing;
   if (minDistance < 10) {
+    trafficSignProperties.SUUNTIMA = Math.floor(minRoadAngle);
     return findMValue(
       feature,
       closestLinkCoordinates,
