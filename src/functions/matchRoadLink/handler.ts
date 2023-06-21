@@ -10,7 +10,8 @@ import {
   PayloadFeature,
   Feature,
   LinkObject,
-  FeatureRoadlinkMap
+  FeatureRoadlinkMap,
+  TrafficSignProperties
 } from '@functions/typing';
 import filterByBearing from './filterByBearing';
 
@@ -85,12 +86,22 @@ const matchRoadLinks = async (event) => {
           );
           break;
         case 'TRAFFICSIGN':
-          var matchResults = filterByBearing(
-            roadLinks,
-            feature,
-            geomFactory,
-            MAX_OFFSET
-          );
+          var props = feature.properties as TrafficSignProperties;
+          if (props.SUUNTIMA) {
+            var matchResults = filterByBearing(
+              roadLinks,
+              feature,
+              geomFactory,
+              MAX_OFFSET
+            );
+          } else {
+            var matchResults = findNearestLink(
+              roadLinks,
+              feature,
+              geomFactory,
+              MAX_OFFSET
+            );
+          }
           break;
       }
       if (!matchResults) {

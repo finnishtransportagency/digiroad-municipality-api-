@@ -19,7 +19,7 @@ const trafficSignPropertiesSchema = yup.object().shape({
     .required()
     .matches(/(^TRAFFICSIGN$)/),
   ID: yup.string().required(),
-  SUUNTIMA: yup.number().required().max(360).min(0),
+  SUUNTIMA: yup.number().max(360).min(0),
   LM_TYYPPI: yup.string().required().oneOf(allowedTrafficSigns),
   ARVO: yup.number().notRequired(),
   TEKSTI: yup.string().notRequired(),

@@ -1,4 +1,9 @@
-import { LinkObject, matchResultObject, Feature } from '@functions/typing';
+import {
+  LinkObject,
+  matchResultObject,
+  Feature,
+  TrafficSignProperties
+} from '@functions/typing';
 import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
 
 export default function (
@@ -41,6 +46,7 @@ export default function (
       mValue += lineOnLink.getLength();
       continue;
     }
+    const roadLinkAngle = getAngle(startPoint, endPoint);
     pointPairDistance.initialize(closestPointOnLink, startPoint);
     const distance2D = pointPairDistance.getDistance();
     const ratio = distance2D / lineOnLink.getLength();
@@ -57,8 +63,18 @@ export default function (
       The reason why M-value is calculated like this is to match the geometry-calculations that are done in Digiroad
       to reduce unneccesary copies of assets in the database. 
       */
-    if (feature.properties.TYPE === 'TRAFFICSIGN')
-      result.TOWARDSDIGITIZING = towardsDigitizing;
+    if (feature.properties.TYPE === 'TRAFFICSIGN') {
+      const props = feature.properties as TrafficSignProperties;
+      if (!props.SUUNTIMA) {
+        const latDiff = feature.geometry.coordinates[1] - closestPointOnLink.y;
+        result.TOWARDSDIGITIZING =
+          (latDiff <= 0 && roadLinkAngle <= 90) ||
+          (latDiff >= 0 && roadLinkAngle > 270);
+        props.SUUNTIMA = Math.floor(roadLinkAngle);
+      } else {
+        result.TOWARDSDIGITIZING = towardsDigitizing;
+      }
+    }
     result.DR_M_VALUE = mValue + distance3D;
     result.DR_OFFSET = distanceToFeature;
     result.DR_REJECTED =
