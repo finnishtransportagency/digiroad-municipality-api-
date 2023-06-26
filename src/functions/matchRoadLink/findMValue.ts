@@ -25,6 +25,10 @@ export default function (
   ) {
     return 180 + Math.atan2(start.x - end.x, start.y - end.y) * (180 / Math.PI);
   }
+  const roadLinkAngle = getAngle(
+    linkCoordinates[0],
+    linkCoordinates[linkCoordinates.length - 1]
+  );
   let mValue = 0;
   for (let i = 0; i < linkCoordinates.length - 1; i++) {
     const startPoint = linkCoordinates[i];
@@ -46,7 +50,7 @@ export default function (
       mValue += lineOnLink.getLength();
       continue;
     }
-    const roadLinkAngle = getAngle(startPoint, endPoint);
+    const roadLinkBearingAtPoint = getAngle(startPoint, endPoint);
     pointPairDistance.initialize(closestPointOnLink, startPoint);
     const distance2D = pointPairDistance.getDistance();
     const ratio = distance2D / lineOnLink.getLength();
@@ -70,7 +74,7 @@ export default function (
         result.TOWARDSDIGITIZING =
           (latDiff <= 0 && roadLinkAngle <= 90) ||
           (latDiff >= 0 && roadLinkAngle > 270);
-        props.SUUNTIMA = Math.floor(roadLinkAngle);
+        props.SUUNTIMA = Math.floor(roadLinkBearingAtPoint);
       } else {
         result.TOWARDSDIGITIZING = towardsDigitizing;
       }
