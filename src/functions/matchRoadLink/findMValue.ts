@@ -25,10 +25,7 @@ export default function (
   ) {
     return 180 + Math.atan2(start.x - end.x, start.y - end.y) * (180 / Math.PI);
   }
-  const roadLinkAngle = getAngle(
-    linkCoordinates[0],
-    linkCoordinates[linkCoordinates.length - 1]
-  );
+
   let mValue = 0;
   for (let i = 0; i < linkCoordinates.length - 1; i++) {
     const startPoint = linkCoordinates[i];
@@ -71,9 +68,19 @@ export default function (
       const props = feature.properties as TrafficSignProperties;
       if (!props.SUUNTIMA) {
         const latDiff = feature.geometry.coordinates[1] - closestPointOnLink.y;
+        const lonDiff = feature.geometry.coordinates[0] - closestPointOnLink.x;
         result.TOWARDSDIGITIZING =
-          (latDiff <= 0 && roadLinkAngle <= 90) ||
-          (latDiff >= 0 && roadLinkAngle > 270);
+          ((roadLinkBearingAtPoint <= 45 || roadLinkBearingAtPoint > 315) &&
+            lonDiff > 0) ||
+          (roadLinkBearingAtPoint <= 135 &&
+            roadLinkBearingAtPoint > 45 &&
+            latDiff < 0) ||
+          (roadLinkBearingAtPoint <= 225 &&
+            roadLinkBearingAtPoint > 135 &&
+            lonDiff < 0) ||
+          (roadLinkBearingAtPoint <= 315 &&
+            roadLinkBearingAtPoint > 225 &&
+            latDiff > 0);
         props.SUUNTIMA = Math.floor(roadLinkBearingAtPoint);
       } else {
         result.TOWARDSDIGITIZING = towardsDigitizing;
