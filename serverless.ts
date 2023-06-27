@@ -59,7 +59,31 @@ const serverlessConfiguration: AWS = {
       drKuntaBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
-          BucketName: `dr-kunta-${process.env.STAGE_NAME}-bucket`
+          BucketName: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+          LifecycleConfiguration: {
+            Rules: [
+              {
+                ExpirationInDays: 30,
+                Prefix: '/matchRoadLink/',
+                Status: 'Enabled'
+              },
+              {
+                ExpirationInDays: 30,
+                Prefix: '/getNearbyLinks/',
+                Status: 'Enabled'
+              },
+              {
+                ExpirationInDays: 30,
+                Prefix: '/calculateDelta/',
+                Status: 'Enabled'
+              },
+              {
+                ExpirationInDays: 30,
+                Prefix: '/infrao/',
+                Status: 'Enabled'
+              }
+            ]
+          }
         }
       },
       createScheduleRole: {
