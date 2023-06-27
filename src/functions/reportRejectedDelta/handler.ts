@@ -45,6 +45,7 @@ const reportRejectedDelta = async (event) => {
 
   const recipients = process.env.OPERATOR_EMAIL.split(',');
   event.Body.stage = process.env.STAGE_NAME;
+  event.Body.link = `https://s3.console.aws.amazon.com/s3/object/dr-kunta-${process.env.STAGE_NAME}-bucket?region=eu-west-1&prefix=logs/${event.Municipality}/${event.Body.now}.json`;
   const municipalityEmail = await ejs.renderFile(
     path.resolve(__dirname, './templates/' + templateName),
     event

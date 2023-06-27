@@ -9,6 +9,6 @@
 <p>Huom! Rakenteiden kohdalla tämä koskee myös rakenteita jotka eivät ole tyyppiä <strong>kulkuesteet (pollarit, puomit)</strong></p>
 <% } %>
 <p> <%=Body.deletesAmount %> kohdetta poistettu (mukaan lukien ennestään hylätyt kohteet)</p>
-<p>Tarkista lokit s3:sesta</p>
+<p><a href=<%= Body.link %>>Tarkista lokit s3:sesta</a></p>
 <p>Bucket: dr-kunta-<%= Body.stage %>-bucket</p>
 <p>Kansio/tiedosto: logs/<%=Municipality%>/<%=Body.now %></p>
