@@ -131,7 +131,7 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['scheduler:CreateSchedule'],
-                    Resource: `arn:aws:scheduler:eu-west-1:${process.env.AWS_ACCOUNT_ID}:schedule/DRKunta-dev/DRKunta-${process.env.STAGE_NAME}-*`
+                    Resource: `arn:aws:scheduler:eu-west-1:${process.env.AWS_ACCOUNT_ID}:schedule/DRKunta-${process.env.STAGE_NAME}/DRKunta-${process.env.STAGE_NAME}-*`
                   },
                   {
                     Effect: 'Allow',
@@ -145,7 +145,7 @@ const serverlessConfiguration: AWS = {
                   {
                     Action: ['iam:PassRole'],
                     Resource:
-                      'arn:aws:iam::475079312496:role/DRKunta-dev-fetchMunicipalityDataScheduleRole',
+                      'arn:aws:iam::475079312496:role/DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataScheduleRole',
                     Effect: 'Allow'
                   }
                 ]
@@ -201,7 +201,7 @@ const serverlessConfiguration: AWS = {
                       'scheduler:GetSchedule',
                       'scheduler:DeleteSchedule'
                     ],
-                    Resource: `arn:aws:scheduler:eu-west-1:${process.env.AWS_ACCOUNT_ID}:schedule/DRKunta-dev/DRKunta-${process.env.STAGE_NAME}-*`
+                    Resource: `arn:aws:scheduler:eu-west-1:${process.env.AWS_ACCOUNT_ID}:schedule/DRKunta-${process.env.STAGE_NAME}/DRKunta-${process.env.STAGE_NAME}-*`
                   },
                   {
                     Effect: 'Allow',
