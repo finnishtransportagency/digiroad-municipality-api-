@@ -61,37 +61,34 @@ export default function (
     const result: matchResultObject = <matchResultObject>{};
     result.DR_LINK_ID = link.linkId;
     /*
-      The reason why M-value is calculated like this is to match the geometry-calculations that are done in Digiroad
-      to reduce unneccesary copies of assets in the database. 
-      */
-    if (feature.properties.TYPE === 'TRAFFICSIGN') {
-      const props = feature.properties as TrafficSignProperties;
-      if (!props.SUUNTIMA) {
-        const latDiff = feature.geometry.coordinates[1] - closestPointOnLink.y;
-        const lonDiff = feature.geometry.coordinates[0] - closestPointOnLink.x;
-        result.TOWARDSDIGITIZING =
-          ((roadLinkBearingAtPoint <= 45 || roadLinkBearingAtPoint > 315) &&
-            lonDiff > 0) ||
-          (roadLinkBearingAtPoint <= 135 &&
-            roadLinkBearingAtPoint > 45 &&
-            latDiff < 0) ||
-          (roadLinkBearingAtPoint <= 225 &&
-            roadLinkBearingAtPoint > 135 &&
-            lonDiff < 0) ||
-          (roadLinkBearingAtPoint <= 315 &&
-            roadLinkBearingAtPoint > 225 &&
-            latDiff > 0);
-        props.SUUNTIMA = Math.floor(roadLinkBearingAtPoint);
-      } else {
-        result.TOWARDSDIGITIZING = towardsDigitizing;
-      }
+        The reason why M-value is calculated like this is to match the geometry-calculations that are done in Digiroad
+        to reduce unneccesary copies of assets in the database. 
+        */
+
+    const props = feature.properties as TrafficSignProperties;
+    if (!towardsDigitizing) {
+      const latDiff = feature.geometry.coordinates[1] - closestPointOnLink.y;
+      const lonDiff = feature.geometry.coordinates[0] - closestPointOnLink.x;
+      result.TOWARDSDIGITIZING =
+        ((roadLinkBearingAtPoint <= 45 || roadLinkBearingAtPoint > 315) &&
+          lonDiff > 0) ||
+        (roadLinkBearingAtPoint <= 135 &&
+          roadLinkBearingAtPoint > 45 &&
+          latDiff < 0) ||
+        (roadLinkBearingAtPoint <= 225 &&
+          roadLinkBearingAtPoint > 135 &&
+          lonDiff < 0) ||
+        (roadLinkBearingAtPoint <= 315 &&
+          roadLinkBearingAtPoint > 225 &&
+          latDiff > 0);
+      props.SUUNTIMA = Math.floor(roadLinkBearingAtPoint);
+    } else {
+      result.TOWARDSDIGITIZING = towardsDigitizing;
     }
+
     result.DR_M_VALUE = mValue + distance3D;
     result.DR_OFFSET = distanceToFeature;
-    result.DR_REJECTED =
-      feature.properties.TYPE === 'OBSTACLE'
-        ? distanceToFeature >= MAX_OFFSET
-        : distanceToFeature >= 10;
+    result.DR_REJECTED = distanceToFeature >= MAX_OFFSET;
     result.DR_GEOMETRY = closestPointOnLink;
     return result;
   }

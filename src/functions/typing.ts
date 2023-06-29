@@ -32,6 +32,7 @@ export interface ObstacleProperties {
   DR_OFFSET?: number;
   DR_REJECTED?: boolean;
   DR_GEOMETRY?: jsts.org.locationtech.jts.geom.Coordinate;
+  OSOITE?: string;
 }
 
 export interface additionalPanel {
@@ -58,6 +59,7 @@ export interface TrafficSignProperties {
   DR_LINK_ID?: number;
   DR_M_VALUE?: number;
   DR_OFFSET?: number;
+  OSOITE?: string;
   DR_REJECTED?: boolean;
   DR_GEOMETRY?: jsts.org.locationtech.jts.geom.Coordinate;
   TOWARDSDIGITIZING?: boolean;
@@ -98,6 +100,7 @@ export interface LinkObject {
   linkId: string;
   points: Array<LinkPoint>;
   directiontype: number;
+  roadname: string;
 }
 
 export interface matchResultObject {

@@ -1,16 +1,44 @@
-import findMValue from './findMValue';
+import getMValue from './getMValue';
+import matchBearing from './matchBearing';
 import Coordinate from 'jsts/org/locationtech/jts/geom/Coordinate';
 import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
 import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance';
 
-import { Feature, LinkObject } from '@functions/typing';
+import { Feature, LinkObject, TrafficSignProperties } from '@functions/typing';
 export default function (
   roadLinks: Array<LinkObject>,
   feature: Feature,
-  geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory,
-  MAX_OFFSET: number,
-  towardsDigitizing?: boolean
+  geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory
 ) {
+  const trafficSignProperties = feature.properties as TrafficSignProperties;
+  let MAX_OFFSET = 5;
+  if (trafficSignProperties.SUUNTIMA) {
+    const result = matchBearing(roadLinks, feature, geomFactory);
+    if (result) {
+      return getMValue(
+        result.feature,
+        result.closestLinkCoordinates,
+        result.closestLink,
+        result.minDistance,
+        result.closestPointOnLink,
+        result.featureCoordinates,
+        result.pointPairDistance,
+        result.geomFactory,
+        MAX_OFFSET,
+        result.minRoadAngle,
+        result.towardsDigitizing
+      );
+    }
+    MAX_OFFSET = 2;
+  }
+  if (trafficSignProperties.OSOITE) {
+    const filteredRoadlinks = roadLinks.filter((roadLink) => {
+      return roadLink.roadname === trafficSignProperties.OSOITE;
+    });
+    if (filteredRoadlinks.length > 0) {
+      roadLinks = filteredRoadlinks;
+    }
+  }
   const pointPairDistance = new PointPairDistance();
   let minDistance = Number.MAX_VALUE;
   let closestLink: LinkObject;
@@ -46,7 +74,7 @@ export default function (
     }
   }
   pointPairDistance.initialize();
-  return findMValue(
+  return getMValue(
     feature,
     closestLinkCoordinates,
     closestLink,
@@ -55,8 +83,6 @@ export default function (
     featureCoordinates,
     pointPairDistance,
     geomFactory,
-    MAX_OFFSET,
-    undefined,
-    towardsDigitizing
+    MAX_OFFSET
   );
 }

@@ -2,7 +2,8 @@ import { middyfy } from '@libs/lambda';
 import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
 import { S3, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
-import findNearestLink from './findNearestLink';
+import matchTrafficSign from './trafficSigns/matchTrafficSign';
+import matchObstacle from './obstacles/matchObstacle';
 import GeometryFactory from 'jsts/org/locationtech/jts/geom/GeometryFactory';
 import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel';
 
@@ -10,10 +11,8 @@ import {
   PayloadFeature,
   Feature,
   LinkObject,
-  FeatureRoadlinkMap,
-  TrafficSignProperties
+  FeatureRoadlinkMap
 } from '@functions/typing';
-import filterByBearing from './filterByBearing';
 
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
@@ -78,7 +77,7 @@ const matchRoadLinks = async (event) => {
     if (roadLinks) {
       switch (feature.properties.TYPE) {
         case 'OBSTACLE':
-          var matchResults = findNearestLink(
+          var matchResults = matchObstacle(
             roadLinks,
             feature,
             geomFactory,
@@ -86,22 +85,7 @@ const matchRoadLinks = async (event) => {
           );
           break;
         case 'TRAFFICSIGN':
-          var props = feature.properties as TrafficSignProperties;
-          if (props.SUUNTIMA) {
-            var matchResults = filterByBearing(
-              roadLinks,
-              feature,
-              geomFactory,
-              MAX_OFFSET
-            );
-          } else {
-            var matchResults = findNearestLink(
-              roadLinks,
-              feature,
-              geomFactory,
-              MAX_OFFSET
-            );
-          }
+          var matchResults = matchTrafficSign(roadLinks, feature, geomFactory);
           break;
       }
       if (!matchResults) {

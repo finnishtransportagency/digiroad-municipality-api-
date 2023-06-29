@@ -1,4 +1,3 @@
-import findMValue from './findMValue';
 import Coordinate from 'jsts/org/locationtech/jts/geom/Coordinate';
 import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
 import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance';
@@ -9,12 +8,11 @@ import {
   LinkPoint,
   TrafficSignProperties
 } from '@functions/typing';
-import findNearestLink from './findNearestLink';
+
 export default function (
   roadLinks: Array<LinkObject>,
   feature: Feature,
-  geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory,
-  MAX_OFFSET: number
+  geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory
 ) {
   const trafficSignProperties = feature.properties as TrafficSignProperties;
   const featureCoordinates = new Coordinate(
@@ -104,28 +102,21 @@ export default function (
   }
   pointPairDistance.initialize();
   trafficSignProperties.SUUNTIMA = adjustedBearing;
-  if (minDistance < 10) {
+  if (minDistance < 5) {
     trafficSignProperties.SUUNTIMA = Math.floor(minRoadAngle);
-    return findMValue(
-      feature,
-      closestLinkCoordinates,
-      closestLink,
-      minDistance,
-      closestPointOnLink,
-      featureCoordinates,
-      pointPairDistance,
-      geomFactory,
-      MAX_OFFSET,
-      minRoadAngle,
-      towardsDigitizing
-    );
+    return {
+      feature: feature,
+      closestLinkCoordinates: closestLinkCoordinates,
+      closestLink: closestLink,
+      minDistance: minDistance,
+      closestPointOnLink: closestPointOnLink,
+      featureCoordinates: featureCoordinates,
+      pointPairDistance: pointPairDistance,
+      geomFactory: geomFactory,
+      towardsDigitizing: towardsDigitizing,
+      minRoadAngle: minRoadAngle
+    };
   } else {
-    return findNearestLink(
-      roadLinks,
-      feature,
-      geomFactory,
-      MAX_OFFSET,
-      towardsDigitizing
-    );
+    return undefined;
   }
 }
