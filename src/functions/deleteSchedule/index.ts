@@ -10,7 +10,7 @@ export default {
       http: {
         method: 'delete',
         path: 'admin/remove/{municipality}',
-        private: true
+        private: process.env.STAGE_NAME === 'dev'
       }
     }
   ]

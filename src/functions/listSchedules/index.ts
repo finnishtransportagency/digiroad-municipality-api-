@@ -9,7 +9,7 @@ export default {
       http: {
         method: 'get',
         path: 'admin/list',
-        private: true
+        private: process.env.STAGE_NAME === 'dev'
       }
     }
   ]
