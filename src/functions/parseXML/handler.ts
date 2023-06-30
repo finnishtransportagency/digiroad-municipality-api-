@@ -6,9 +6,11 @@ import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
 import { XMLParser } from 'fast-xml-parser';
 import parseObstacle from './datatypes/parseObstacles';
 import parseTrafficsign from './datatypes/parseTrafficsigns';
+import parseRoadSurface from './datatypes/parseRoadSurface';
 import {
   trafficSignFeatureSchema,
-  obstacleFeatureSchema
+  obstacleFeatureSchema,
+  roadSurfaceFeatureSchema
 } from './validationSchemas/validationSchema';
 
 const parseXML = async (event) => {
@@ -51,7 +53,12 @@ const parseXML = async (event) => {
     return;
   }
 
-  const alwaysArray = ['FeatureCollection.featureMember'];
+  const alwaysArray = [
+    'FeatureCollection.featureMember',
+    'FeatureCollection.featureMember.KatualueenOsa.sijaintitieto.Sijainti.alue.Polygon.interior',
+    'FeatureCollection.featureMember.KatualueenOsa.sijaintitieto.Sijainti.alue.Polygon.exterior.LinearRing.pos',
+    'FeatureCollection.featureMember.KatualueenOsa.sijaintitieto.Sijainti.alue.Polygon.interior.LinearRing.pos'
+  ];
   //Assures that even if there is only one feature it makes it an array
   const options = {
     isArray: (_name, jpath) => {
@@ -65,6 +72,9 @@ const parseXML = async (event) => {
   }
   if (assetType === 'trafficSigns') {
     schema = trafficSignFeatureSchema;
+  }
+  if (assetType === 'roadSurface') {
+    schema = roadSurfaceFeatureSchema;
   }
   if (!schema) {
     throw new Error('Unknown assetType');
@@ -97,6 +107,17 @@ const parseXML = async (event) => {
           } else {
             rejectsAmount++;
             rejectedFeatures.push(feature.Liikennemerkki['yksilointitieto']);
+          }
+        }
+      }
+      if (assetType === 'roadSurface') {
+        for (const feature of featureMembers) {
+          const roadSurface = parseRoadSurface(feature.KatualueenOsa, now);
+          if (roadSurface && schema.isValidSync(roadSurface)) {
+            features.push(schema.cast(roadSurface));
+          } else {
+            rejectsAmount++;
+            rejectedFeatures.push(feature.KatualueenOsa['yksilointitieto']);
           }
         }
       }

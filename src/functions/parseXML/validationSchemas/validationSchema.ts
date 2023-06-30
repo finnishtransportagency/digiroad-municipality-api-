@@ -39,12 +39,34 @@ const obstaclePropertiesSchema = yup.object().shape({
   EST_TYYPPI: yup.number().required().oneOf([1, 2])
 });
 
+const surfacePropertiesSchema = yup.object().shape({
+  TYPE: yup
+    .string()
+    .required()
+    .matches(/(^SURFACE$)/),
+  P_TYYPPI: yup.number().oneOf([1, 2, 10, 20, 30, 40, 50, 99]).required()
+});
+
 const pointGeometrySchema = yup.object().shape({
   type: yup
     .string()
     .required()
     .matches(/(^Point$)/),
   coordinates: yup.array().of(yup.number().required()).length(2)
+});
+
+const areaGeometrySchema = yup.object().shape({
+  type: yup
+    .string()
+    .required()
+    .matches(/(^MultiPolygon$)/),
+  coordinates: yup
+    .array()
+    .of(
+      yup
+        .array()
+        .of(yup.array().of(yup.array().of(yup.number().required()).length(2)))
+    )
 });
 
 const obstacleFeatureSchema = yup.object().shape({
@@ -59,4 +81,14 @@ const trafficSignFeatureSchema = yup.object().shape({
   geometry: pointGeometrySchema.required()
 });
 
-export { trafficSignFeatureSchema, obstacleFeatureSchema };
+const roadSurfaceFeatureSchema = yup.object().shape({
+  type: yup.string().required(),
+  properties: surfacePropertiesSchema,
+  geometry: areaGeometrySchema.required()
+});
+
+export {
+  trafficSignFeatureSchema,
+  obstacleFeatureSchema,
+  roadSurfaceFeatureSchema
+};
