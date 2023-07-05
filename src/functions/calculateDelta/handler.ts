@@ -10,7 +10,8 @@ import { Upload } from '@aws-sdk/lib-storage';
 import { Feature, PayloadFeature } from '@functions/typing';
 import {
   obstaclesSchema,
-  trafficSignsSchema
+  trafficSignsSchema,
+  roadSurfacesSchema
 } from './validation/validationSchema';
 import isEqual from 'lodash.isequal';
 
@@ -56,6 +57,9 @@ const calculateDelta = async (event) => {
   }
   if (assetType === 'trafficSigns') {
     schema = trafficSignsSchema;
+  }
+  if (assetType === 'roadSurfaces') {
+    schema = roadSurfacesSchema;
   }
   if (!schema) {
     throw new Error('Unknown assetType');
@@ -116,7 +120,7 @@ const calculateDelta = async (event) => {
   const updated: Array<Feature> = [];
 
   // returns true if Features differ
-  function comparePoints(obj1: Feature, obj2: Feature) {
+  function compareFeatures(obj1: Feature, obj2: Feature) {
     return !isEqual(obj1, obj2);
   }
 
@@ -129,7 +133,7 @@ const calculateDelta = async (event) => {
         updateFeatures[i].properties.TYPE ===
           referenceFeatures[j].properties.TYPE
       ) {
-        if (comparePoints(updateFeatures[i], referenceFeatures[j])) {
+        if (compareFeatures(updateFeatures[i], referenceFeatures[j])) {
           updated.push(updateFeatures[i]);
         }
         found = true;
