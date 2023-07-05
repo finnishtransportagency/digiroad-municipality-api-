@@ -6,9 +6,11 @@ import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
 import { XMLParser } from 'fast-xml-parser';
 import parseObstacle from './datatypes/parseObstacles';
 import parseTrafficsign from './datatypes/parseTrafficsigns';
+import parseRoadSurface from './datatypes/parseRoadSurface';
 import {
   trafficSignFeatureSchema,
-  obstacleFeatureSchema
+  obstacleFeatureSchema,
+  roadSurfaceFeatureSchema
 } from './validationSchemas/validationSchema';
 
 const parseXML = async (event) => {
@@ -66,6 +68,9 @@ const parseXML = async (event) => {
   if (assetType === 'trafficSigns') {
     schema = trafficSignFeatureSchema;
   }
+  if (assetType === 'roadSurfaces') {
+    schema = roadSurfaceFeatureSchema;
+  }
   if (!schema) {
     throw new Error('Unknown assetType');
   }
@@ -100,7 +105,19 @@ const parseXML = async (event) => {
           }
         }
       }
+      if (assetType === 'roadSurfaces') {
+        for (const feature of featureMembers) {
+          const roadSurface = parseRoadSurface(feature.KatualueenOsa, now);
+          if (roadSurface && schema.isValidSync(roadSurface)) {
+            features.push(schema.cast(roadSurface));
+          } else {
+            rejectsAmount++;
+            rejectedFeatures.push(feature.KatualueenOsa['yksilointitieto']);
+          }
+        }
+      }
     }
+
     var geoJSON = {
       type: 'FeatureCollection',
       name: `${municipality}-Kuntarajapinta`,

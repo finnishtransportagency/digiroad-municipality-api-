@@ -14,9 +14,15 @@ export interface GeoJSON {
   };
 }
 
+export interface SurfaceProperties {
+  TYPE: string;
+  P_TYYPPI: string;
+  ID: string;
+}
+
 export interface Feature {
   type?: string;
-  properties: ObstacleProperties | TrafficSignProperties;
+  properties: ObstacleProperties | TrafficSignProperties | SurfaceProperties;
   geometry: {
     type: string;
     coordinates: Array<number>;
