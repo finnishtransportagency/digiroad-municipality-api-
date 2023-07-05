@@ -18,6 +18,7 @@ export interface SurfaceProperties {
   TYPE: string;
   P_TYYPPI: string;
   ID: string;
+  DR_REJECTED?: boolean;
 }
 
 export interface Feature {
