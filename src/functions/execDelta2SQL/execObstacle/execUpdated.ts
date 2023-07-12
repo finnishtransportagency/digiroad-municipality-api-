@@ -1,8 +1,8 @@
 import { Feature, ObstacleProperties } from '@functions/typing';
 import { Client } from 'pg';
-import execCreated from './execCreated';
+import execCreatedObstacle from './execCreated';
 
-export default async function (
+export default async function execUpdatedObstacle (
   feature: Feature,
   municipality_code: number,
   dbmodifier: string,
@@ -26,7 +26,7 @@ export default async function (
   const createdData = result.rows[0];
 
   if (!createdData) {
-    await execCreated(feature, municipality_code, dbmodifier, client);
+    await execCreatedObstacle(feature, municipality_code, dbmodifier, client);
     return;
   }
   const point = `Point(${obstacleProperties.DR_GEOMETRY.x} ${obstacleProperties.DR_GEOMETRY.y} 0 0 )`;

@@ -1,8 +1,8 @@
 import { Feature, TrafficSignProperties } from '@functions/typing';
 import { Client } from 'pg';
-import execCreated from './execCreated';
+import execCreatedTrafficSign from './execCreated';
 
-export default async function (
+export default async function execUpdatedTrafficSign (
   feature: Feature,
   municipality_code: number,
   dbmodifier: string,
@@ -31,7 +31,7 @@ export default async function (
   const createdData = expireResult.rows[0];
 
   if (!createdData) {
-    await execCreated(feature, municipality_code, dbmodifier, client);
+    await execCreatedTrafficSign(feature, municipality_code, dbmodifier, client);
     return;
   }
 

@@ -1,8 +1,8 @@
 import { Feature, ObstacleProperties } from '@functions/typing';
 import { Client } from 'pg';
-import execUpdated from './execUpdated';
+import execUpdatedObstacle from './execUpdated';
 
-export default async function (
+export default async function execCreatedObstacle (
   feature: Feature,
   municipality_code: number,
   dbmodifier: string,
@@ -25,7 +25,7 @@ export default async function (
   const checkExistingAssetResult = await client.query(checkExistingAssetQuery);
 
   if (checkExistingAssetResult.rowCount > 0) {
-    await execUpdated(feature, municipality_code, dbmodifier, client);
+    await execUpdatedObstacle(feature, municipality_code, dbmodifier, client);
     return;
   }
 

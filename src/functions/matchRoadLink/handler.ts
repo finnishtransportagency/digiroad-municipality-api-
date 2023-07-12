@@ -117,7 +117,8 @@ const matchRoadLinks = async (event) => {
     ),
     metadata: {
       OFFSET_LIMIT: MAX_OFFSET,
-      municipality: delta.metadata.municipality
+      municipality: delta.metadata.municipality,
+      assetType: delta.metadata.assetType
     }
   };
 

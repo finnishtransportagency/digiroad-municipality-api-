@@ -60,65 +60,68 @@ const execDelta2SQL = async (event) => {
       ).rows[0].id
     );
 
-    for (const feature of delta.Created) {
-      if (feature.properties.TYPE === 'OBSTACLE') {
-        await execCreatedObstacle(
-          feature,
-          municipality_code,
-          dbmodifier,
-          client
-        );
-        continue;
-      }
-      if (feature.properties.TYPE === 'TRAFFICSIGN') {
-        await execCreatedTrafficSign(
-          feature,
-          municipality_code,
-          dbmodifier,
-          client
-        );
-        continue;
-      }
-    }
-    for (const feature of delta.Deleted) {
-      if (feature.properties.TYPE === 'OBSTACLE') {
-        await execExpiredObstacle(
-          feature,
-          municipality_code,
-          dbmodifier,
-          client
-        );
-        continue;
-      }
-      if (feature.properties.TYPE === 'TRAFFICSIGN') {
-        await execExpiredTrafficSign(
-          feature,
-          municipality_code,
-          dbmodifier,
-          client
-        );
-        continue;
-      }
-    }
-    for (const feature of delta.Updated) {
-      if (feature.properties.TYPE === 'OBSTACLE') {
-        await execUpdatedObstacle(
-          feature,
-          municipality_code,
-          dbmodifier,
-          client
-        );
-        continue;
-      }
-      if (feature.properties.TYPE === 'TRAFFICSIGN') {
-        await execUpdatedTrafficSign(
-          feature,
-          municipality_code,
-          dbmodifier,
-          client
-        );
-        continue;
-      }
+    switch (delta.metadata.assetType) {
+      case 'obstacles':
+        for (const feature of delta.Created) {
+          await execCreatedObstacle(
+            feature,
+            municipality_code,
+            dbmodifier,
+            client
+          );
+          continue;
+        }
+        for (const feature of delta.Deleted) {
+          await execExpiredObstacle(
+            feature,
+            municipality_code,
+            dbmodifier,
+            client
+          );
+          continue;
+        }
+        for (const feature of delta.Updated) {
+          await execUpdatedObstacle(
+            feature,
+            municipality_code,
+            dbmodifier,
+            client
+          );
+          continue;
+        };
+        break;
+      case 'trafficSigns':
+        for (const feature of delta.Created) {
+          await execCreatedTrafficSign(
+            feature,
+            municipality_code,
+            dbmodifier,
+            client
+          );
+          continue;
+        }
+        for (const feature of delta.Deleted) {
+          await execExpiredTrafficSign(
+            feature,
+            municipality_code,
+            dbmodifier,
+            client
+          );
+          continue;
+        }
+        for (const feature of delta.Updated) {
+          await execUpdatedTrafficSign(
+            feature,
+            municipality_code,
+            dbmodifier,
+            client
+          );
+          continue;
+        };
+        break;
+      default:
+        throw new Error('Invalid assetType')
+        break;
     }
 
     await client.query('COMMIT');
