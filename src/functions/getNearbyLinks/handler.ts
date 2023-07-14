@@ -99,6 +99,7 @@ const getNearbyLinks = async (event) => {
   client.end();
 
   res.rows.forEach((row) => {
+    console.log(row);
     row.roadlinks.forEach((roadlink) => {
       const feature = Geometry.parse(`SRID=3067;${roadlink.f1}`) as LineString;
       const pointObjects: Array<Point> = feature.points;
