@@ -51,6 +51,7 @@ export default function (alue, now) {
     type: 'Feature',
     properties: {
       TYPE: 'SURFACE',
+      ID: alue['yksilointitieto'],
       P_TYYPPI: infraoSurface2digiroad[alue['pintamateriaali']]
     },
     geometry: {

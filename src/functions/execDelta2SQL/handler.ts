@@ -88,7 +88,7 @@ const execDelta2SQL = async (event) => {
             client
           );
           continue;
-        };
+        }
         break;
       case 'trafficSigns':
         for (const feature of delta.Created) {
@@ -117,10 +117,10 @@ const execDelta2SQL = async (event) => {
             client
           );
           continue;
-        };
+        }
         break;
       default:
-        throw new Error('Invalid assetType')
+        throw new Error('Invalid assetType');
         break;
     }
 

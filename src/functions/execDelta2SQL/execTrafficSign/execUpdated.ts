@@ -2,7 +2,7 @@ import { Feature, TrafficSignProperties } from '@functions/typing';
 import { Client } from 'pg';
 import execCreatedTrafficSign from './execCreated';
 
-export default async function execUpdatedTrafficSign (
+export default async function execUpdatedTrafficSign(
   feature: Feature,
   municipality_code: number,
   dbmodifier: string,
@@ -31,7 +31,12 @@ export default async function execUpdatedTrafficSign (
   const createdData = expireResult.rows[0];
 
   if (!createdData) {
-    await execCreatedTrafficSign(feature, municipality_code, dbmodifier, client);
+    await execCreatedTrafficSign(
+      feature,
+      municipality_code,
+      dbmodifier,
+      client
+    );
     return;
   }
 

@@ -1,7 +1,7 @@
 import { TrafficSignProperties, Feature } from '@functions/typing';
 import { Client } from 'pg';
 
-export default async function execExpiredTrafficSign (
+export default async function execExpiredTrafficSign(
   feature: Feature,
   municipality_code: number,
   dbmodifier: string,

@@ -2,7 +2,7 @@ import { Feature, ObstacleProperties } from '@functions/typing';
 import { Client } from 'pg';
 import execUpdatedObstacle from './execUpdated';
 
-export default async function execCreatedObstacle (
+export default async function execCreatedObstacle(
   feature: Feature,
   municipality_code: number,
   dbmodifier: string,
