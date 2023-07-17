@@ -48,7 +48,8 @@ const matchRoadLinks = async (event) => {
 
   const getNearbyLinksPayload = {
     features: features,
-    municipality: delta.metadata.municipality
+    municipality: delta.metadata.municipality,
+    assetType: delta.metadata.assetType
   };
   const getNearbyLinksParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-getNearbyLinks`,

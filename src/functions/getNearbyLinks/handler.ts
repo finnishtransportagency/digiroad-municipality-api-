@@ -69,7 +69,7 @@ const getNearbyLinks = async (event) => {
   });
   await client.connect();
 
-  const query = {
+  const pointQuery = {
     text: `
     WITH municipality_ AS (
       SELECT id
@@ -94,6 +94,32 @@ const getNearbyLinks = async (event) => {
       `,
     values: [event.municipality, JSON.stringify(event.features), allowedOnKapy]
   };
+  const areaQuery = {
+    text: `
+    WITH municipality_ AS (
+      SELECT id
+      FROM municipality
+      WHERE LOWER(name_fi) = LOWER($1)
+      ), 
+      acceptable_roadlinks AS (
+        SELECT linkid, shape, directiontype, roadname_fi
+        FROM kgv_roadlink, municipality_
+        WHERE kgv_roadlink.municipalitycode = municipality_.id AND not EXISTS(
+        SELECT 1
+        FROM administrative_class 
+        WHERE administrative_class.link_id = kgv_roadlink.linkid AND administrative_class.administrative_class = 1
+        ) AND (kgv_roadlink.adminclass != 1 OR kgv_roadlink.adminclass IS NULL)
+      )
+      
+      SELECT (value#>'{properties}'->>'ID')::TEXT AS ID, (value#>'{properties}'->>'TYPE')::TEXT AS TYPE,json_agg((st_astext(shape),linkid,directiontype, roadname_fi)) AS roadlinks
+      FROM json_array_elements($2) AS features, acceptable_roadlinks
+      WHERE ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067) && acceptable_roadlinks.shape 
+      GROUP BY ID,TYPE
+      `,
+    values: [event.municipality, JSON.stringify(event.features)]
+  };
+
+  const query = event.assetType === 'roadSurfaces' ? areaQuery : pointQuery;
 
   const res = await client.query(query);
   client.end();
