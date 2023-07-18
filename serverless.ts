@@ -233,8 +233,7 @@ const serverlessConfiguration: AWS = {
                   },
                   {
                     Action: ['iam:PassRole'],
-                    Resource:
-                      'arn:aws:iam::475079312496:role/DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataScheduleRole',
+                    Resource: `arn:aws:iam::${process.env.AWS_ACCOUNT_ID}:role/DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataScheduleRole`,
                     Effect: 'Allow'
                   }
                 ]
