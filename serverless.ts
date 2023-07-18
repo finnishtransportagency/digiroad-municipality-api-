@@ -145,6 +145,12 @@ const serverlessConfiguration: AWS = {
           }
         }
       }),
+      drKuntaScheduleGroup: {
+        Type: 'AWS::Scheduler::ScheduleGroup',
+        Properties: {
+          Name: `DRKunta-${process.env.STAGE_NAME}`
+        }
+      },
       drKuntaBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
