@@ -44,6 +44,7 @@ const surfacePropertiesSchema = yup.object().shape({
     .string()
     .required()
     .matches(/(^SURFACE$)/),
+  ID: yup.string().required(),
   P_TYYPPI: yup.number().oneOf([1, 2, 10, 20, 30, 40, 50, 99]).required()
 });
 

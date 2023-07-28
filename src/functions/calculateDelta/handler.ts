@@ -7,7 +7,7 @@ import {
   DeleteObjectCommand
 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
-import { Feature, PayloadFeature } from '@functions/typing';
+import { DrKuntaFeature, PayloadFeature } from '@functions/typing';
 import {
   obstaclesSchema,
   trafficSignsSchema,
@@ -112,15 +112,15 @@ const calculateDelta = async (event) => {
 
   referenceObject = schema.cast(referenceObject);
 
-  const updateFeatures: Array<Feature> = updateObject.features;
-  const referenceFeatures: Array<Feature> = referenceObject.features;
+  const updateFeatures: Array<DrKuntaFeature> = updateObject.features;
+  const referenceFeatures: Array<DrKuntaFeature> = referenceObject.features;
 
-  const created: Array<Feature> = [];
-  const deleted: Array<Feature> = [];
-  const updated: Array<Feature> = [];
+  const created: Array<DrKuntaFeature> = [];
+  const deleted: Array<DrKuntaFeature> = [];
+  const updated: Array<DrKuntaFeature> = [];
 
   // returns true if Features differ
-  function compareFeatures(obj1: Feature, obj2: Feature) {
+  function compareFeatures(obj1: DrKuntaFeature, obj2: DrKuntaFeature) {
     return !isEqual(obj1, obj2);
   }
 

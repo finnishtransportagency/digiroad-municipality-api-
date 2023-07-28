@@ -4,12 +4,14 @@ import { S3, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import matchTrafficSign from './trafficSigns/matchTrafficSign';
 import matchObstacle from './obstacles/matchObstacle';
+import matchSurface from './surface/matchSurface';
+import combineSurfaces from './surface/combineSurfaces';
 import GeometryFactory from 'jsts/org/locationtech/jts/geom/GeometryFactory';
 import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel';
 
 import {
   PayloadFeature,
-  Feature,
+  DrKuntaFeature,
   LinkObject,
   FeatureRoadlinkMap
 } from '@functions/typing';
@@ -42,10 +44,13 @@ const matchRoadLinks = async (event) => {
   );
 
   let rejectsAmount = 0;
-
-  const features: Array<Feature> = delta.Created.concat(delta.Updated);
+  let features: Array<DrKuntaFeature> = delta.Created.concat(delta.Updated);
+  if (delta.metadata.assetType === 'roadSurfaces') {
+    features = combineSurfaces(features) as unknown as Array<DrKuntaFeature>;
+    delta.Created = features;
+    delta.Updated = [];
+  }
   const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
-
   const getNearbyLinksPayload = {
     features: features,
     municipality: delta.metadata.municipality,
@@ -68,7 +73,6 @@ const matchRoadLinks = async (event) => {
     `dr-kunta-${process.env.STAGE_NAME}-bucket`,
     allRoadLinksS3Key
   );
-
   for (let p = 0; p < features.length; p++) {
     const feature = features[p];
     const roadLinks: Array<LinkObject> | undefined = allRoadLinks.find(
@@ -78,43 +82,81 @@ const matchRoadLinks = async (event) => {
     if (roadLinks) {
       switch (feature.properties.TYPE) {
         case 'OBSTACLE':
-          var matchResults = matchObstacle(
+          var obstacleMatchResults = matchObstacle(
             roadLinks,
             feature,
             geomFactory,
             MAX_OFFSET
           );
+          if (!obstacleMatchResults) {
+            console.error('matchResult is undefined');
+            return;
+          }
+
+          if (obstacleMatchResults.DR_REJECTED) {
+            rejectsAmount++;
+          }
+
+          feature.properties = {
+            ...feature.properties,
+            ...obstacleMatchResults
+          };
           break;
         case 'TRAFFICSIGN':
-          var matchResults = matchTrafficSign(roadLinks, feature, geomFactory);
+          var trafficSignMatchResults = matchTrafficSign(
+            roadLinks,
+            feature,
+            geomFactory
+          );
+          if (!trafficSignMatchResults) {
+            console.error('matchResult is undefined');
+            return;
+          }
+
+          if (trafficSignMatchResults.DR_REJECTED) {
+            rejectsAmount++;
+          }
+
+          feature.properties = {
+            ...feature.properties,
+            ...trafficSignMatchResults
+          };
+          break;
+        case 'SURFACE':
+          var surfaceMatchResults = matchSurface(
+            roadLinks,
+            feature,
+            geomFactory
+          );
+
+          if (!surfaceMatchResults) {
+            console.error('matchResult is undefined');
+            return;
+          }
+
+          if (surfaceMatchResults.DR_REJECTED) {
+            rejectsAmount++;
+          }
+
+          delete feature['geometry'];
+          feature.properties = {
+            ...feature.properties,
+            ...surfaceMatchResults
+          };
           break;
       }
-      if (!matchResults) {
-        console.error('matchResults is undefined');
-        return;
-      }
-
-      if (matchResults.DR_REJECTED) {
-        rejectsAmount++;
-      }
-
-      feature.properties = {
-        ...feature.properties,
-        ...matchResults
-      };
     } else {
       rejectsAmount++;
       feature.properties.DR_REJECTED = true;
     }
   }
-
   const execDelta2SQLBody: PayloadFeature = {
     Created: delta.Created.filter(
-      (feature: Feature) => !feature.properties.DR_REJECTED
+      (feature: DrKuntaFeature) => !feature.properties.DR_REJECTED
     ),
     Deleted: delta.Deleted,
     Updated: delta.Updated.filter(
-      (feature: Feature) => !feature.properties.DR_REJECTED
+      (feature: DrKuntaFeature) => !feature.properties.DR_REJECTED
     ),
     metadata: {
       OFFSET_LIMIT: MAX_OFFSET,
@@ -126,19 +168,19 @@ const matchRoadLinks = async (event) => {
   const logsBody = {
     Rejected: {
       Created: delta.Created.filter(
-        (feature: Feature) => feature.properties.DR_REJECTED
+        (feature: DrKuntaFeature) => feature.properties.DR_REJECTED
       ),
       Updated: delta.Updated.filter(
-        (feature: Feature) => feature.properties.DR_REJECTED
+        (feature: DrKuntaFeature) => feature.properties.DR_REJECTED
       )
     },
     Accepted: {
       Created: delta.Created.filter(
-        (feature: Feature) => !feature.properties.DR_REJECTED
+        (feature: DrKuntaFeature) => !feature.properties.DR_REJECTED
       ),
       Deleted: delta.Deleted,
       Updated: delta.Updated.filter(
-        (feature: Feature) => !feature.properties.DR_REJECTED
+        (feature: DrKuntaFeature) => !feature.properties.DR_REJECTED
       )
     },
     invalidInfrao: delta.invalidInfrao,

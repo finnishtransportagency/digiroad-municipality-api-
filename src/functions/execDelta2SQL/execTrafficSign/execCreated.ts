@@ -1,9 +1,9 @@
-import { Feature, TrafficSignProperties } from '@functions/typing';
+import { DrKuntaFeature, TrafficSignProperties } from '@functions/typing';
 import { Client } from 'pg';
 import execUpdatedTrafficSign from './execUpdated';
 
 export default async function execCreatedTrafficSign(
-  feature: Feature,
+  feature: DrKuntaFeature,
   municipality_code: number,
   dbmodifier: string,
   client: Client
@@ -114,9 +114,15 @@ export default async function execCreatedTrafficSign(
     await client.query(query);
   }
 
-  await numberQuery('terrain_coordinates_x', feature.geometry.coordinates[0]);
+  await numberQuery(
+    'terrain_coordinates_x',
+    feature.geometry.coordinates[0] as number
+  );
 
-  await numberQuery('terrain_coordinates_y', feature.geometry.coordinates[1]);
+  await numberQuery(
+    'terrain_coordinates_y',
+    feature.geometry.coordinates[1] as number
+  );
 
   const typeQuery = {
     text: `

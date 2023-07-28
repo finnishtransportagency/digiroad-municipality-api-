@@ -1,9 +1,9 @@
-import { Feature, ObstacleProperties } from '@functions/typing';
+import { DrKuntaFeature, ObstacleProperties } from '@functions/typing';
 import { Client } from 'pg';
 import execCreatedObstacle from './execCreated';
 
 export default async function execUpdatedObstacle(
-  feature: Feature,
+  feature: DrKuntaFeature,
   municipality_code: number,
   dbmodifier: string,
   client: Client

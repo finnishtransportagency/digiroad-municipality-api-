@@ -7,7 +7,7 @@ export interface GeoJSON {
       name?: string;
     };
   };
-  features: Array<Feature>;
+  features: Array<DrKuntaFeature>;
   invalidInfrao: {
     sum: number;
     IDs: Array<string>;
@@ -19,14 +19,15 @@ export interface SurfaceProperties {
   P_TYYPPI: string;
   ID: string;
   DR_REJECTED?: boolean;
+  DR_VALIDLINKS?: Array<{ linkid: string; length: number }>;
 }
 
-export interface Feature {
+export interface DrKuntaFeature {
   type?: string;
   properties: ObstacleProperties | TrafficSignProperties | SurfaceProperties;
   geometry: {
     type: string;
-    coordinates: Array<number>;
+    coordinates: Array<Array<Array<Array<number>>>> | Array<number>;
   };
 }
 
@@ -73,9 +74,9 @@ export interface TrafficSignProperties {
 }
 
 export interface PayloadFeature {
-  Created: Array<Feature>;
-  Deleted: Array<Feature>;
-  Updated: Array<Feature>;
+  Created: Array<DrKuntaFeature>;
+  Deleted: Array<DrKuntaFeature>;
+  Updated: Array<DrKuntaFeature>;
   metadata?: {
     OFFSET_LIMIT?: number;
     municipality: string;
@@ -106,8 +107,9 @@ export interface LinkPoint {
 export interface LinkObject {
   linkId: string;
   points: Array<LinkPoint>;
-  directiontype: number;
-  roadname: string;
+  directiontype?: number;
+  roadname?: string;
+  geometrylength?: number;
 }
 
 export interface matchResultObject {

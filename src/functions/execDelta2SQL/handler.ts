@@ -11,6 +11,9 @@ import execCreatedTrafficSign from './execTrafficSign/execCreated';
 import execUpdatedTrafficSign from './execTrafficSign/execUpdated';
 import execExpiredTrafficSign from './execTrafficSign/execExpired';
 
+import execCreatedSurface from './execSurface/execCreated';
+import execCleanUp from './execSurface/execCleanup';
+
 const getParameter = async (name: string): Promise<string> => {
   const ssm = new SSM({});
   const getParametersCommand = new GetParameterCommand({
@@ -111,6 +114,18 @@ const execDelta2SQL = async (event) => {
         }
         for (const feature of delta.Updated) {
           await execUpdatedTrafficSign(
+            feature,
+            municipality_code,
+            dbmodifier,
+            client
+          );
+          continue;
+        }
+        break;
+      case 'roadSurfaces':
+        await execCleanUp(municipality_code, dbmodifier, client);
+        for (const feature of delta.Created) {
+          await execCreatedSurface(
             feature,
             municipality_code,
             dbmodifier,

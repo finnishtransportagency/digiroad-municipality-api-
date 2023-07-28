@@ -3,10 +3,10 @@ import Coordinate from 'jsts/org/locationtech/jts/geom/Coordinate';
 import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
 import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance';
 
-import { Feature, LinkObject } from '@functions/typing';
+import { DrKuntaFeature, LinkObject } from '@functions/typing';
 export default function (
   roadLinks: Array<LinkObject>,
-  feature: Feature,
+  feature: DrKuntaFeature,
   geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory,
   MAX_OFFSET: number
 ) {
@@ -18,8 +18,8 @@ export default function (
   let closestPointOnLink: jsts.org.locationtech.jts.geom.Coordinate;
 
   const featureCoordinates = new Coordinate(
-    feature.geometry.coordinates[0],
-    feature.geometry.coordinates[1]
+    feature.geometry.coordinates[0] as number,
+    feature.geometry.coordinates[1] as number
   );
 
   for (let i = 0; i < roadLinks.length; i++) {

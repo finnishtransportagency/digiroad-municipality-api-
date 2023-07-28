@@ -1,13 +1,13 @@
 import {
   LinkObject,
   matchResultObject,
-  Feature,
+  DrKuntaFeature,
   TrafficSignProperties
 } from '@functions/typing';
 import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
 
 export default function (
-  feature: Feature,
+  feature: DrKuntaFeature,
   linkCoordinates: Array<jsts.org.locationtech.jts.geom.Coordinate>,
   link: LinkObject,
   distanceToFeature: number,
@@ -67,8 +67,10 @@ export default function (
 
     const props = feature.properties as TrafficSignProperties;
     if (!towardsDigitizing) {
-      const latDiff = feature.geometry.coordinates[1] - closestPointOnLink.y;
-      const lonDiff = feature.geometry.coordinates[0] - closestPointOnLink.x;
+      const latDiff =
+        (feature.geometry.coordinates[1] as number) - closestPointOnLink.y;
+      const lonDiff =
+        (feature.geometry.coordinates[0] as number) - closestPointOnLink.x;
       result.TOWARDSDIGITIZING =
         ((roadLinkBearingAtPoint <= 45 || roadLinkBearingAtPoint > 315) &&
           lonDiff > 0) ||

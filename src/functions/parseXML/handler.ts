@@ -1,5 +1,5 @@
 import { middyfy } from '@libs/lambda';
-import { Feature } from '@functions/typing';
+import { DrKuntaFeature } from '@functions/typing';
 import { Upload } from '@aws-sdk/lib-storage';
 import { S3, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
@@ -53,7 +53,12 @@ const parseXML = async (event) => {
     return;
   }
 
-  const alwaysArray = ['FeatureCollection.featureMember'];
+  const alwaysArray = [
+    'FeatureCollection.featureMember',
+    'FeatureCollection.featureMember.KatualueenOsa.sijaintitieto.Sijainti.alue.Polygon.interior',
+    'FeatureCollection.featureMember.KatualueenOsa.sijaintitieto.Sijainti.alue.Polygon.exterior.LinearRing.pos',
+    'FeatureCollection.featureMember.KatualueenOsa.sijaintitieto.Sijainti.alue.Polygon.interior.LinearRing.pos'
+  ];
   //Assures that even if there is only one feature it makes it an array
   const options = {
     isArray: (_name, jpath) => {
@@ -81,7 +86,7 @@ const parseXML = async (event) => {
     const featureMembers = featureCollection.featureMember;
     let rejectsAmount = 0;
     const rejectedFeatures: Array<string> = [];
-    const features: Array<Feature> = [];
+    const features: Array<DrKuntaFeature> = [];
     if (featureMembers) {
       if (assetType === 'obstacles') {
         for (const feature of featureMembers) {

@@ -3,7 +3,7 @@ import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/Distan
 import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance';
 
 import {
-  Feature,
+  DrKuntaFeature,
   LinkObject,
   LinkPoint,
   TrafficSignProperties
@@ -11,13 +11,13 @@ import {
 
 export default function (
   roadLinks: Array<LinkObject>,
-  feature: Feature,
+  feature: DrKuntaFeature,
   geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory
 ) {
   const trafficSignProperties = feature.properties as TrafficSignProperties;
   const featureCoordinates = new Coordinate(
-    feature.geometry.coordinates[0],
-    feature.geometry.coordinates[1]
+    feature.geometry.coordinates[0] as number,
+    feature.geometry.coordinates[1] as number
   );
   const bearing = trafficSignProperties.SUUNTIMA;
   const towardsDigitizing = bearing > 270 || bearing <= 90;
