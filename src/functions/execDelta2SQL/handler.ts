@@ -62,7 +62,6 @@ const execDelta2SQL = async (event) => {
         })
       ).rows[0].id
     );
-    console.log(delta);
     switch (delta.metadata.assetType) {
       case 'obstacles':
         for (const feature of delta.Created) {

@@ -23,8 +23,8 @@ export default async function execCreatedSurface(
 
     const lrmPositionQuery = {
       text: `
-    INSERT INTO lrm_position (id,start_measure,end_measure,link_id)
-    VALUES (nextval('LRM_POSITION_PRIMARY_KEY_SEQ'),0, $1, $2)
+    INSERT INTO lrm_position (id,side_code,start_measure,end_measure,link_id)
+    VALUES (nextval('LRM_POSITION_PRIMARY_KEY_SEQ'),1,0, $1, $2)
     `,
       values: [roadLink.length, roadLink.linkid]
     };
