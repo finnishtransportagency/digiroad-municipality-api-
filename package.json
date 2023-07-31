@@ -24,6 +24,7 @@
     "@middy/http-json-body-parser": "^2.5.3",
     "@middy/validator": "^4.3.1",
     "@turf/dissolve": "^6.5.0",
+    "@turf/flatten": "^6.5.0",
     "@turf/helpers": "^6.5.0",
     "@turf/simplify": "^6.5.0",
     "axios": "^1.4.0",
