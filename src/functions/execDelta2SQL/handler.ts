@@ -71,7 +71,6 @@ const execDelta2SQL = async (event) => {
             dbmodifier,
             client
           );
-          continue;
         }
         for (const feature of delta.Deleted) {
           await execExpiredObstacle(
@@ -80,7 +79,6 @@ const execDelta2SQL = async (event) => {
             dbmodifier,
             client
           );
-          continue;
         }
         for (const feature of delta.Updated) {
           await execUpdatedObstacle(
@@ -89,7 +87,6 @@ const execDelta2SQL = async (event) => {
             dbmodifier,
             client
           );
-          continue;
         }
         break;
       case 'trafficSigns':
@@ -100,7 +97,6 @@ const execDelta2SQL = async (event) => {
             dbmodifier,
             client
           );
-          continue;
         }
         for (const feature of delta.Deleted) {
           await execExpiredTrafficSign(
@@ -109,7 +105,6 @@ const execDelta2SQL = async (event) => {
             dbmodifier,
             client
           );
-          continue;
         }
         for (const feature of delta.Updated) {
           await execUpdatedTrafficSign(
@@ -118,7 +113,6 @@ const execDelta2SQL = async (event) => {
             dbmodifier,
             client
           );
-          continue;
         }
         break;
       case 'roadSurfaces':
@@ -131,13 +125,11 @@ const execDelta2SQL = async (event) => {
               dbmodifier,
               client
             );
-            continue;
           }
         }
         break;
       default:
         throw new Error('Invalid assetType');
-        break;
     }
 
     await client.query('COMMIT');
