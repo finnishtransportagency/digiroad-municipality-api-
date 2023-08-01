@@ -116,7 +116,7 @@ const execDelta2SQL = async (event) => {
         }
         break;
       case 'roadSurfaces':
-        if (delta.Created) {
+        if (delta.Created.length > 0 || delta.Deleted.length > 0) {
           await execCleanUp(municipality_code, dbmodifier, client);
           for (const feature of delta.Created) {
             await execCreatedSurface(

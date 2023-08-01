@@ -117,7 +117,7 @@ const calculateDelta = async (event) => {
 
   let created: Array<DrKuntaFeature> = [];
   const updated: Array<DrKuntaFeature> = [];
-  const deleted: Array<DrKuntaFeature> = [];
+  let deleted: Array<DrKuntaFeature> = [];
 
   // returns true if Features differ
   function compareFeatures(obj1: DrKuntaFeature, obj2: DrKuntaFeature) {
@@ -164,7 +164,11 @@ const calculateDelta = async (event) => {
   }
   if (assetType === 'roadSurfaces') {
     if (!isEqual(updateFeatures, referenceFeatures)) {
-      created = updateFeatures;
+      if (updateFeatures.length > 0) {
+        created = updateFeatures;
+      } else {
+        deleted = referenceFeatures;
+      }
     }
   }
   const payLoad: PayloadFeature = {
