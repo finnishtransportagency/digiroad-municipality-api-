@@ -115,53 +115,58 @@ const calculateDelta = async (event) => {
   const updateFeatures: Array<DrKuntaFeature> = updateObject.features;
   const referenceFeatures: Array<DrKuntaFeature> = referenceObject.features;
 
-  const created: Array<DrKuntaFeature> = [];
-  const deleted: Array<DrKuntaFeature> = [];
+  let created: Array<DrKuntaFeature> = [];
   const updated: Array<DrKuntaFeature> = [];
+  const deleted: Array<DrKuntaFeature> = [];
 
   // returns true if Features differ
   function compareFeatures(obj1: DrKuntaFeature, obj2: DrKuntaFeature) {
     return !isEqual(obj1, obj2);
   }
-
-  for (let i = 0; i < updateFeatures.length; i++) {
-    let found = false;
-    for (let j = 0; j < referenceFeatures.length; j++) {
-      if (
-        updateFeatures[i].properties.ID ===
-          referenceFeatures[j].properties.ID &&
-        updateFeatures[i].properties.TYPE ===
-          referenceFeatures[j].properties.TYPE
-      ) {
-        if (compareFeatures(updateFeatures[i], referenceFeatures[j])) {
-          updated.push(updateFeatures[i]);
-        }
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
-      created.push(updateFeatures[i]);
-    }
-  }
-  for (let j = 0; j < referenceFeatures.length; j++) {
-    let found = false;
+  if (assetType === 'obstacles' || assetType === 'trafficSigns') {
     for (let i = 0; i < updateFeatures.length; i++) {
-      if (
-        updateFeatures[i].properties.ID ===
-          referenceFeatures[j].properties.ID &&
-        updateFeatures[i].properties.TYPE ===
-          referenceFeatures[j].properties.TYPE
-      ) {
-        found = true;
-        break;
+      let found = false;
+      for (let j = 0; j < referenceFeatures.length; j++) {
+        if (
+          updateFeatures[i].properties.ID ===
+            referenceFeatures[j].properties.ID &&
+          updateFeatures[i].properties.TYPE ===
+            referenceFeatures[j].properties.TYPE
+        ) {
+          if (compareFeatures(updateFeatures[i], referenceFeatures[j])) {
+            updated.push(updateFeatures[i]);
+          }
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        created.push(updateFeatures[i]);
       }
     }
-    if (!found) {
-      deleted.push(referenceFeatures[j]);
+    for (let j = 0; j < referenceFeatures.length; j++) {
+      let found = false;
+      for (let i = 0; i < updateFeatures.length; i++) {
+        if (
+          updateFeatures[i].properties.ID ===
+            referenceFeatures[j].properties.ID &&
+          updateFeatures[i].properties.TYPE ===
+            referenceFeatures[j].properties.TYPE
+        ) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        deleted.push(referenceFeatures[j]);
+      }
     }
   }
-
+  if (assetType === 'roadSurfaces') {
+    if (!isEqual(updateFeatures, referenceFeatures)) {
+      created = updateFeatures;
+    }
+  }
   const payLoad: PayloadFeature = {
     Created: created,
     Deleted: deleted,

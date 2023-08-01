@@ -122,15 +122,17 @@ const execDelta2SQL = async (event) => {
         }
         break;
       case 'roadSurfaces':
-        await execCleanUp(municipality_code, dbmodifier, client);
-        for (const feature of delta.Created) {
-          await execCreatedSurface(
-            feature,
-            municipality_code,
-            dbmodifier,
-            client
-          );
-          continue;
+        if (delta.Created) {
+          await execCleanUp(municipality_code, dbmodifier, client);
+          for (const feature of delta.Created) {
+            await execCreatedSurface(
+              feature,
+              municipality_code,
+              dbmodifier,
+              client
+            );
+            continue;
+          }
         }
         break;
       default:
