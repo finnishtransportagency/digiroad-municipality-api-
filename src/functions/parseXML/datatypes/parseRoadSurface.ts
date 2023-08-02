@@ -25,7 +25,7 @@ export default function (alue, now) {
     return;
   }
   const pintaAla = alue['pintaAla'];
-  if (pintaAla && pintaAla < 5) {
+  if (pintaAla && pintaAla < 10) {
     return;
   }
   if (alue.loppuHetki && alue.loppuHetki < now) return;
