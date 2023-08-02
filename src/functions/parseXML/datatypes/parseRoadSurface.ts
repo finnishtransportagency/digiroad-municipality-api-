@@ -24,6 +24,10 @@ export default function (alue, now) {
   if (!pinnoite) {
     return;
   }
+  const pintaAla = alue['pintaAla'];
+  if (pintaAla && pintaAla < 5) {
+    return;
+  }
   if (alue.loppuHetki && alue.loppuHetki < now) return;
   const multipolygon = [[]];
   const locationData = alue['sijaintitieto']['Sijainti']['alue'];
