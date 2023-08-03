@@ -25,7 +25,7 @@ export default function (
     const intersectedLength = intersected.getLength();
     const roadlinkLength = lineString.getLength();
     const ratio = intersectedLength / roadlinkLength;
-    if (ratio > 0.7) {
+    if (ratio > 0.5) {
       validLinks.push({
         linkid: roadlink.linkId,
         length: roadlink.geometrylength
