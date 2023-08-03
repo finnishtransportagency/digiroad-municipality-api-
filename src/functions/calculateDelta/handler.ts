@@ -164,11 +164,8 @@ const calculateDelta = async (event) => {
   }
   if (assetType === 'roadSurfaces') {
     if (!isEqual(updateFeatures, referenceFeatures)) {
-      if (updateFeatures.length > 0) {
-        created = updateFeatures;
-      } else {
-        deleted = referenceFeatures;
-      }
+      created = updateFeatures;
+      deleted = referenceFeatures;
     }
   }
   const payLoad: PayloadFeature = {
