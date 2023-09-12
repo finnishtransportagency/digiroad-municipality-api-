@@ -14,7 +14,7 @@ export default function (liikennemerkki, now) {
     properties: {
       TYPE: 'TRAFFICSIGN',
       ID: liikennemerkki['yksilointitieto'],
-      //Remove SUUNTIMA for testing purposes
+      SUUNTIMA: liikennemerkki['suunta'],
       TEKSTI: liikennemerkki['teksti'],
       LM_TYYPPI: trafficSignType,
       LISAKILVET: [] //For testing
