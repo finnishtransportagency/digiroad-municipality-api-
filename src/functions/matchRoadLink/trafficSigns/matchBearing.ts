@@ -20,6 +20,7 @@ export default function (
     feature.geometry.coordinates[1] as number
   );
   const bearing = trafficSignProperties.SUUNTIMA;
+  console.log('SUUNTIMA: ', trafficSignProperties.SUUNTIMA);
   const towardsDigitizing = bearing > 270 || bearing <= 90;
   const adjustedBearing = towardsDigitizing
     ? bearing
@@ -27,7 +28,7 @@ export default function (
     ? bearing + 180
     : Math.abs(bearing - 180);
   const MAX_ANGLE_OFFSET = 25;
-
+  console.log('adjustedBearing: ', adjustedBearing);
   const pointPairDistance = new PointPairDistance();
   let minDistance = Number.MAX_VALUE;
   let minRoadAngle: number;
