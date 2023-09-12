@@ -50,11 +50,7 @@ const fetchMunicipalityData = async (event) => {
             offset * 5000
           }`;
 
-        const { data, status } = await axios.get(url, {
-          headers: {
-            'x-api-key': apiKey
-          }
-        });
+        const { data, status } = await axios.get(url, {});
         if (!data.includes('sf:featureMember')) {
           empty = true;
           break;
