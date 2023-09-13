@@ -139,7 +139,7 @@ export const allowedTrafficSigns = [
   'E9.1 Linja-autokaista',
   'E9.2 Linja-autokaista',
   'E10.1 Linja-autokaista päättyy',
-  'E10.2 Linja-autokaista päättyy',
+  //'E10.2 Linja-autokaista päättyy',
   'E11.1 Raitiovaunukaista',
   'E11.2 Raitiovaunukaista',
   'E12.1 Raitiovaunukaista päättyy',
