@@ -109,7 +109,7 @@ export const allowedTrafficSigns = [
   'D1.7 Pakollinen ajosuunta',
   'D1.8 Pakollinen ajosuunta',
   'D1.9 Pakollinen ajosuunta',
-  'D2 Pakollinen kiertosuunta',
+  //'D2 Pakollinen kiertosuunta',
   'D3.1 Liikenteenjakaja',
   'D3.2 Liikenteenjakaja',
   'D3.3 Liikenteenjakaja',
