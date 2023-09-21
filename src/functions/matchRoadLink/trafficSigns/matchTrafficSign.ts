@@ -18,6 +18,7 @@ export default function (
   let MAX_OFFSET = 5;
   if (trafficSignProperties.SUUNTIMA) {
     const result = matchBearing(roadLinks, feature, geomFactory);
+    console.log('result by bearing', feature.properties.ID);
     if (result) {
       return getMValue(
         result.feature,
