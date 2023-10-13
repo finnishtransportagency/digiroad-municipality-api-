@@ -4,8 +4,14 @@ import {
   allowedTrafficSigns
 } from './trafficSignTypes.js';
 
-const additionalPanel = yup.object().shape({
-  LK_TYYPPI: yup.string().required().oneOf(allowedAdditionalPanel),
+const additionalPanelPropertiesSchema = yup.object().shape({
+  TYPE: yup
+    .string()
+    .required()
+    .matches(/(^ADDITIONALPANEL$)/),
+  ID: yup.string().required(),
+  SUUNTIMA: yup.number().max(360).min(0),
+  LM_TYYPPI: yup.string().required().oneOf(allowedAdditionalPanel),
   ARVO: yup.number().notRequired(),
   TEKSTI: yup.string().notRequired(),
   KOKO: yup.number().oneOf([1, 2, 3]).notRequired(),
@@ -27,7 +33,11 @@ const trafficSignPropertiesSchema = yup.object().shape({
   RAKENNE: yup.number().oneOf([1, 2, 3, 4, 5, 6]).notRequired(),
   KUNTO: yup.number().oneOf([1, 2, 3, 4, 5]).notRequired(),
   KOKO: yup.number().oneOf([1, 2, 3]).notRequired(),
-  LISAKILVET: yup.array().of(additionalPanel).notRequired().max(3)
+  LISAKILVET: yup
+    .array()
+    .of(additionalPanelPropertiesSchema)
+    .notRequired()
+    .max(3)
 });
 
 const obstaclePropertiesSchema = yup.object().shape({
@@ -87,9 +97,15 @@ const roadSurfaceFeatureSchema = yup.object().shape({
   properties: surfacePropertiesSchema,
   geometry: areaGeometrySchema.required()
 });
+const additionalPanelSchema = yup.object().shape({
+  type: yup.string().required(),
+  properties: additionalPanelPropertiesSchema,
+  geometry: pointGeometrySchema.required()
+});
 
 export {
   trafficSignFeatureSchema,
   obstacleFeatureSchema,
-  roadSurfaceFeatureSchema
+  roadSurfaceFeatureSchema,
+  additionalPanelSchema
 };

@@ -7,17 +7,18 @@ export default function (liikennemerkki, now) {
       ? liikennemerkki.liikennemerkkityyppi2020
       : oldTrafficSignMapping[liikennemerkki.liikennemerkkityyppi];
   if (!trafficSignType) return;
-  if (trafficSignType[0] === 'H') return; //Temp. H =>  Additional panel, implementation depends how additional panels will be defined
 
   const feature = {
     type: 'Feature',
     properties: {
-      TYPE: 'TRAFFICSIGN',
+      TYPE: trafficSignType[0] === 'H' ? 'ADDITIONALPANEL' : 'TRAFFICSIGN',
       ID: liikennemerkki['yksilointitieto'],
       SUUNTIMA: liikennemerkki['suunta'] * (180 / Math.PI),
       TEKSTI: liikennemerkki['teksti'],
       LM_TYYPPI: trafficSignType,
-      LISAKILVET: [] //For testing
+      ...(!(trafficSignType[0] === 'H') && {
+        LISAKILVET: []
+      })
     },
     geometry: {
       type: 'Point',

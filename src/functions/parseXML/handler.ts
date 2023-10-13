@@ -7,10 +7,12 @@ import { XMLParser } from 'fast-xml-parser';
 import parseObstacle from './datatypes/parseObstacles';
 import parseTrafficsign from './datatypes/parseTrafficsigns';
 import parseRoadSurface from './datatypes/parseRoadSurface';
+import matchAdditionalPanels from './datatypes/matchAdditionalPanels';
 import {
   trafficSignFeatureSchema,
   obstacleFeatureSchema,
-  roadSurfaceFeatureSchema
+  roadSurfaceFeatureSchema,
+  additionalPanelSchema
 } from './validationSchemas/validationSchema';
 
 const parseXML = async (event) => {
@@ -67,11 +69,13 @@ const parseXML = async (event) => {
     removeNSPrefix: true
   };
   let schema;
+  let APSchema;
   if (assetType === 'obstacles') {
     schema = obstacleFeatureSchema;
   }
   if (assetType === 'trafficSigns') {
     schema = trafficSignFeatureSchema;
+    APSchema = additionalPanelSchema;
   }
   if (assetType === 'roadSurfaces') {
     schema = roadSurfaceFeatureSchema;
@@ -100,15 +104,25 @@ const parseXML = async (event) => {
         }
       }
       if (assetType === 'trafficSigns') {
+        const additionalPanels = [];
         for (const feature of featureMembers) {
           const trafficSign = parseTrafficsign(feature.Liikennemerkki, now);
           if (trafficSign && schema.isValidSync(trafficSign)) {
             features.push(schema.cast(trafficSign));
+          } else if (APSchema.isValidSync(trafficSign)) {
+            additionalPanels.push(APSchema.cast(trafficSign));
           } else {
             rejectsAmount++;
             rejectedFeatures.push(feature.Liikennemerkki['yksilointitieto']);
           }
         }
+        // Adds additional panels to features and return rejected additional panels
+        const rejectedAditonalPanels = matchAdditionalPanels(
+          features,
+          additionalPanels
+        );
+        rejectedFeatures.concat(rejectedAditonalPanels);
+        rejectsAmount += rejectedAditonalPanels.length;
       }
       if (assetType === 'roadSurfaces') {
         for (const feature of featureMembers) {
