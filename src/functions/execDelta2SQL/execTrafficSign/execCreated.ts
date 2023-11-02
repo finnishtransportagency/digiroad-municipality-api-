@@ -203,7 +203,7 @@ export default async function execCreatedTrafficSign(
 
   await singleChoiseQuery('size', trafficSignProperties.KOKO);
 
-  await trafficSignProperties.LISAKILVET.forEach((panel, index) => {
+  trafficSignProperties.LISAKILVET.forEach((panel, index) => {
     const additionalPanelQuery = {
       text: `
     WITH ap_property AS (
