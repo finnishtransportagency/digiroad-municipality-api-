@@ -44,7 +44,7 @@ export interface ObstacleProperties {
 }
 
 export interface additionalPanel {
-  LK_TYYPPI: string;
+  LM_TYYPPI: string;
   ARVO?: number;
   TEKSTI?: string;
   KOKO?: number;

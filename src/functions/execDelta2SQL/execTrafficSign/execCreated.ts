@@ -226,7 +226,7 @@ export default async function execCreatedTrafficSign(
       values: [
         'additional_panel',
         'trafficSigns_type',
-        panel.LK_TYYPPI,
+        panel.LM_TYYPPI,
         assetID,
         panel.ARVO,
         index + 1,

@@ -5,7 +5,7 @@ import {
 } from './trafficSignTypes.js';
 
 const additionalPanel = yup.object().shape({
-  LK_TYYPPI: yup.string().required().oneOf(allowedAdditionalPanel),
+  LM_TYYPPI: yup.string().required().oneOf(allowedAdditionalPanel),
   ARVO: yup.number().notRequired(),
   TEKSTI: yup.string().notRequired(),
   KOKO: yup.number().oneOf([1, 2, 3]).notRequired(),
