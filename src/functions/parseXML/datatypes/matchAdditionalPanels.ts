@@ -20,6 +20,7 @@ export default function (features, additionalPanels) {
       }
     }
     if (match.feature) {
+      console.log(additionalPanel);
       match.feature.properties.LISAKILVET.push(additionalPanel);
     } else {
       rejectedAdditionalPanels.push(additionalPanel.properties.ID);
