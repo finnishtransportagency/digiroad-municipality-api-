@@ -27,7 +27,7 @@ const trafficSignPropertiesSchema = yup.object().shape({
   RAKENNE: yup.number().oneOf([1, 2, 3, 4, 5, 6]).notRequired(),
   KUNTO: yup.number().oneOf([1, 2, 3, 4, 5]).notRequired(),
   KOKO: yup.number().oneOf([1, 2, 3]).notRequired(),
-  LISAKILVET: yup.array().of(additionalPanel).notRequired().max(3)
+  LISAKILVET: yup.array().of(additionalPanel).notRequired()
 });
 
 const obstaclePropertiesSchema = yup.object().shape({
