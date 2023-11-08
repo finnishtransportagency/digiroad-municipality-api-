@@ -203,7 +203,8 @@ export default async function execCreatedTrafficSign(
 
   await singleChoiseQuery('size', trafficSignProperties.KOKO);
 
-  trafficSignProperties.LISAKILVET.forEach((panel, index) => {
+  for (const i in trafficSignProperties.LISAKILVET) {
+    const panel = trafficSignProperties.LISAKILVET[i];
     const additionalPanelQuery = {
       text: `
     WITH ap_property AS (
@@ -229,15 +230,15 @@ export default async function execCreatedTrafficSign(
         panel.LM_TYYPPI,
         assetID,
         panel.ARVO,
-        index + 1,
+        i + 1,
         panel.TEKSTI,
         panel.KOKO,
         panel.KALVON_TYYPPI,
         panel.VARI
       ]
     };
-    client.query(additionalPanelQuery);
-  });
+    await client.query(additionalPanelQuery);
+  }
 
   return;
 }
