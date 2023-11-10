@@ -229,12 +229,12 @@ export default async function execCreatedTrafficSign(
         'trafficSigns_type',
         panel.LM_TYYPPI,
         assetID,
-        panel.ARVO,
+        panel.ARVO ? panel.ARVO : 'NULL',
         i + 1,
-        panel.TEKSTI,
-        panel.KOKO,
-        panel.KALVON_TYYPPI,
-        panel.VARI
+        panel.TEKSTI ? panel.TEKSTI : 'NULL',
+        panel.KOKO ? panel.KOKO : 'NULL',
+        panel.KALVON_TYYPPI ? panel.KALVON_TYYPPI : 'NULL',
+        panel.VARI ? panel.VARI : 'NULL'
       ]
     };
     await client.query(additionalPanelQuery);
