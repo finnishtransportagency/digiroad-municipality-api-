@@ -52,7 +52,7 @@ const fetchMunicipalityData = async (event) => {
 
         const { data, status } = await axios.get(url, {
           headers: {
-            'x-api-key': apiKey
+            Authorization: apiKey
           }
         });
         if (!data.includes('sf:featureMember')) {
