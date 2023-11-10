@@ -230,7 +230,7 @@ export default async function execCreatedTrafficSign(
         panel.LM_TYYPPI,
         assetID,
         panel.ARVO || null,
-        i + 1,
+        parseInt(i) + 1,
         panel.TEKSTI || null,
         panel.KOKO || null,
         panel.KALVON_TYYPPI || null,
