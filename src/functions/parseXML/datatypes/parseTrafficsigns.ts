@@ -15,6 +15,9 @@ export default function (liikennemerkki, now) {
       ID: liikennemerkki['yksilointitieto'],
       SUUNTIMA: liikennemerkki['suunta'] * (180 / Math.PI),
       TEKSTI: liikennemerkki['teksti'],
+      ...(trafficSignType === 'C32 Nopeusrajoitus' && {
+        ARVO: Number(liikennemerkki['teksti'])
+      }),
       LM_TYYPPI: trafficSignType,
       ...(!(trafficSignType[0] === 'H') && {
         LISAKILVET: []
