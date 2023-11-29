@@ -4,6 +4,7 @@ export default {
   handler: `${handlerPath(__dirname)}/handler.main`,
   maximumRetryAttempts: 0,
   timeout: 60,
+  memorySize: 4096,
   events: [
     {
       s3: {
