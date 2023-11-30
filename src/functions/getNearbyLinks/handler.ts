@@ -1,6 +1,6 @@
 import { middyfy } from '@libs/lambda';
 import { SSM, GetParameterCommand } from '@aws-sdk/client-ssm';
-import { S3 } from '@aws-sdk/client-s3';
+import { GetObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { Client } from 'pg';
 import { Geometry, LineString, Point } from 'wkx';
@@ -60,6 +60,15 @@ const getParameter = async (name: string): Promise<string> => {
 
 const s3 = new S3({});
 const getNearbyLinks = async (event) => {
+  const getObjectParams = {
+    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    Key: event.key
+  };
+  const getObjectsCommand = new GetObjectCommand(getObjectParams);
+  const data = await s3.send(getObjectsCommand);
+  const object = await data.Body.transformToString();
+  const requestPayload = JSON.parse(object);
+
   const client = new Client({
     host: process.env.PGHOST,
     port: parseInt(process.env.PGPORT),
@@ -92,7 +101,11 @@ const getNearbyLinks = async (event) => {
         AND ((features#>'{properties}'->>'TYPE') != 'TRAFFICSIGN' OR (features#>'{properties}'->>'LM_TYYPPI') = ANY(($3)::text[]) OR acceptable_roadlinks.functional_class != 8)
       GROUP BY ID,TYPE
       `,
-    values: [event.municipality, JSON.stringify(event.features), allowedOnKapy]
+    values: [
+      requestPayload.municipality,
+      JSON.stringify(requestPayload.features),
+      allowedOnKapy
+    ]
   };
   const areaQuery = {
     text: `
@@ -116,9 +129,13 @@ const getNearbyLinks = async (event) => {
       WHERE ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067) && acceptable_roadlinks.shape 
       GROUP BY ID,TYPE
       `,
-    values: [event.municipality, JSON.stringify(event.features)]
+    values: [
+      requestPayload.municipality,
+      JSON.stringify(requestPayload.features)
+    ]
   };
-  const query = event.assetType === 'roadSurfaces' ? areaQuery : pointQuery;
+  const query =
+    requestPayload.assetType === 'roadSurfaces' ? areaQuery : pointQuery;
 
   const res = await client.query(query);
   client.end();
@@ -131,7 +148,7 @@ const getNearbyLinks = async (event) => {
       roadlink.points = pointObjects;
       delete roadlink.f1;
       delete roadlink.f2;
-      if (event.assetType === 'roadSurfaces') {
+      if (requestPayload.assetType === 'roadSurfaces') {
         roadlink.geometrylength = roadlink.f3;
       } else {
         roadlink.directiontype = roadlink.f3;
@@ -143,7 +160,7 @@ const getNearbyLinks = async (event) => {
   });
 
   const now = new Date().toISOString().slice(0, 19);
-  const S3ObjectKey = `getNearbyLinks/${event.municipality}/${now}.json`;
+  const S3ObjectKey = `getNearbyLinks/${requestPayload.municipality}/${now}.json`;
   const putParams = {
     Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
     Key: S3ObjectKey,

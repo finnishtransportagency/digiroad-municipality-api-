@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import type { AWS } from '@serverless/typescript';
 
 import {
@@ -641,7 +642,10 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['s3:ListBucket', 's3:GetObject'],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/matchRoadLink/*`
+                    Resource: [
+                      `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/matchRoadLink/*`,
+                      `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/getNearbyLinksRequestPayload/*`
+                  ]
                   },
                   {
                     Effect: 'Allow',
@@ -716,7 +720,8 @@ const serverlessConfiguration: AWS = {
                     Action: ['s3:PutObject', 's3:PutObjectAcl'],
                     Resource: [
                       `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/matchRoadLink/*`,
-                      `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/logs/*`
+                      `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/logs/*`,
+                      `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/getNearbyLinksRequestPayload/*`
                     ]
                   }
                 ]

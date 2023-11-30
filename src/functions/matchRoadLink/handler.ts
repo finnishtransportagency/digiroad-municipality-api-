@@ -15,12 +15,14 @@ import {
   LinkObject,
   FeatureRoadlinkMap
 } from '@functions/typing';
+import { get } from 'http';
 
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
 
 const lambda = new Lambda({});
 const s3 = new S3({});
+const now = new Date().toISOString().slice(0, 19);
 
 const matchRoadLinks = async (event) => {
   async function getObject(bucket: string, objectKey: string) {
@@ -56,10 +58,23 @@ const matchRoadLinks = async (event) => {
     municipality: delta.metadata.municipality,
     assetType: delta.metadata.assetType
   };
+
+  const getNearbyLinksParamsS3 = {
+    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    Key: `getNearbyLinksRequestPayload/${delta.metadata.municipality}/${now}.json`,
+    Body: JSON.stringify(getNearbyLinksPayload)
+  };
+
+  await new Upload({ client: s3, params: getNearbyLinksParamsS3 }).done();
+
   const getNearbyLinksParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-getNearbyLinks`,
     InvocationType: 'RequestResponse',
-    Payload: Buffer.from(JSON.stringify(getNearbyLinksPayload))
+    Payload: Buffer.from(
+      JSON.stringify({
+        key: `getNearbyLinksRequestPayload/${delta.metadata.municipality}/${now}.json`
+      })
+    )
   };
 
   const getNearbyLinksCommand = new InvokeCommand(getNearbyLinksParams);
@@ -191,7 +206,6 @@ const matchRoadLinks = async (event) => {
     }
   };
 
-  const now = new Date().toISOString().slice(0, 19);
   const putParams = {
     Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
     Key: `matchRoadLink/${delta.metadata.municipality}/${now}.json`,
