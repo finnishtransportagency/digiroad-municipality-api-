@@ -1,5 +1,7 @@
 /* eslint-disable prettier/prettier */
 import type { AWS } from '@serverless/typescript';
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 import {
   calculateDelta,
@@ -52,6 +54,7 @@ const serverlessConfiguration: AWS = {
       })
     },
     environment: {
+      OFFLINE: process.env.OFFLINE,
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       STAGE_NAME: process.env.STAGE_NAME,

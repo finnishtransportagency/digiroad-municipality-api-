@@ -43,9 +43,11 @@ const mergeData = (dataArray: Array<any>) => {
 };
 
 const fetchMunicipalityData = async (event) => {
-  const apiKey = offline ? apikey : await getParameter(
-    `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`
-  );
+  const apiKey = offline
+    ? apikey
+    : await getParameter(
+        `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`
+      );
 
   if (event.format === 'xml') {
     for (var assetType of Object.entries(event.assetTypes)) {

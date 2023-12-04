@@ -4,9 +4,11 @@ jspm_packages
 
 # Serverless directories
 .serverless
+buckets
 
 # esbuild directories
 .esbuild
 
 # env variables
 env.sh
+.env
