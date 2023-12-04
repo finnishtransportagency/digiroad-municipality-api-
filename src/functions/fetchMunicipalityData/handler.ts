@@ -4,8 +4,19 @@ import { S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import axios from 'axios';
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
+import { offline, apikey } from '@functions/config';
 
-const s3 = new S3({});
+const s3config = offline
+  ? {
+      forcePathStyle: true,
+      credentials: {
+        accessKeyId: 'S3RVER', // This specific key is required when working offline
+        secretAccessKey: 'S3RVER'
+      },
+      endpoint: 'http://localhost:4569'
+    }
+  : {};
+const s3 = new S3(s3config);
 const getParameter = async (name: string): Promise<string> => {
   const ssm = new SSM({});
   const getParametersCommand = new GetParameterCommand({
@@ -32,7 +43,7 @@ const mergeData = (dataArray: Array<any>) => {
 };
 
 const fetchMunicipalityData = async (event) => {
-  const apiKey = await getParameter(
+  const apiKey = offline ? apikey : await getParameter(
     `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`
   );
 
@@ -50,7 +61,7 @@ const fetchMunicipalityData = async (event) => {
             offset * 5000
           }`;
 
-        const { data, status } = await axios.get(url, {
+        const { data } = await axios.get(url, {
           headers: {
             Authorization: apiKey
           }

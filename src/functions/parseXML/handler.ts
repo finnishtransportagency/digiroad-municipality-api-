@@ -14,11 +14,23 @@ import {
   roadSurfaceFeatureSchema,
   additionalPanelSchema
 } from './validationSchemas/validationSchema';
+import { offline } from '@functions/config';
 
 const parseXML = async (event) => {
   const now = new Date().toISOString().slice(0, 19);
-  const s3 = new S3({});
-  const lambda = new Lambda({});
+  const s3config = offline
+    ? {
+        forcePathStyle: true,
+        credentials: {
+          accessKeyId: 'S3RVER', // This specific key is required when working offline
+          secretAccessKey: 'S3RVER'
+        },
+        endpoint: 'http://localhost:4569'
+      }
+    : {};
+  const s3 = new S3(s3config);
+  const lambdaConfig = offline ? { endpoint: 'http://localhost:3002' } : {};
+  const lambda = new Lambda(lambdaConfig);
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
   const municipality: string = key.split('/')[1];
   const assetType: string = key.split('/')[2];

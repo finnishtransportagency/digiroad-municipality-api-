@@ -14,9 +14,20 @@ import {
   roadSurfacesSchema
 } from './validation/validationSchema';
 import isEqual from 'lodash.isequal';
+import { offline } from '@functions/config';
 
 const calculateDelta = async (event) => {
-  const s3 = new S3({});
+  const s3config = offline
+    ? {
+        forcePathStyle: true,
+        credentials: {
+          accessKeyId: 'S3RVER', // This specific key is required when working offline
+          secretAccessKey: 'S3RVER'
+        },
+        endpoint: 'http://localhost:4569'
+      }
+    : {};
+  const s3 = new S3(s3config);
   const lambda = new Lambda({});
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
 

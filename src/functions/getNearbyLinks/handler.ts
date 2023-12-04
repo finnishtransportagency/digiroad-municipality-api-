@@ -4,6 +4,7 @@ import { GetObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { Client } from 'pg';
 import { Geometry, LineString, Point } from 'wkx';
+import { offline, pghost, pgport, pgdatabase, pguser, pgpassword } from '@functions/config';
 
 const allowedOnKapy = [
   'A11 Tietyö',
@@ -58,7 +59,17 @@ const getParameter = async (name: string): Promise<string> => {
   return result.Parameter.Value;
 };
 
-const s3 = new S3({});
+const s3config = offline
+  ? {
+      forcePathStyle: true,
+      credentials: {
+        accessKeyId: 'S3RVER', // This specific key is required when working offline
+        secretAccessKey: 'S3RVER'
+      },
+      endpoint: 'http://localhost:4569'
+    }
+  : {};
+const s3 = new S3(s3config);
 const getNearbyLinks = async (event) => {
   const getObjectParams = {
     Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
@@ -70,11 +81,11 @@ const getNearbyLinks = async (event) => {
   const requestPayload = JSON.parse(object);
 
   const client = new Client({
-    host: process.env.PGHOST,
-    port: parseInt(process.env.PGPORT),
-    database: process.env.PGDATABASE,
-    user: process.env.PGUSER,
-    password: await getParameter(process.env.PGPASSWORD_SSM_KEY)
+    host: pghost,
+    port: parseInt(pgport),
+    database: pgdatabase,
+    user: pguser,
+    password: await getParameter(pgpassword)
   });
   await client.connect();
 

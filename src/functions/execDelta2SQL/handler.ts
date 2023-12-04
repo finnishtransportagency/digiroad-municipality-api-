@@ -13,6 +13,7 @@ import execExpiredTrafficSign from './execTrafficSign/execExpired';
 
 import execCreatedSurface from './execSurface/execCreated';
 import execCleanUp from './execSurface/execCleanup';
+import { offline, pghost, pgport, pgdatabase, pguser, pgpassword } from '@functions/config';
 
 const getParameter = async (name: string): Promise<string> => {
   const ssm = new SSM({});
@@ -23,7 +24,17 @@ const getParameter = async (name: string): Promise<string> => {
   const result = await ssm.send(getParametersCommand);
   return result.Parameter.Value;
 };
-const s3 = new S3({});
+const s3config = offline
+  ? {
+      forcePathStyle: true,
+      credentials: {
+        accessKeyId: 'S3RVER', // This specific key is required when working offline
+        secretAccessKey: 'S3RVER'
+      },
+      endpoint: 'http://localhost:4569'
+    }
+  : {};
+const s3 = new S3(s3config);
 
 const execDelta2SQL = async (event) => {
   const getObjectParams = {
@@ -36,11 +47,11 @@ const execDelta2SQL = async (event) => {
   const delta = JSON.parse(object);
 
   const client = new Client({
-    host: process.env.PGHOST,
-    port: parseInt(process.env.PGPORT),
-    database: process.env.PGDATABASE,
-    user: process.env.PGUSER,
-    password: await getParameter(process.env.PGPASSWORD_SSM_KEY)
+    host: pghost,
+    port: parseInt(pgport),
+    database: pgdatabase,
+    user: pguser,
+    password: await getParameter(pgpassword)
   });
   client.connect();
 

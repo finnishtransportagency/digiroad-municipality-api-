@@ -15,13 +15,24 @@ import {
   LinkObject,
   FeatureRoadlinkMap
 } from '@functions/typing';
-import { get } from 'http';
+import { offline } from '@functions/config';
 
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
 
-const lambda = new Lambda({});
-const s3 = new S3({});
+const lambdaConfig = offline ? { endpoint: 'http://localhost:3002' } : {};
+const lambda = new Lambda(lambdaConfig);
+const s3config = offline
+  ? {
+      forcePathStyle: true,
+      credentials: {
+        accessKeyId: 'S3RVER', // This specific key is required when working offline
+        secretAccessKey: 'S3RVER'
+      },
+      endpoint: 'http://localhost:4569'
+    }
+  : {};
+const s3 = new S3(s3config);
 const now = new Date().toISOString().slice(0, 19);
 
 const matchRoadLinks = async (event) => {

@@ -3,6 +3,7 @@ import { SSM, GetParameterCommand } from '@aws-sdk/client-ssm';
 import nodemailer from 'nodemailer';
 import ejs from 'ejs';
 import * as path from 'path';
+import { offline } from '@functions/config';
 
 const getParameter = async (name: string): Promise<string> => {
   const ssm = new SSM({});
@@ -15,6 +16,7 @@ const getParameter = async (name: string): Promise<string> => {
 };
 
 const reportRejectedDelta = async (event) => {
+  if (offline) return;
   var transporter = nodemailer.createTransport({
     host: 'email-smtp.eu-west-1.amazonaws.com',
     port: 587,
