@@ -229,7 +229,7 @@ export const allowedTrafficSigns = [
   'F44 Teollisuusalue tai yritysalue',
   'F45 Vähittäiskaupan suuryksikkö',
   'F46.1 Pysäköinti',
-  'F46.2 Pysäköinti',
+  //'F46.2 Pysäköinti',
   'F47 Rautatieasema',
   'F48 Linja-autoasema',
   'F49 Keskusta',
