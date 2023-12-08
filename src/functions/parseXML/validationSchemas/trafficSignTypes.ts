@@ -92,7 +92,7 @@ export const allowedTrafficSigns = [
   'C39 Pysäköintikieltoalue',
   'C40 Pysäköintikieltoalue päättyy',
   'C41 Taksiasema-alue',
-  'C42 Taksin pysäyttämispaikka',
+  'C42 Taksin pysähtymispaikka',
   'C43 Kuormauspaikka',
   'C44.1 Vuoropysäköinti',
   'C44.2 Vuoropysäköinti',
