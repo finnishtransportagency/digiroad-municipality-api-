@@ -15,7 +15,7 @@ export const allowedTrafficSigns = [
   'A11 Tietyö',
   'A12 Irtokiviä',
   'A13 Liukas ajorata',
-  'A14 Vaarallinen tienreuna',
+  'A14 Vaarallinen tien reuna',
   'A15 Suojatien ennakkovaroitus',
   'A16 Jalankulkijoita',
   'A17 Lapsia',
