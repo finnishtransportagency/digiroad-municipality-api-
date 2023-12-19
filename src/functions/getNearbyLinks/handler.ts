@@ -4,7 +4,14 @@ import { GetObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { Client } from 'pg';
 import { Geometry, LineString, Point } from 'wkx';
-import { offline, pghost, pgport, pgdatabase, pguser, pgpassword } from '@functions/config';
+import {
+  offline,
+  pghost,
+  pgport,
+  pgdatabase,
+  pguser,
+  pgpassword
+} from '@functions/config';
 
 const allowedOnKapy = [
   'A11 Tietyö',
@@ -85,7 +92,7 @@ const getNearbyLinks = async (event) => {
     port: parseInt(pgport),
     database: pgdatabase,
     user: pguser,
-    password: await getParameter(pgpassword)
+    password: offline ? pgpassword : await getParameter(pgpassword)
   });
   await client.connect();
 

@@ -27,7 +27,6 @@ export default function (
     ? bearing + 180
     : Math.abs(bearing - 180);
   const MAX_ANGLE_OFFSET = 25;
-  console.log('adjustedBearing: ', bearing, adjustedBearing);
   const pointPairDistance = new PointPairDistance();
   let minDistance = Number.MAX_VALUE;
   let minRoadAngle: number;

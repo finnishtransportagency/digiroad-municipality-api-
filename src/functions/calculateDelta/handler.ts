@@ -215,4 +215,5 @@ const calculateDelta = async (event) => {
   );
   await lambda.send(invokeMatchRoadLinksCommand);
 };
+
 export const main = middyfy(calculateDelta);

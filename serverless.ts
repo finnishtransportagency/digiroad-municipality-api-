@@ -15,6 +15,7 @@ import {
   listSchedules,
   deleteSchedule
 } from '@functions/index';
+import { offline } from '@functions/config';
 
 const serverlessConfiguration: AWS = {
   service: 'DRKunta',
@@ -22,7 +23,7 @@ const serverlessConfiguration: AWS = {
   plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-s3-local'],
   provider: {
     name: 'aws',
-    runtime: 'nodejs18.x',
+    runtime: offline ? 'nodejs16.x' : 'nodejs18.x',
     stage: process.env.STAGE_NAME,
     apiGateway: {
       minimumCompressionSize: 1024,

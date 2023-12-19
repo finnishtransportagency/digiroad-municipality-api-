@@ -13,7 +13,14 @@ import execExpiredTrafficSign from './execTrafficSign/execExpired';
 
 import execCreatedSurface from './execSurface/execCreated';
 import execCleanUp from './execSurface/execCleanup';
-import { offline, pghost, pgport, pgdatabase, pguser, pgpassword } from '@functions/config';
+import {
+  offline,
+  pghost,
+  pgport,
+  pgdatabase,
+  pguser,
+  pgpassword
+} from '@functions/config';
 
 const getParameter = async (name: string): Promise<string> => {
   const ssm = new SSM({});
@@ -51,7 +58,7 @@ const execDelta2SQL = async (event) => {
     port: parseInt(pgport),
     database: pgdatabase,
     user: pguser,
-    password: await getParameter(pgpassword)
+    password: offline ? pgpassword : await getParameter(pgpassword)
   });
   client.connect();
 

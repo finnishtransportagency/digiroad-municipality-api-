@@ -147,7 +147,6 @@ export default async function execCreatedTrafficSign(
       dbmodifier
     ]
   };
-  console.log('LM: ', trafficSignProperties.LM_TYYPPI);
   await client.query(typeQuery);
 
   async function textQuery(publicId: string, value: string) {
