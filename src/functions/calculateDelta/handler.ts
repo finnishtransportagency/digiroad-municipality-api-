@@ -28,7 +28,8 @@ const calculateDelta = async (event) => {
       }
     : {};
   const s3 = new S3(s3config);
-  const lambda = new Lambda({});
+  const lambdaConfig = offline ? { endpoint: 'http://localhost:3002' } : {};
+  const lambda = new Lambda(lambdaConfig);
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
 
   const municipality: string = key.split('/')[1];
