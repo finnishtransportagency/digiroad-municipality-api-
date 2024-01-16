@@ -211,8 +211,8 @@ export default async function execUpdatedTrafficSign(
 
   await singleChoiseQuery('size', trafficSignProperties.KOKO);
 
-  trafficSignProperties.LISAKILVET.forEach((panel, index) => {
-    const panelTypeRegex = `^${panel.LK_TYYPPI} .*$`;
+  for (const i in trafficSignProperties.LISAKILVET) {
+    const panel = trafficSignProperties.LISAKILVET[i];
     const additionalPanelQuery = {
       text: `
     WITH ap_property AS (
@@ -226,7 +226,8 @@ export default async function execUpdatedTrafficSign(
     ), _enumerated_value AS (
       SELECT enumerated_value.value
       FROM enumerated_value, _property
-      WHERE property_id = _property.id AND name_fi ~ ($3)
+      WHERE property_id = _property.id AND name_fi = ($3)
+      LIMIT 1
     )
 
     INSERT INTO additional_panel (asset_id, id, property_id, additional_sign_type, additional_sign_value, form_position, additional_sign_text, additional_sign_size, additional_sign_coating_type, additional_sign_panel_color)
@@ -235,18 +236,17 @@ export default async function execUpdatedTrafficSign(
       values: [
         'additional_panel',
         'trafficSigns_type',
-        panelTypeRegex,
+        panel.LM_TYYPPI,
         assetID,
-        panel.ARVO,
-        index + 1,
-        panel.TEKSTI,
-        panel.KOKO,
-        panel.KALVON_TYYPPI,
-        panel.VARI
+        panel.ARVO || null,
+        parseInt(i) + 1,
+        panel.TEKSTI || null,
+        panel.KOKO || null,
+        panel.KALVON_TYYPPI || null,
+        panel.VARI || null
       ]
     };
-    client.query(additionalPanelQuery);
-  });
-
+    await client.query(additionalPanelQuery);
+  }
   return;
 }
