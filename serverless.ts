@@ -22,18 +22,11 @@ const serverlessConfiguration: AWS = {
     name: 'aws',
     runtime: 'nodejs18.x',
     stage: process.env.STAGE_NAME,
-    // AwsResourceTags interface is incorrectly defined in node_modules/@serverless/typescript/index.d.ts
-    tags: [
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
-      { Key: 'Name', Value: 'DRKunta' },
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
-      { Key: 'Environment', Value: process.env.STAGE_NAME },
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
-      { Key: 'Administrator', Value: 'info@digiroad.fi,eero.perola@cgi.com' }
-    ],
+    tags: {
+      'Name': 'DRKunta',
+      'Environment': process.env.STAGE_NAME,
+      'Administrator': 'info@digiroad.fi,eero.perola@cgi.com'
+    },
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
