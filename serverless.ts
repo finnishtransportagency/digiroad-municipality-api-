@@ -27,6 +27,11 @@ const serverlessConfiguration: AWS = {
       'Environment': process.env.STAGE_NAME,
       'Administrator': 'eero.perola@cgi.com'
     },
+    stackTags: {
+      'Name': 'DRKunta',
+      'Environment': process.env.STAGE_NAME,
+      'Administrator': 'eero.perola@cgi.com'
+    },
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
