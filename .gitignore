@@ -10,3 +10,7 @@ jspm_packages
 
 # env variables
 env.sh
+.env
+
+# local s3
+buckets*

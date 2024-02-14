@@ -22,6 +22,11 @@ const serverlessConfiguration: AWS = {
     name: 'aws',
     runtime: 'nodejs18.x',
     stage: process.env.STAGE_NAME,
+    tags: {
+      Name: 'DRKunta',
+      Environment: process.env.STAGE_NAME,
+      Administrator: process.env.OPERATOR_EMAIL
+    },
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -645,7 +650,7 @@ const serverlessConfiguration: AWS = {
                     Resource: [
                       `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/matchRoadLink/*`,
                       `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/getNearbyLinksRequestPayload/*`
-                  ]
+                    ]
                   },
                   {
                     Effect: 'Allow',
