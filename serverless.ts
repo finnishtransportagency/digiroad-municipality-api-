@@ -25,7 +25,7 @@ const serverlessConfiguration: AWS = {
     tags: {
       'Name': 'DRKunta',
       'Environment': process.env.STAGE_NAME,
-      'Administrator': 'info@digiroad.fi,eero.perola@cgi.com'
+      'Administrator': 'eero.perola@cgi.com'
     },
     apiGateway: {
       minimumCompressionSize: 1024,
