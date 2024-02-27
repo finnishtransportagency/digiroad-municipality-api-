@@ -52,6 +52,9 @@ const fetchMunicipalityData = async (event) => {
   if (event.format === 'xml') {
     for (var assetType of Object.entries(event.assetTypes)) {
       var offset = 0;
+      const bbox = offline
+        ? '&bbox=379010,6677995,378228,6677525&bbox-crs=http://www.opengis.net/def/crs/EPSG/0/3067'
+        : '';
       const dataArray = [];
       var empty = false;
       while (!empty) {
@@ -61,7 +64,7 @@ const fetchMunicipalityData = async (event) => {
             assetType[1]
           }/items?f=gml&crs=http://www.opengis.net/def/crs/EPSG/0/3067&limit=5000&offset=${
             offset * 5000
-          }`;
+          }${bbox}`;
 
         const { data } = await axios.get(url, {
           headers: {
