@@ -27,6 +27,8 @@ const getParameter = async (name: string): Promise<string> => {
   return result.Parameter.Value;
 };
 
+// SPECIFY TYPE & CREATE TYPE GUARDS ! ! ! ! ! ! ! ! !
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mergeData = (dataArray: Array<any>) => {
   const parser = new XMLParser();
   dataArray.forEach((data) => parser.parse(data));
