@@ -36,7 +36,7 @@ const mergeData = (dataArray: Array<string>): string => {
 
   const parser = new XMLParser();
   const jsonArray = dataArray.map((data) => {
-    const parsed = parser.parse(data);
+    const parsed = parser.parse(data) as unknown;
     if (!isXmlFeatureCollectionJson(parsed)) {
       throw new Error('Invalid XML data');
     }
@@ -55,7 +55,8 @@ const mergeData = (dataArray: Array<string>): string => {
   );
 
   const builder = new XMLBuilder({});
-  const xmlResult = builder.build(result);
+  const xmlResult = builder.build(result) as unknown;
+  if (typeof xmlResult !== 'string') throw new Error('Failed to build XML');
   return xmlResult;
 };
 
@@ -86,7 +87,7 @@ const fetchMunicipalityData = async (event: unknown) => {
           offset * fetchSize
         }${bbox}`;
 
-      const { data } = await axios.get(url, {
+      const { data }: { data: unknown } = await axios.get(url, {
         headers: {
           Authorization: apiKey
         }
