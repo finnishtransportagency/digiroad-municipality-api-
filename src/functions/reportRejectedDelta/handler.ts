@@ -1,19 +1,9 @@
 import { middyfy } from '@libs/lambda';
-import { SSM, GetParameterCommand } from '@aws-sdk/client-ssm';
 import nodemailer from 'nodemailer';
-import ejs from 'ejs';
+import * as ejs from 'ejs';
 import * as path from 'path';
 import { offline } from '@functions/config';
-
-const getParameter = async (name: string): Promise<string> => {
-  const ssm = new SSM({});
-  const getParametersCommand = new GetParameterCommand({
-    Name: name,
-    WithDecryption: true
-  });
-  const result = await ssm.send(getParametersCommand);
-  return result.Parameter.Value;
-};
+import { getParameter } from '@libs/ssm-tools';
 
 const reportRejectedDelta = async (event) => {
   if (offline) return;

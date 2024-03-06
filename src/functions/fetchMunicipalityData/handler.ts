@@ -1,11 +1,11 @@
 import { middyfy } from '@libs/lambda';
-import { SSM, GetParameterCommand } from '@aws-sdk/client-ssm';
 import { PutObjectCommandInput, S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import axios from 'axios';
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
 import { offline, apikey, testBbox } from '@functions/config';
 import { isScheduleEvent, isXmlFeatureCollectionJson } from './types';
+import { getParameter } from '@libs/ssm-tools';
 
 const s3 = new S3(
   offline
@@ -19,16 +19,6 @@ const s3 = new S3(
       }
     : {}
 );
-
-const getParameter = async (name: string): Promise<string> => {
-  const ssm = new SSM({});
-  const getParametersCommand = new GetParameterCommand({
-    Name: name,
-    WithDecryption: true
-  });
-  const result = await ssm.send(getParametersCommand);
-  return result.Parameter.Value;
-};
 
 const mergeData = (dataArray: Array<string>): string => {
   if (dataArray.length === 0) throw new Error('No data to merge');

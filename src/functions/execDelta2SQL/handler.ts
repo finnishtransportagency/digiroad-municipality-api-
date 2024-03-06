@@ -1,5 +1,4 @@
 import { middyfy } from '@libs/lambda';
-import { SSM, GetParameterCommand } from '@aws-sdk/client-ssm';
 import { S3, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Client } from 'pg';
 
@@ -21,16 +20,8 @@ import {
   pguser,
   pgpassword
 } from '@functions/config';
+import { getParameter } from '@libs/ssm-tools';
 
-const getParameter = async (name: string): Promise<string> => {
-  const ssm = new SSM({});
-  const getParametersCommand = new GetParameterCommand({
-    Name: name,
-    WithDecryption: true
-  });
-  const result = await ssm.send(getParametersCommand);
-  return result.Parameter.Value;
-};
 const s3config = offline
   ? {
       forcePathStyle: true,
