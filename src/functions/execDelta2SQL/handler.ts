@@ -1,5 +1,4 @@
 import { middyfy } from '@libs/lambda';
-import { S3, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Client } from 'pg';
 
 import execCreatedObstacle from './execObstacle/execCreated';
@@ -21,26 +20,13 @@ import {
   pgpassword
 } from '@functions/config';
 import { getParameter } from '@libs/ssm-tools';
-
-const s3config = offline
-  ? {
-      forcePathStyle: true,
-      credentials: {
-        accessKeyId: 'S3RVER', // This specific key is required when working offline
-        secretAccessKey: 'S3RVER'
-      },
-      endpoint: 'http://localhost:4569'
-    }
-  : {};
-const s3 = new S3(s3config);
+import { getFromS3 } from '@libs/s3-tools';
 
 const execDelta2SQL = async (event) => {
-  const getObjectParams = {
-    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    Key: event.key
-  };
-  const getObjectsCommand = new GetObjectCommand(getObjectParams);
-  const data = await s3.send(getObjectsCommand);
+  const data = await getFromS3(
+    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    event.key
+  );
   const object = await data.Body.transformToString();
   const delta = JSON.parse(object);
 

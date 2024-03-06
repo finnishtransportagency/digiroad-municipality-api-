@@ -1,7 +1,5 @@
 import { middyfy } from '@libs/lambda';
-import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
-import { S3, GetObjectCommand } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
+import { Lambda, InvokeCommand, InvocationType } from '@aws-sdk/client-lambda';
 import matchTrafficSign from './trafficSigns/matchTrafficSign';
 import matchObstacle from './obstacles/matchObstacle';
 import matchSurface from './surface/matchSurface';
@@ -16,34 +14,19 @@ import {
   FeatureRoadlinkMap
 } from '@functions/typing';
 import { offline } from '@functions/config';
+import { getFromS3, uploadToS3 } from '@libs/s3-tools';
 
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
 
 const lambdaConfig = offline ? { endpoint: 'http://localhost:3002' } : {};
 const lambda = new Lambda(lambdaConfig);
-const s3config = offline
-  ? {
-      forcePathStyle: true,
-      credentials: {
-        accessKeyId: 'S3RVER', // This specific key is required when working offline
-        secretAccessKey: 'S3RVER'
-      },
-      endpoint: 'http://localhost:4569'
-    }
-  : {};
-const s3 = new S3(s3config);
 const now = new Date().toISOString().slice(0, 19);
 
 const matchRoadLinks = async (event) => {
   async function getObject(bucket: string, objectKey: string) {
     try {
-      const getObjectParams = {
-        Bucket: bucket,
-        Key: objectKey
-      };
-      const getObjectsCommand = new GetObjectCommand(getObjectParams);
-      const data = await s3.send(getObjectsCommand);
+      const data = await getFromS3(bucket, objectKey);
       const object = await data.Body.transformToString();
       return JSON.parse(object);
     } catch (e) {
@@ -70,17 +53,15 @@ const matchRoadLinks = async (event) => {
     assetType: delta.metadata.assetType
   };
 
-  const getNearbyLinksParamsS3 = {
-    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    Key: `getNearbyLinksRequestPayload/${delta.metadata.municipality}/${now}.json`,
-    Body: JSON.stringify(getNearbyLinksPayload)
-  };
-
-  await new Upload({ client: s3, params: getNearbyLinksParamsS3 }).done();
+  await uploadToS3(
+    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    `getNearbyLinksRequestPayload/${delta.metadata.municipality}/${now}.json`,
+    JSON.stringify(getNearbyLinksPayload)
+  );
 
   const getNearbyLinksParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-getNearbyLinks`,
-    InvocationType: 'RequestResponse',
+    InvocationType: InvocationType.RequestResponse,
     Payload: Buffer.from(
       JSON.stringify({
         key: `getNearbyLinksRequestPayload/${delta.metadata.municipality}/${now}.json`
@@ -217,24 +198,21 @@ const matchRoadLinks = async (event) => {
     }
   };
 
-  const putParams = {
-    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    Key: `matchRoadLink/${delta.metadata.municipality}/${now}.json`,
-    Body: JSON.stringify(execDelta2SQLBody)
-  };
+  await uploadToS3(
+    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    `matchRoadLink/${delta.metadata.municipality}/${now}.json`,
+    JSON.stringify(execDelta2SQLBody)
+  );
 
-  const putLogsParams = {
-    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    Key: `logs/${delta.metadata.municipality}/${now}.json`,
-    Body: JSON.stringify(logsBody)
-  };
-
-  await new Upload({ client: s3, params: putLogsParams }).done();
-  await new Upload({ client: s3, params: putParams }).done();
+  await uploadToS3(
+    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    `logs/${delta.metadata.municipality}/${now}.json`,
+    JSON.stringify(logsBody)
+  );
 
   const execDelta2SQLParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-execDelta2SQL`,
-    InvocationType: 'Event',
+    InvocationType: InvocationType.Event,
     Payload: Buffer.from(
       JSON.stringify({
         key: `matchRoadLink/${delta.metadata.municipality}/${now}.json`
@@ -257,7 +235,7 @@ const matchRoadLinks = async (event) => {
 
   const reportRejectedDeltaParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
-    InvocationType: 'Event',
+    InvocationType: InvocationType.Event,
     Payload: Buffer.from(
       JSON.stringify({
         ReportType:

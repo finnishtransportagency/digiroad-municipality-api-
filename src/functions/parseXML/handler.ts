@@ -1,8 +1,6 @@
 import { middyfy } from '@libs/lambda';
 import { DrKuntaFeature } from '@functions/typing';
-import { Upload } from '@aws-sdk/lib-storage';
-import { S3, GetObjectCommand } from '@aws-sdk/client-s3';
-import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
+import { Lambda, InvokeCommand, InvocationType } from '@aws-sdk/client-lambda';
 import { XMLParser } from 'fast-xml-parser';
 import parseObstacle from './datatypes/parseObstacles';
 import parseTrafficsign from './datatypes/parseTrafficsigns';
@@ -15,20 +13,11 @@ import {
   additionalPanelSchema
 } from './validationSchemas/validationSchema';
 import { offline } from '@functions/config';
+import { S3Event } from 'aws-lambda';
+import { getFromS3, uploadToS3 } from '@libs/s3-tools';
 
-const parseXML = async (event) => {
+const parseXML = async (event: S3Event): Promise<void> => {
   const now = new Date().toISOString().slice(0, 19);
-  const s3config = offline
-    ? {
-        forcePathStyle: true,
-        credentials: {
-          accessKeyId: 'S3RVER', // This specific key is required when working offline
-          secretAccessKey: 'S3RVER'
-        },
-        endpoint: 'http://localhost:4569'
-      }
-    : {};
-  const s3 = new S3(s3config);
   const lambdaConfig = offline ? { endpoint: 'http://localhost:3002' } : {};
   const lambda = new Lambda(lambdaConfig);
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
@@ -38,7 +27,7 @@ const parseXML = async (event) => {
   const sendReport = async (message: string) => {
     const invokeRejectedDeltaParams = {
       FunctionName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
-      InvocationType: 'Event',
+      InvocationType: InvocationType.Event,
       Payload: Buffer.from(
         JSON.stringify({
           ReportType: 'invalidData',
@@ -53,14 +42,11 @@ const parseXML = async (event) => {
     await lambda.send(invokeRejectedDeltaCommand);
   };
 
-  const getObjectParams = {
-    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    Key: key
-  };
-
-  const getObjectCommand = new GetObjectCommand(getObjectParams);
   try {
-    const result = await s3.send(getObjectCommand);
+    const result = await getFromS3(
+      `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+      key
+    );
     var xmlFile = await result.Body.transformToString();
   } catch (error) {
     console.error(`Could not retrieve file from s3: ${error.message}`);
@@ -75,7 +61,7 @@ const parseXML = async (event) => {
   ];
   //Assures that even if there is only one feature it makes it an array
   const options = {
-    isArray: (_name, jpath) => {
+    isArray: (_tagName: string, jpath: string) => {
       if (alwaysArray.indexOf(jpath) !== -1) return true;
     },
     removeNSPrefix: true
@@ -172,16 +158,12 @@ const parseXML = async (event) => {
     return;
   }
 
-  const putParams = {
-    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    Key: `geojson/${municipality}/${assetType}/${now}.json`,
-    Body: JSON.stringify(geoJSON)
-  };
+  await uploadToS3(
+    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    `geojson/${municipality}/${assetType}/${now}.json`,
+    JSON.stringify(geoJSON)
+  );
 
-  await new Upload({
-    client: s3,
-    params: putParams
-  }).done();
   return;
 };
 

@@ -1,6 +1,4 @@
 import { middyfy } from '@libs/lambda';
-import { GetObjectCommand, S3 } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
 import { Client } from 'pg';
 import { Geometry, LineString, Point } from 'wkx';
 import {
@@ -9,72 +7,17 @@ import {
   pgport,
   pgdatabase,
   pguser,
-  pgpassword
+  pgpassword,
+  allowedOnKapy
 } from '@functions/config';
 import { getParameter } from '@libs/ssm-tools';
+import { getFromS3, uploadToS3 } from '@libs/s3-tools';
 
-const allowedOnKapy = [
-  'A11 Tietyö',
-  'A21 Tienristeys',
-  'A33 Muu vaara',
-  'B5 Väistämisvelvollisuus risteyksessä',
-  'B6 Pakollinen pysäyttäminen',
-  'C2 Moottorikäyttöisellä ajoneuvolla ajo kielletty',
-  'C21 Ajoneuvon suurin sallittu leveys',
-  'C22 Ajoneuvon suurin sallittu korkeus',
-  'C24 Ajoneuvon suurin sallittu massa',
-  'D4 Jalkakäytävä',
-  'D5 Pyörätie',
-  'D6 Yhdistetty pyörätie ja jalkakäytävä',
-  'D7.1 Pyörätie ja jalkakäytävä rinnakkain',
-  'D7.2 Pyörätie ja jalkakäytävä rinnakkain',
-  'E26 Kävelykatu',
-  'E27 Kävelykatu päättyy',
-  'F16 Osoiteviitta',
-  'F19 Jalankulun viitta',
-  'F20.1 Pyöräilyn viitta',
-  'F20.2 Pyöräilyn viitta',
-  'F21.1 Pyöräilyn suunnistustaulu',
-  'F21.2 Pyöräilyn suunnistustaulu',
-  'F22 Pyöräilyn etäisyystaulu',
-  'F23 Pyöräilyn paikannimi',
-  'F50.9 Polkupyörälle tarkoitettu reitti',
-  'F52 Jalankulkijalle tarkoitettu reitti',
-  'F53 Esteetön reitti',
-  'F54.1 Reitti, jolla on portaat alas',
-  'F54.2 Reitti, jolla on portaat ylös',
-  'F55.1 Reitti ilman portaita alas',
-  'F55.2 Reitti ilman portaitaylös',
-  'F55.3 Pyörätuoliramppi alas',
-  'F55.4 Pyörätuoliramppi ylös',
-  'F56.1 Hätäuloskäynti vasemmalla',
-  'F56.2 Hätäuloskäynti oikealla',
-  'F57.1 Poistumisreitti (yksi)',
-  'F57.2 Poistumisreitti (useita)',
-  'H23.1 Kaksisuuntainen pyörätie',
-  'H23.2 Kaksisuuntainen pyörätie',
-  'H24 Tekstillinen lisäkilpi',
-  'H25 Huoltoajo sallittu'
-];
-
-const s3config = offline
-  ? {
-      forcePathStyle: true,
-      credentials: {
-        accessKeyId: 'S3RVER', // This specific key is required when working offline
-        secretAccessKey: 'S3RVER'
-      },
-      endpoint: 'http://localhost:4569'
-    }
-  : {};
-const s3 = new S3(s3config);
 const getNearbyLinks = async (event) => {
-  const getObjectParams = {
-    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    Key: event.key
-  };
-  const getObjectsCommand = new GetObjectCommand(getObjectParams);
-  const data = await s3.send(getObjectsCommand);
+  const data = await getFromS3(
+    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    event.key
+  );
   const object = await data.Body.transformToString();
   const requestPayload = JSON.parse(object);
 
@@ -169,17 +112,13 @@ const getNearbyLinks = async (event) => {
   });
 
   const now = new Date().toISOString().slice(0, 19);
-  const S3ObjectKey = `getNearbyLinks/${requestPayload.municipality}/${now}.json`;
-  const putParams = {
-    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    Key: S3ObjectKey,
-    Body: JSON.stringify(res.rows)
-  };
 
-  await new Upload({
-    client: s3,
-    params: putParams
-  }).done();
+  const S3ObjectKey = `getNearbyLinks/${requestPayload.municipality}/${now}.json`;
+  await uploadToS3(
+    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    S3ObjectKey,
+    JSON.stringify(res.rows)
+  );
 
   return { key: S3ObjectKey };
 };

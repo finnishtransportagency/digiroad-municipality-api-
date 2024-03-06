@@ -1,24 +1,10 @@
-import { middyfy } from '@libs/lambda';
-import { PutObjectCommandInput, S3 } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
 import axios from 'axios';
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
-import { offline, apikey, testBbox } from '@functions/config';
+import { offline, apikey, testBbox, fetchSize } from '@functions/config';
 import { isScheduleEvent, isXmlFeatureCollectionJson } from './types';
+import { middyfy } from '@libs/lambda';
 import { getParameter } from '@libs/ssm-tools';
-
-const s3 = new S3(
-  offline
-    ? {
-        forcePathStyle: true,
-        credentials: {
-          accessKeyId: 'S3RVER', // This specific key is required when working offline
-          secretAccessKey: 'S3RVER'
-        },
-        endpoint: 'http://localhost:4569'
-      }
-    : {}
-);
+import { uploadToS3 } from '@libs/s3-tools';
 
 const mergeData = (dataArray: Array<string>): string => {
   if (dataArray.length === 0) throw new Error('No data to merge');
@@ -62,7 +48,6 @@ const fetchMunicipalityData = async (event: unknown) => {
       );
 
   for (var assetType of Object.entries(event.assetTypes)) {
-    const fetchSize = 5000;
     let offset = 0;
     const bbox = offline
       ? `&bbox=${testBbox}&bbox-crs=http://www.opengis.net/def/crs/EPSG/0/3067`
@@ -93,16 +78,11 @@ const fetchMunicipalityData = async (event: unknown) => {
 
     const now = new Date().toISOString().slice(0, 19);
 
-    const putParams: PutObjectCommandInput = {
-      Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-      Key: `infrao/${event.municipality}/${assetType[0]}/${now}.xml`,
-      Body: payload
-    };
-
-    await new Upload({
-      client: s3,
-      params: putParams
-    }).done();
+    await uploadToS3(
+      `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+      `infrao/${event.municipality}/${assetType[0]}/${now}.xml`,
+      payload
+    );
   }
 };
 

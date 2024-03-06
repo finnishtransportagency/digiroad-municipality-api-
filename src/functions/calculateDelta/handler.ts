@@ -1,12 +1,10 @@
 import { middyfy } from '@libs/lambda';
-import { Lambda, InvokeCommand } from '@aws-sdk/client-lambda';
+import { Lambda, InvokeCommand, InvocationType } from '@aws-sdk/client-lambda';
 import {
   S3,
   ListObjectsV2Command,
-  GetObjectCommand,
   DeleteObjectCommand
 } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
 import { DrKuntaFeature, PayloadFeature } from '@functions/typing';
 import {
   obstaclesSchema,
@@ -15,6 +13,7 @@ import {
 } from './validation/validationSchema';
 import isEqual from 'lodash.isequal';
 import { offline } from '@functions/config';
+import { getFromS3, uploadToS3 } from '@libs/s3-tools';
 
 const calculateDelta = async (event) => {
   const s3config = offline
@@ -49,20 +48,6 @@ const calculateDelta = async (event) => {
     throw new Error(`Could not list object keys from S3: ${e.message}`);
   }
 
-  async function getObject(bucket: string, objectKey: string) {
-    try {
-      const getObjectParams = {
-        Bucket: bucket,
-        Key: objectKey
-      };
-      const getObjectsCommand = new GetObjectCommand(getObjectParams);
-      const data = await s3.send(getObjectsCommand);
-      const object = await data.Body.transformToString();
-      return JSON.parse(object);
-    } catch (e) {
-      throw new Error(`Could not retrieve file from S3: ${e.message}`);
-    }
-  }
   let schema;
   if (assetType === 'obstacles') {
     schema = obstaclesSchema;
@@ -78,7 +63,8 @@ const calculateDelta = async (event) => {
   }
 
   try {
-    var updateObject = await getObject(
+    // PLACEHOLDER TYPE UNTIL TYPE SORTING ROUND FOR THIS FILE
+    var updateObject: unknown = await getFromS3(
       `dr-kunta-${process.env.STAGE_NAME}-bucket`,
       updateKey
     );
@@ -90,7 +76,7 @@ const calculateDelta = async (event) => {
   } catch (e) {
     const invokeRejectedDeltaParams = {
       FunctionName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
-      InvocationType: 'Event',
+      InvocationType: InvocationType.Event,
       Payload: Buffer.from(
         JSON.stringify({
           ReportType: 'invalidData',
@@ -117,7 +103,7 @@ const calculateDelta = async (event) => {
   let referenceObject =
     refrenceKey === null
       ? { type: 'FeatureCollection', features: [] }
-      : await getObject(
+      : await getFromS3(
           `dr-kunta-${process.env.STAGE_NAME}-bucket`,
           refrenceKey
         );
@@ -192,20 +178,16 @@ const calculateDelta = async (event) => {
   };
 
   const now = new Date().toISOString().slice(0, 19);
-  const putParams = {
-    Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    Key: `calculateDelta/${municipality}/${now}.json`,
-    Body: JSON.stringify(payLoad)
-  };
 
-  await new Upload({
-    client: s3,
-    params: putParams
-  }).done();
+  await uploadToS3(
+    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    `calculateDelta/${municipality}/${now}.json`,
+    JSON.stringify(payLoad)
+  );
 
   const invokeMatchRoadLinkParams = {
     FunctionName: `DRKunta-${process.env.STAGE_NAME}-matchRoadLink`,
-    InvocationType: 'Event',
+    InvocationType: InvocationType.Event,
     Payload: Buffer.from(
       JSON.stringify({ key: `calculateDelta/${municipality}/${now}.json` })
     )
