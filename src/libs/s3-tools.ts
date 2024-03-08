@@ -1,7 +1,10 @@
 import {
+  DeleteObjectCommand,
+  DeleteObjectCommandOutput,
   GetObjectCommand,
   GetObjectCommandOutput,
-  PutObjectCommandInput,
+  ListObjectsV2Command,
+  ListObjectsV2CommandOutput,
   S3
 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
@@ -35,12 +38,34 @@ export const uploadToS3 = async (
   }).done();
 };
 
+export const listS3Objects = async (
+  bucketName: string,
+  objectPrefix: string
+): Promise<ListObjectsV2CommandOutput> =>
+  await s3.send(
+    new ListObjectsV2Command({
+      Bucket: bucketName,
+      Prefix: objectPrefix
+    })
+  );
+
 export const getFromS3 = async (
   bucketName: string,
   fileName: string
 ): Promise<GetObjectCommandOutput> =>
   await s3.send(
     new GetObjectCommand({
+      Bucket: bucketName,
+      Key: fileName
+    })
+  );
+
+export const deleteFromS3 = async (
+  bucketName: string,
+  fileName: string
+): Promise<DeleteObjectCommandOutput> =>
+  await s3.send(
+    new DeleteObjectCommand({
       Bucket: bucketName,
       Key: fileName
     })

@@ -1,10 +1,5 @@
 import { middyfy } from '@libs/lambda';
 import { Lambda, InvokeCommand, InvocationType } from '@aws-sdk/client-lambda';
-import {
-  S3,
-  ListObjectsV2Command,
-  DeleteObjectCommand
-} from '@aws-sdk/client-s3';
 import { DrKuntaFeature, PayloadFeature } from '@functions/typing';
 import {
   obstaclesSchema,
@@ -13,20 +8,20 @@ import {
 } from './validation/validationSchema';
 import isEqual from 'lodash.isequal';
 import { offline } from '@functions/config';
-import { getFromS3, uploadToS3 } from '@libs/s3-tools';
+import {
+  deleteFromS3,
+  getFromS3,
+  listS3Objects,
+  uploadToS3
+} from '@libs/s3-tools';
+import { S3Event } from 'aws-lambda';
 
-const calculateDelta = async (event) => {
-  const s3config = offline
-    ? {
-        forcePathStyle: true,
-        credentials: {
-          accessKeyId: 'S3RVER', // This specific key is required when working offline
-          secretAccessKey: 'S3RVER'
-        },
-        endpoint: 'http://localhost:4569'
-      }
-    : {};
-  const s3 = new S3(s3config);
+const getAndFormatS3Object = async (bucketName: string, fileName: string) => {
+  const data = await getFromS3(bucketName, fileName);
+  return JSON.parse(await data.Body.transformToString());
+};
+
+const calculateDelta = async (event: S3Event) => {
   const lambdaConfig = offline ? { endpoint: 'http://localhost:3002' } : {};
   const lambda = new Lambda(lambdaConfig);
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
@@ -35,12 +30,10 @@ const calculateDelta = async (event) => {
   const assetType: string = key.split('/')[2];
 
   try {
-    const listObjectsparams = {
-      Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-      Prefix: `geojson/${municipality}/${assetType}/`
-    };
-    const listObjectsCommand = new ListObjectsV2Command(listObjectsparams);
-    var keys = await s3.send(listObjectsCommand);
+    var keys = await listS3Objects(
+      `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+      `geojson/${municipality}/${assetType}/`
+    );
     const sortedKeyList = keys.Contents.sort((k) => -k.LastModified.getTime());
     var updateKey = sortedKeyList[0].Key;
     var refrenceKey = sortedKeyList.length > 1 ? sortedKeyList[1].Key : null; //null for first upload where a refrence object does not exist
@@ -63,8 +56,7 @@ const calculateDelta = async (event) => {
   }
 
   try {
-    // PLACEHOLDER TYPE UNTIL TYPE SORTING ROUND FOR THIS FILE
-    var updateObject: unknown = await getFromS3(
+    var updateObject = await getAndFormatS3Object(
       `dr-kunta-${process.env.STAGE_NAME}-bucket`,
       updateKey
     );
@@ -89,21 +81,15 @@ const calculateDelta = async (event) => {
       invokeRejectedDeltaParams
     );
     await lambda.send(invokeRejectedDeltaCommand);
-    const deleteObjectParams = {
-      Bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-      Key: updateKey
-    };
 
-    const deleteObjectCommand = new DeleteObjectCommand(deleteObjectParams);
-
-    await s3.send(deleteObjectCommand);
+    await deleteFromS3(`dr-kunta-${process.env.STAGE_NAME}-bucket`, updateKey);
     throw new Error(`Object deleted because of invalid data: ${e.message}`);
   }
 
   let referenceObject =
     refrenceKey === null
       ? { type: 'FeatureCollection', features: [] }
-      : await getFromS3(
+      : await getAndFormatS3Object(
           `dr-kunta-${process.env.STAGE_NAME}-bucket`,
           refrenceKey
         );
