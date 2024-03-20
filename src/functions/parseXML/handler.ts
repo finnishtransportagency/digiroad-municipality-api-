@@ -1,6 +1,10 @@
-import { middyfy } from '@libs/lambda';
+import { invokeLambda, middyfy } from '@libs/lambda-tools';
 import { DrKuntaFeature } from '@functions/typing';
-import { Lambda, InvokeCommand, InvocationType } from '@aws-sdk/client-lambda';
+import {
+  InvokeCommand,
+  InvocationType,
+  InvokeCommandInput
+} from '@aws-sdk/client-lambda';
 import { XMLParser } from 'fast-xml-parser';
 import parseObstacle from './datatypes/parseObstacles';
 import parseTrafficsign from './datatypes/parseTrafficsigns';
@@ -12,35 +16,14 @@ import {
   roadSurfaceFeatureSchema,
   additionalPanelSchema
 } from './validationSchemas/validationSchema';
-import { offline } from '@functions/config';
 import { S3Event } from 'aws-lambda';
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
 
 const parseXML = async (event: S3Event): Promise<void> => {
   const now = new Date().toISOString().slice(0, 19);
-  const lambdaConfig = offline ? { endpoint: 'http://localhost:3002' } : {};
-  const lambda = new Lambda(lambdaConfig);
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
   const municipality: string = key.split('/')[1];
   const assetType: string = key.split('/')[2];
-
-  const sendReport = async (message: string) => {
-    const invokeRejectedDeltaParams = {
-      FunctionName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
-      InvocationType: InvocationType.Event,
-      Payload: Buffer.from(
-        JSON.stringify({
-          ReportType: 'invalidData',
-          Municipality: municipality,
-          Body: { Message: message }
-        })
-      )
-    };
-    const invokeRejectedDeltaCommand = new InvokeCommand(
-      invokeRejectedDeltaParams
-    );
-    await lambda.send(invokeRejectedDeltaCommand);
-  };
 
   try {
     const result = await getFromS3(
@@ -154,7 +137,17 @@ const parseXML = async (event: S3Event): Promise<void> => {
     console.error(
       `XML could not be parsed into valid GeoJSON: ${error.message}`
     );
-    await sendReport(error.message);
+    await invokeLambda(
+      `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
+      'Event',
+      Buffer.from(
+        JSON.stringify({
+          ReportType: 'invalidData',
+          Municipality: municipality,
+          Body: { Message: error.message }
+        })
+      )
+    );
     return;
   }
 

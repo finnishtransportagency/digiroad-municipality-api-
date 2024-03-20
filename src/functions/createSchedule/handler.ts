@@ -1,4 +1,4 @@
-import { middyfy } from '@libs/lambda';
+import { middyfy } from '@libs/lambda-tools';
 import validator from '@middy/validator';
 import httpErrorHandler from '@middy/http-error-handler';
 import { transpileSchema } from '@middy/validator/transpile';

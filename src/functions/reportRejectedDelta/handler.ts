@@ -1,4 +1,4 @@
-import { middyfy } from '@libs/lambda';
+import { middyfy } from '@libs/lambda-tools';
 import nodemailer from 'nodemailer';
 import * as ejs from 'ejs';
 import * as path from 'path';

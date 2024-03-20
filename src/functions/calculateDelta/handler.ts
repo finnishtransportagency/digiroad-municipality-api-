@@ -1,5 +1,4 @@
-import { middyfy } from '@libs/lambda';
-import { Lambda, InvokeCommand, InvocationType } from '@aws-sdk/client-lambda';
+import { invokeLambda, middyfy } from '@libs/lambda-tools';
 import { DrKuntaFeature, PayloadFeature } from '@functions/typing';
 import {
   obstaclesSchema,
@@ -7,7 +6,6 @@ import {
   roadSurfacesSchema
 } from './validation/validationSchema';
 import isEqual from 'lodash.isequal';
-import { offline } from '@functions/config';
 import {
   deleteFromS3,
   getFromS3,
@@ -16,14 +14,15 @@ import {
 } from '@libs/s3-tools';
 import { S3Event } from 'aws-lambda';
 
-const getAndFormatS3Object = async (bucketName: string, fileName: string) => {
+const getAndFormatS3Object = async (
+  bucketName: string,
+  fileName: string
+): Promise<unknown> => {
   const data = await getFromS3(bucketName, fileName);
-  return JSON.parse(await data.Body.transformToString());
+  return JSON.parse(await data.Body.transformToString()) as unknown;
 };
 
 const calculateDelta = async (event: S3Event) => {
-  const lambdaConfig = offline ? { endpoint: 'http://localhost:3002' } : {};
-  const lambda = new Lambda(lambdaConfig);
   const key: string = decodeURIComponent(event.Records[0].s3.object.key);
 
   const municipality: string = key.split('/')[1];
@@ -65,23 +64,19 @@ const calculateDelta = async (event: S3Event) => {
       throw new Error('Invalid schema');
     }
     updateObject = schema.cast(updateObject);
-  } catch (e) {
-    const invokeRejectedDeltaParams = {
-      FunctionName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
-      InvocationType: InvocationType.Event,
-      Payload: Buffer.from(
+  } catch (e: unknown) {
+    if (!(e instanceof Error)) throw e;
+    await invokeLambda(
+      `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
+      'Event',
+      Buffer.from(
         JSON.stringify({
           ReportType: 'invalidData',
           Municipality: municipality,
           Body: { Message: e.message }
         })
       )
-    };
-    const invokeRejectedDeltaCommand = new InvokeCommand(
-      invokeRejectedDeltaParams
     );
-    await lambda.send(invokeRejectedDeltaCommand);
-
     await deleteFromS3(`dr-kunta-${process.env.STAGE_NAME}-bucket`, updateKey);
     throw new Error(`Object deleted because of invalid data: ${e.message}`);
   }
@@ -171,17 +166,13 @@ const calculateDelta = async (event: S3Event) => {
     JSON.stringify(payLoad)
   );
 
-  const invokeMatchRoadLinkParams = {
-    FunctionName: `DRKunta-${process.env.STAGE_NAME}-matchRoadLink`,
-    InvocationType: InvocationType.Event,
-    Payload: Buffer.from(
+  await invokeLambda(
+    `DRKunta-${process.env.STAGE_NAME}-matchRoadLink`,
+    'Event',
+    Buffer.from(
       JSON.stringify({ key: `calculateDelta/${municipality}/${now}.json` })
     )
-  };
-  const invokeMatchRoadLinksCommand = new InvokeCommand(
-    invokeMatchRoadLinkParams
   );
-  await lambda.send(invokeMatchRoadLinksCommand);
 };
 
 export const main = middyfy(calculateDelta);

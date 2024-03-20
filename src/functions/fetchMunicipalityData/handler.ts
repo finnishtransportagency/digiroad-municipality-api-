@@ -2,7 +2,7 @@ import axios from 'axios';
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
 import { offline, apikey, testBbox, fetchSize } from '@functions/config';
 import { isScheduleEvent, isXmlFeatureCollectionJson } from './types';
-import { middyfy } from '@libs/lambda';
+import { middyfy } from '@libs/lambda-tools';
 import { getParameter } from '@libs/ssm-tools';
 import { uploadToS3 } from '@libs/s3-tools';
 

@@ -1,4 +1,4 @@
-import { middyfy } from '@libs/lambda';
+import { middyfy } from '@libs/lambda-tools';
 import { Client } from 'pg';
 
 import execCreatedObstacle from './execObstacle/execCreated';

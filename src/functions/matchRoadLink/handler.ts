@@ -1,5 +1,4 @@
-import { middyfy } from '@libs/lambda';
-import { Lambda, InvokeCommand, InvocationType } from '@aws-sdk/client-lambda';
+import { invokeLambda, middyfy } from '@libs/lambda-tools';
 import matchTrafficSign from './trafficSigns/matchTrafficSign';
 import matchObstacle from './obstacles/matchObstacle';
 import matchSurface from './surface/matchSurface';
@@ -13,14 +12,11 @@ import {
   LinkObject,
   FeatureRoadlinkMap
 } from '@functions/typing';
-import { offline } from '@functions/config';
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
 
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
 
-const lambdaConfig = offline ? { endpoint: 'http://localhost:3002' } : {};
-const lambda = new Lambda(lambdaConfig);
 const now = new Date().toISOString().slice(0, 19);
 
 const matchRoadLinks = async (event) => {
@@ -59,18 +55,15 @@ const matchRoadLinks = async (event) => {
     JSON.stringify(getNearbyLinksPayload)
   );
 
-  const getNearbyLinksParams = {
-    FunctionName: `DRKunta-${process.env.STAGE_NAME}-getNearbyLinks`,
-    InvocationType: InvocationType.RequestResponse,
-    Payload: Buffer.from(
+  const invocationResult = await invokeLambda(
+    `DRKunta-${process.env.STAGE_NAME}-getNearbyLinks`,
+    'RequestResponse',
+    Buffer.from(
       JSON.stringify({
         key: `getNearbyLinksRequestPayload/${delta.metadata.municipality}/${now}.json`
       })
     )
-  };
-
-  const getNearbyLinksCommand = new InvokeCommand(getNearbyLinksParams);
-  const invocationResult = await lambda.send(getNearbyLinksCommand);
+  );
 
   const allRoadLinksS3Key = JSON.parse(
     Buffer.from(invocationResult.Payload).toString()
@@ -210,19 +203,15 @@ const matchRoadLinks = async (event) => {
     JSON.stringify(logsBody)
   );
 
-  const execDelta2SQLParams = {
-    FunctionName: `DRKunta-${process.env.STAGE_NAME}-execDelta2SQL`,
-    InvocationType: InvocationType.Event,
-    Payload: Buffer.from(
+  await invokeLambda(
+    `DRKunta-${process.env.STAGE_NAME}-execDelta2SQL`,
+    'Event',
+    Buffer.from(
       JSON.stringify({
         key: `matchRoadLink/${delta.metadata.municipality}/${now}.json`
       })
     )
-  };
-
-  const execDelta2SQLCommand = new InvokeCommand(execDelta2SQLParams);
-
-  await lambda.send(execDelta2SQLCommand);
+  );
 
   const reportRejectedDeltabody = {
     assetType: delta.metadata.assetType,
@@ -233,10 +222,10 @@ const matchRoadLinks = async (event) => {
     now: now
   };
 
-  const reportRejectedDeltaParams = {
-    FunctionName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
-    InvocationType: InvocationType.Event,
-    Payload: Buffer.from(
+  await invokeLambda(
+    `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
+    'Event',
+    Buffer.from(
       JSON.stringify({
         ReportType:
           rejectsAmount > 0 || delta.invalidInfrao.sum > 0
@@ -246,13 +235,7 @@ const matchRoadLinks = async (event) => {
         Body: reportRejectedDeltabody
       })
     )
-  };
-
-  const reportRejectedDeltaCommand = new InvokeCommand(
-    reportRejectedDeltaParams
   );
-
-  await lambda.send(reportRejectedDeltaCommand);
 };
 
 export const main = middyfy(matchRoadLinks);
