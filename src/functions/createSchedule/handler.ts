@@ -104,7 +104,7 @@ const createSchedule = async (event) => {
 
   try {
     await ssm.send(putParameterCommand);
-  } catch (e) {
+  } catch (e: unknown) {
     console.error(e);
     return {
       statusCode: 400,
@@ -114,7 +114,7 @@ const createSchedule = async (event) => {
 
   try {
     await scheduler.send(creteScheduleCommand);
-  } catch (e) {
+  } catch (e: unknown) {
     const deleteParameterInput = {
       Name: `/DRKunta/${process.env.STAGE_NAME}/${event.body.municipality}`
     };

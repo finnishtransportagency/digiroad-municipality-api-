@@ -30,8 +30,8 @@ const deleteSchedule = async (event) => {
   try {
     await scheduler.send(getScheduleCommand);
     await ssm.send(getParameterCommand);
-  } catch (error) {
-    console.error(error);
+  } catch (e: unknown) {
+    console.error(e);
     return {
       statusCode: 400,
       body: 'No schedule defined for municipality'

@@ -1,10 +1,5 @@
 import { invokeLambda, middyfy } from '@libs/lambda-tools';
 import { DrKuntaFeature } from '@functions/typing';
-import {
-  InvokeCommand,
-  InvocationType,
-  InvokeCommandInput
-} from '@aws-sdk/client-lambda';
 import { XMLParser } from 'fast-xml-parser';
 import parseObstacle from './datatypes/parseObstacles';
 import parseTrafficsign from './datatypes/parseTrafficsigns';
@@ -31,8 +26,9 @@ const parseXML = async (event: S3Event): Promise<void> => {
       key
     );
     var xmlFile = await result.Body.transformToString();
-  } catch (error) {
-    console.error(`Could not retrieve file from s3: ${error.message}`);
+  } catch (e: unknown) {
+    if (!(e instanceof Error)) throw e;
+    console.error(`Could not retrieve file from s3: ${e.message}`);
     return;
   }
 
@@ -133,10 +129,9 @@ const parseXML = async (event: S3Event): Promise<void> => {
         IDs: rejectedFeatures
       }
     };
-  } catch (error) {
-    console.error(
-      `XML could not be parsed into valid GeoJSON: ${error.message}`
-    );
+  } catch (e: unknown) {
+    if (!(e instanceof Error)) throw e;
+    console.error(`XML could not be parsed into valid GeoJSON: ${e.message}`);
     await invokeLambda(
       `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
       'Event',
@@ -144,7 +139,7 @@ const parseXML = async (event: S3Event): Promise<void> => {
         JSON.stringify({
           ReportType: 'invalidData',
           Municipality: municipality,
-          Body: { Message: error.message }
+          Body: { Message: e.message }
         })
       )
     );

@@ -36,7 +36,8 @@ const calculateDelta = async (event: S3Event) => {
     const sortedKeyList = keys.Contents.sort((k) => -k.LastModified.getTime());
     var updateKey = sortedKeyList[0].Key;
     var refrenceKey = sortedKeyList.length > 1 ? sortedKeyList[1].Key : null; //null for first upload where a refrence object does not exist
-  } catch (e) {
+  } catch (e: unknown) {
+    if (!(e instanceof Error)) throw e;
     throw new Error(`Could not list object keys from S3: ${e.message}`);
   }
 

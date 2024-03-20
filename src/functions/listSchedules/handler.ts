@@ -37,7 +37,7 @@ const listSchedules = async () => {
       statusCode: 200,
       body: JSON.stringify(result)
     };
-  } catch (e) {
+  } catch (e: unknown) {
     console.error(e);
     return {
       statusCode: 400,

@@ -25,7 +25,8 @@ const matchRoadLinks = async (event) => {
       const data = await getFromS3(bucket, objectKey);
       const object = await data.Body.transformToString();
       return JSON.parse(object);
-    } catch (e) {
+    } catch (e: unknown) {
+      if (!(e instanceof Error)) throw e;
       throw new Error(`Could not retrieve file from S3: ${e.message}`);
     }
   }

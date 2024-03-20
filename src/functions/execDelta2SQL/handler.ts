@@ -37,7 +37,7 @@ const execDelta2SQL = async (event) => {
     user: pguser,
     password: offline ? pgpassword : await getParameter(pgpassword)
   });
-  client.connect();
+  await client.connect();
 
   const municipality: string = delta.metadata.municipality;
 
@@ -128,10 +128,10 @@ const execDelta2SQL = async (event) => {
     }
 
     await client.query('COMMIT');
-  } catch (error) {
+  } catch (e: unknown) {
     await client.query('ROLLBACK');
-    client.end();
-    console.error('Database error, rolling back: ', error);
+    await client.end();
+    console.error('Database error, rolling back: ', e);
     return;
   }
 
