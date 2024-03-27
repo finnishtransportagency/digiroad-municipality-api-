@@ -6,35 +6,30 @@ import combineSurfaces from './surface/combineSurfaces';
 import GeometryFactory from 'jsts/org/locationtech/jts/geom/GeometryFactory';
 import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel';
 
+import { getFromS3, uploadToS3 } from '@libs/s3-tools';
 import {
   PayloadFeature,
   DrKuntaFeature,
   LinkObject,
-  FeatureRoadlinkMap
+  S3KeyObject,
+  isS3KeyObject
 } from '@functions/typing';
-import { getFromS3, uploadToS3 } from '@libs/s3-tools';
+import { isDelta, isFeatureRoadlinkMap } from './types';
 
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
 
 const now = new Date().toISOString().slice(0, 19);
 
-const matchRoadLinks = async (event) => {
-  async function getObject(bucket: string, objectKey: string) {
-    try {
-      const data = await getFromS3(bucket, objectKey);
-      const object = await data.Body.transformToString();
-      return JSON.parse(object);
-    } catch (e: unknown) {
-      if (!(e instanceof Error)) throw e;
-      throw new Error(`Could not retrieve file from S3: ${e.message}`);
-    }
-  }
-
-  const delta = await getObject(
-    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    event.key
-  );
+const matchRoadLinks = async (event: S3KeyObject) => {
+  const delta = JSON.parse(
+    await getFromS3(`dr-kunta-${process.env.STAGE_NAME}-bucket`, event.key)
+  ) as unknown;
+  if (!isDelta(delta))
+    throw new Error(
+      `S3 object ${event.key} is not valid Delta object:\n`,
+      delta
+    );
 
   let rejectsAmount = 0;
   let features: Array<DrKuntaFeature> = delta.Created.concat(delta.Updated);
@@ -56,24 +51,40 @@ const matchRoadLinks = async (event) => {
     JSON.stringify(getNearbyLinksPayload)
   );
 
-  const invocationResult = await invokeLambda(
-    `DRKunta-${process.env.STAGE_NAME}-getNearbyLinks`,
-    'RequestResponse',
-    Buffer.from(
-      JSON.stringify({
-        key: `getNearbyLinksRequestPayload/${delta.metadata.municipality}/${now}.json`
-      })
+  const invocationResult = Buffer.from(
+    (
+      await invokeLambda(
+        `DRKunta-${process.env.STAGE_NAME}-getNearbyLinks`,
+        'RequestResponse',
+        Buffer.from(
+          JSON.stringify({
+            key: `getNearbyLinksRequestPayload/${delta.metadata.municipality}/${now}.json`
+          })
+        )
+      )
+    ).Payload
+  ).toString();
+
+  const parsedResult = JSON.parse(invocationResult) as unknown;
+  if (!isS3KeyObject(parsedResult)) {
+    throw new Error(
+      `getNearbyLinks lambda invocation result is not valid S3KeyObject:\n`,
+      parsedResult
+    );
+  }
+  const allRoadLinksS3Key = parsedResult.key;
+
+  const allRoadLinks = JSON.parse(
+    await getFromS3(
+      `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+      allRoadLinksS3Key
     )
-  );
+  ) as unknown;
+  if (!Array.isArray(allRoadLinks) || !allRoadLinks.every(isFeatureRoadlinkMap))
+    throw new Error(
+      `S3 object ${allRoadLinksS3Key} is not valid Array<FeatureRoadlinkMap>`
+    );
 
-  const allRoadLinksS3Key = JSON.parse(
-    Buffer.from(invocationResult.Payload).toString()
-  ).key;
-
-  const allRoadLinks: Array<FeatureRoadlinkMap> = await getObject(
-    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    allRoadLinksS3Key
-  );
   for (let p = 0; p < features.length; p++) {
     const feature = features[p];
     const roadLinks: Array<LinkObject> | undefined = allRoadLinks.find(
@@ -82,8 +93,8 @@ const matchRoadLinks = async (event) => {
     )?.roadlinks;
     if (roadLinks) {
       switch (feature.properties.TYPE) {
-        case 'OBSTACLE':
-          var obstacleMatchResults = matchObstacle(
+        case 'OBSTACLE': {
+          const obstacleMatchResults = matchObstacle(
             roadLinks,
             feature,
             geomFactory,
@@ -103,8 +114,9 @@ const matchRoadLinks = async (event) => {
             ...obstacleMatchResults
           };
           break;
-        case 'TRAFFICSIGN':
-          var trafficSignMatchResults = matchTrafficSign(
+        }
+        case 'TRAFFICSIGN': {
+          const trafficSignMatchResults = matchTrafficSign(
             roadLinks,
             feature,
             geomFactory
@@ -123,8 +135,9 @@ const matchRoadLinks = async (event) => {
             ...trafficSignMatchResults
           };
           break;
-        case 'SURFACE':
-          var surfaceMatchResults = matchSurface(
+        }
+        case 'SURFACE': {
+          const surfaceMatchResults = matchSurface(
             roadLinks,
             feature,
             geomFactory
@@ -145,6 +158,7 @@ const matchRoadLinks = async (event) => {
             ...surfaceMatchResults
           };
           break;
+        }
       }
     } else {
       rejectsAmount++;

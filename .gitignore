@@ -12,3 +12,7 @@ buckets
 # env variables
 env.sh
 .env
+
+# database dumps
+*.dump
+*.sql

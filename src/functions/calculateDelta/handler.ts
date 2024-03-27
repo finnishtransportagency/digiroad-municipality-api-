@@ -5,7 +5,7 @@ import {
   trafficSignsSchema,
   roadSurfacesSchema
 } from './validation/validationSchema';
-import isEqual from 'lodash.isequal';
+import { isEqual } from 'lodash';
 import {
   deleteFromS3,
   getFromS3,
@@ -19,7 +19,7 @@ const getAndFormatS3Object = async (
   fileName: string
 ): Promise<unknown> => {
   const data = await getFromS3(bucketName, fileName);
-  return JSON.parse(await data.Body.transformToString()) as unknown;
+  return JSON.parse(data) as unknown;
 };
 
 const calculateDelta = async (event: S3Event) => {

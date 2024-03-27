@@ -27,8 +27,7 @@ const execDelta2SQL = async (event) => {
     `dr-kunta-${process.env.STAGE_NAME}-bucket`,
     event.key
   );
-  const object = await data.Body.transformToString();
-  const delta = JSON.parse(object);
+  const delta = JSON.parse(data) as unknown;
 
   const client = new Client({
     host: pghost,

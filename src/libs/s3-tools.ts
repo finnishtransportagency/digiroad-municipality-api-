@@ -52,13 +52,15 @@ export const listS3Objects = async (
 export const getFromS3 = async (
   bucketName: string,
   fileName: string
-): Promise<GetObjectCommandOutput> =>
-  await s3.send(
-    new GetObjectCommand({
-      Bucket: bucketName,
-      Key: fileName
-    })
-  );
+): Promise<string> =>
+  await (
+    await s3.send(
+      new GetObjectCommand({
+        Bucket: bucketName,
+        Key: fileName
+      })
+    )
+  ).Body.transformToString();
 
 export const deleteFromS3 = async (
   bucketName: string,

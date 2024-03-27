@@ -20,16 +20,12 @@ const parseXML = async (event: S3Event): Promise<void> => {
   const municipality: string = key.split('/')[1];
   const assetType: string = key.split('/')[2];
 
+  let xmlFile: string;
   try {
-    const result = await getFromS3(
-      `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-      key
-    );
-    var xmlFile = await result.Body.transformToString();
+    xmlFile = await getFromS3(`dr-kunta-${process.env.STAGE_NAME}-bucket`, key);
   } catch (e: unknown) {
     if (!(e instanceof Error)) throw e;
-    console.error(`Could not retrieve file from s3: ${e.message}`);
-    return;
+    throw new Error(`Could not retrieve file from s3: ${e.message}`);
   }
 
   const alwaysArray = [

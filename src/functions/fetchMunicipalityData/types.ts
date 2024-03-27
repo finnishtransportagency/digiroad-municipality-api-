@@ -8,7 +8,7 @@ interface ScheduleEvent {
   assetTypes: {
     obstacles?: 'infrao:Rakenne';
     trafficSigns?: 'infrao:Liikennemerkki';
-    roadSurfaces?: 'infrao:KatuAlueenOsa';
+    roadSurfaces?: 'infrao:KatualueenOsa';
   };
 }
 
@@ -25,12 +25,11 @@ export const isScheduleEvent = (event: unknown): event is ScheduleEvent => {
     typeof municipality !== 'string' ||
     typeof assetTypes !== 'object' ||
     assetTypes === null ||
-    (assetTypes.obstacles !== undefined &&
-      assetTypes.obstacles !== 'infrao:Rakenne') ||
-    (assetTypes.trafficSigns !== undefined &&
+    (assetTypes.obstacles && assetTypes.obstacles !== 'infrao:Rakenne') ||
+    (assetTypes.trafficSigns &&
       assetTypes.trafficSigns !== 'infrao:Liikennemerkki') ||
-    (assetTypes.roadSurfaces !== undefined &&
-      assetTypes.roadSurfaces !== 'infrao:KatuAlueenOsa')
+    (assetTypes.roadSurfaces &&
+      assetTypes.roadSurfaces !== 'infrao:KatualueenOsa')
   ) {
     return false;
   }
