@@ -12,7 +12,8 @@ import {
   DrKuntaFeature,
   LinkObject,
   S3KeyObject,
-  isS3KeyObject
+  isS3KeyObject,
+  FeatureType
 } from '@functions/typing';
 import { isDelta, isFeatureRoadlinkMap } from './types';
 
@@ -93,7 +94,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     )?.roadlinks;
     if (roadLinks) {
       switch (feature.properties.TYPE) {
-        case 'OBSTACLE': {
+        case FeatureType.Obstacle: {
           const obstacleMatchResults = matchObstacle(
             roadLinks,
             feature,
@@ -115,7 +116,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
           };
           break;
         }
-        case 'TRAFFICSIGN': {
+        case FeatureType.TrafficSign: {
           const trafficSignMatchResults = matchTrafficSign(
             roadLinks,
             feature,
@@ -136,7 +137,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
           };
           break;
         }
-        case 'SURFACE': {
+        case FeatureType.Surface: {
           const surfaceMatchResults = matchSurface(
             roadLinks,
             feature,

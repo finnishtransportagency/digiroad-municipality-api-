@@ -34,7 +34,7 @@ export interface GeoJSON {
   };
 }
 
-enum FeatureType {
+export enum FeatureType {
   Obstacle = 'OBSTACLE',
   TrafficSign = 'TRAFFICSIGN',
   Surface = 'SURFACE'
@@ -113,7 +113,7 @@ export interface TrafficSignProperties {
   KUNTO?: number;
   KOKO?: number;
   LISAKILVET?: Array<additionalPanel>;
-  DR_LINK_ID?: number;
+  DR_LINK_ID?: string;
   DR_M_VALUE?: number;
   DR_OFFSET?: number;
   OSOITE?: string;
