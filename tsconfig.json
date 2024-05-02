@@ -3,13 +3,15 @@
   "compilerOptions": {
     "lib": ["ESNext"],
     "moduleResolution": "node",
+    "strict": false,
+    "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": true,
     "sourceMap": true,
     "target": "ES2020",
     "outDir": "lib",
-    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "typeRoots": ["types", "./node_modules/@types"]
   },
   "include": ["src/**/*.ts", "serverless.ts"],
   "exclude": [
@@ -21,5 +23,5 @@
   ],
   "ts-node": {
     "require": ["tsconfig-paths/register"]
-  },
+  }
 }

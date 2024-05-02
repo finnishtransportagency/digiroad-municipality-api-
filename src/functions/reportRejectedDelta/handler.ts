@@ -1,13 +1,24 @@
 import { middyfy } from '@libs/lambda-tools';
-import nodemailer from 'nodemailer';
+import { createTransport } from 'nodemailer';
 import * as ejs from 'ejs';
 import * as path from 'path';
 import { offline } from '@functions/config';
 import { getParameter } from '@libs/ssm-tools';
 
-const reportRejectedDelta = async (event) => {
+interface ReportRejectedDeltaEvent {
+  ReportType: 'invalidData' | 'matchedWithFailures' | 'matchedSuccessfully';
+  Municipality: string;
+  Body: {
+    now: string;
+    stage: string;
+    link: string;
+    Message?: string;
+  };
+}
+
+const reportRejectedDelta = async (event: ReportRejectedDeltaEvent) => {
   if (offline) return;
-  var transporter = nodemailer.createTransport({
+  const transporter = createTransport({
     host: 'email-smtp.eu-west-1.amazonaws.com',
     port: 587,
     auth: {

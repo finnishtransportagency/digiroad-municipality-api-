@@ -46,7 +46,7 @@ enum GeometryType {
 }
 
 export interface DrKuntaFeature {
-  type?: string;
+  type?: 'Feature';
   properties: ObstacleProperties | TrafficSignProperties | SurfaceProperties;
   geometry: {
     type: GeometryType;

@@ -17,13 +17,17 @@ const lambda = new Lambda(
 );
 
 export const invokeLambda = async (
-  FunctionName: string,
+  FunctionName:
+    | 'reportRejectedDelta'
+    | 'matchRoadLink'
+    | 'getNearbyLinks'
+    | 'execDelta2SQL',
   InvocationType: 'Event' | 'RequestResponse',
   Payload: Buffer
 ): Promise<InvokeCommandOutput> =>
   await lambda.send(
     new InvokeCommand({
-      FunctionName,
+      FunctionName: `DRKunta-${process.env.STAGE_NAME}-${FunctionName}`,
       InvocationType,
       Payload
     })

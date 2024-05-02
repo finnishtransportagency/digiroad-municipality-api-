@@ -13,7 +13,7 @@
     "clear-traffic-signs": "aws s3 --endpoint-url http://localhost:4569 cp ./empty.xml s3://dr-kunta-dev-bucket/infrao/espoo/trafficSigns/empty.xml",
     "clear-road-surfaces": "aws s3 --endpoint-url http://localhost:4569 cp ./empty.xml s3://dr-kunta-dev-bucket/infrao/espoo/roadSurfaces/empty.xml",
     "reset-s3": "npm run clear-obstacles && npm run clear-traffic-signs && npm run clear-road-surfaces",
-    "obstacles": "sls invoke local --function fetchMunicipalityData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"xml\", \"municipality\": \"espoo\", \"assetTypes\": { \"roadSurfaces\": \"infrao:KatualueenOsa\" }}'",
+    "obstacles": "sls invoke local --function fetchMunicipalityData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"xml\", \"municipality\": \"espoo\", \"assetTypes\": { \"obstacles\": \"infrao:Rakenne\" }}'",
     "traffic-signs": "sls invoke local --function fetchMunicipalityData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"xml\", \"municipality\": \"espoo\", \"assetTypes\": { \"trafficSigns\": \"infrao:Liikennemerkki\" }}'",
     "road-surfaces": "sls invoke local --function fetchMunicipalityData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"xml\", \"municipality\": \"espoo\", \"assetTypes\": { \"roadSurfaces\": \"infrao:KatualueenOsa\" }}'"
   },
@@ -53,6 +53,7 @@
     "@types/ejs": "^3.1.5",
     "@types/jsts": "^0.17.22",
     "@types/node": "^18.15.0",
+    "@types/nodemailer": "^6.4.14",
     "@types/pg": "^8.6.5",
     "@typescript-eslint/eslint-plugin": "^5.30.6",
     "@typescript-eslint/parser": "^5.30.6",

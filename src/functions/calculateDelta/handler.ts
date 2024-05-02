@@ -68,7 +68,7 @@ const calculateDelta = async (event: S3Event) => {
   } catch (e: unknown) {
     if (!(e instanceof Error)) throw e;
     await invokeLambda(
-      `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
+      'reportRejectedDelta',
       'Event',
       Buffer.from(
         JSON.stringify({
@@ -168,7 +168,7 @@ const calculateDelta = async (event: S3Event) => {
   );
 
   await invokeLambda(
-    `DRKunta-${process.env.STAGE_NAME}-matchRoadLink`,
+    'matchRoadLink',
     'Event',
     Buffer.from(
       JSON.stringify({ key: `calculateDelta/${municipality}/${now}.json` })

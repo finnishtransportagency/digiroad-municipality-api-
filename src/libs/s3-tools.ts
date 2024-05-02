@@ -2,7 +2,6 @@ import {
   DeleteObjectCommand,
   DeleteObjectCommandOutput,
   GetObjectCommand,
-  GetObjectCommandOutput,
   ListObjectsV2Command,
   ListObjectsV2CommandOutput,
   S3

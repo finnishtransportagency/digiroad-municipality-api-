@@ -55,7 +55,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   const invocationResult = Buffer.from(
     (
       await invokeLambda(
-        `DRKunta-${process.env.STAGE_NAME}-getNearbyLinks`,
+        'getNearbyLinks',
         'RequestResponse',
         Buffer.from(
           JSON.stringify({
@@ -220,7 +220,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   );
 
   await invokeLambda(
-    `DRKunta-${process.env.STAGE_NAME}-execDelta2SQL`,
+    'execDelta2SQL',
     'Event',
     Buffer.from(
       JSON.stringify({
@@ -239,7 +239,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   };
 
   await invokeLambda(
-    `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
+    'reportRejectedDelta',
     'Event',
     Buffer.from(
       JSON.stringify({

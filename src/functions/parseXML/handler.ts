@@ -129,7 +129,7 @@ const parseXML = async (event: S3Event): Promise<void> => {
     if (!(e instanceof Error)) throw e;
     console.error(`XML could not be parsed into valid GeoJSON: ${e.message}`);
     await invokeLambda(
-      `DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`,
+      'reportRejectedDelta',
       'Event',
       Buffer.from(
         JSON.stringify({
