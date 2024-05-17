@@ -7,12 +7,12 @@ import {
   pgport,
   pgdatabase,
   pguser,
-  pgpassword,
-  allowedOnKapy
+  pgpassword
 } from '@functions/config';
 import { getParameter } from '@libs/ssm-tools';
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
 import { S3KeyObject } from '@functions/typing';
+import { allowedOnKapy } from '@schemas/trafficSignTypes';
 
 const getNearbyLinks = async (event: S3KeyObject) => {
   const data = await getFromS3(

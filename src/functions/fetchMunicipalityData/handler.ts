@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
-import { offline, apikey, testBbox, fetchSize } from '@functions/config';
+import { offline, offlineApiKey, testBbox, fetchSize } from '@functions/config';
 import { isScheduleEvent, isXmlFeatureCollectionJson } from './types';
 import { middyfy } from '@libs/lambda-tools';
 import { getParameter } from '@libs/ssm-tools';
@@ -42,7 +42,7 @@ const fetchMunicipalityData = async (event: unknown) => {
   }
 
   const apiKey = offline
-    ? apikey
+    ? offlineApiKey
     : await getParameter(
         `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`
       );

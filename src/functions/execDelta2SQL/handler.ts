@@ -134,7 +134,7 @@ const execDelta2SQL = async (event) => {
     return;
   }
 
-  client.end();
+  await client.end();
   return;
 };
 
