@@ -1,6 +1,7 @@
 import {
-  AssetType,
-  isAssetType,
+  AssetTypeString,
+  isAssetTypeString,
+  isAssetTypeKey,
   isScheduleEvent
 } from '@customTypes/eventTypes';
 import {
@@ -8,20 +9,50 @@ import {
   offline,
   offlineApiKey,
   stage,
-  testBbox
+  bbox
 } from '@functions/config';
 import { middyfy } from '@libs/lambda-tools';
+import { uploadToS3 } from '@libs/s3-tools';
 import { getParameter } from '@libs/ssm-tools';
 import { Feature, FeatureCollection } from '@schemas/geoJsonSchema';
-import { infraoJsonSchema } from '@schemas/muniResponseSchema';
+import {
+  infraoJsonSchema,
+  infraoObstacleSchema
+} from '@schemas/muniResponseSchema';
 import axios from 'axios';
 
-const parseFeature = (assetType: AssetType, feature: unknown): Feature => {
+const parseFeature = (
+  assetType: AssetTypeString,
+  feature: unknown
+): Feature => {
   switch (assetType) {
-    case 'infrao:Rakenne':
-      //TODO: Implement
-      console.warn(`${assetType} not yet implemented in parseFeature`);
-      break;
+    case 'infrao:Rakenne': {
+      const castedFeature = infraoObstacleSchema.cast(feature);
+      const id = castedFeature.id;
+      const properties = castedFeature.properties;
+      const coordinates = castedFeature.geometry.coordinates;
+
+      if (!infraoObstacleSchema.isValidSync(castedFeature))
+        return {
+          type: 'Invalid',
+          id: id,
+          properties: JSON.stringify(feature)
+        };
+
+      return {
+        type: 'Feature',
+        id: id,
+        properties: {
+          TYPE: 'OBSTACLE',
+          ID: properties.yksilointitieto,
+          EST_TYYPPI: properties.malli === 'Puomi' ? 2 : 1
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: [coordinates[0], coordinates[1]]
+        }
+      };
+    }
 
     case 'infrao:Liikennemerkki':
       //TODO: Implement
@@ -35,11 +66,10 @@ const parseFeature = (assetType: AssetType, feature: unknown): Feature => {
 
     default:
       console.warn('Asset type not supported by parseFeature:', assetType);
-      break;
   }
   return {
     type: 'Invalid',
-    id: 'Default_return',
+    id: `Asset type not supported by parseFeature: ${assetType}`,
     properties: JSON.stringify(feature)
   };
 };
@@ -49,10 +79,8 @@ const fetchAndParseData = async (event: unknown) => {
     throw new Error('Invalid event');
   }
 
-  const assetTypes = Object.entries(event.assetTypes)
-    .map((t) => t[1] as unknown)
-    .filter(isAssetType);
-  if (assetTypes.length === 0) {
+  const assetTypeKeys = Object.keys(event.assetTypes).filter(isAssetTypeKey);
+  if (assetTypeKeys.length === 0) {
     throw new Error('No valid asset types provided');
   }
 
@@ -60,22 +88,32 @@ const fetchAndParseData = async (event: unknown) => {
     ? offlineApiKey
     : await getParameter(`/DRKunta/${stage}/${event.municipality}`);
 
-  for (const assetType of assetTypes) {
+  for (const assetKey of assetTypeKeys) {
     switch (event.format) {
       case 'json': {
-        const geoJson = await fetchJsonData(
-          assetType,
+        const geoJson: FeatureCollection = await fetchJsonData(
+          event.assetTypes[assetKey],
           event.municipality,
           event.url,
           apiKey
         );
         console.log('GeoJSON:', geoJson);
-        // TODO: Save GeoJSON to S3
+        await uploadToS3(
+          `dr-kunta-${stage}-bucket`,
+          `geojson/${event.municipality}/${assetKey}/${new Date()
+            .toISOString()
+            .slice(0, 19)}.json`,
+          JSON.stringify(geoJson)
+        );
         break;
       }
 
       case 'gml' || 'xml': {
-        const dataArray = await fetchXmlData(assetType, event.url, apiKey);
+        const dataArray: Array<string> = await fetchXmlData(
+          event.assetTypes[assetKey],
+          event.url,
+          apiKey
+        );
         console.log('XML dataArray:', dataArray);
         // TODO: Parse XML data
         // TODO: Save GeoJSON to S3
@@ -94,15 +132,12 @@ const fetchAndParseData = async (event: unknown) => {
 };
 
 const fetchJsonData = async (
-  assetType: AssetType,
+  assetType: AssetTypeString,
   municipality: string,
   baseUrl: string,
   apiKey: string
 ): Promise<FeatureCollection> => {
   let page = 0;
-  const bbox = offline
-    ? `&bbox=${testBbox}&bbox-crs=http://www.opengis.net/def/crs/EPSG/0/3067`
-    : '';
   const geoJson: FeatureCollection = {
     type: 'FeatureCollection',
     name: `${municipality}-Kuntarajapinta`,
@@ -131,10 +166,9 @@ const fetchJsonData = async (
       }
     );
     const infraoFeatureCollection = await infraoJsonSchema.validate(data);
-    const parsedFeatures = infraoFeatureCollection.features.map((feature) =>
-      parseFeature(assetType, feature)
+    const parsedFeatures: Array<Feature> = infraoFeatureCollection.features.map(
+      (feature) => parseFeature(assetType, feature)
     );
-
     const validFeatures = parsedFeatures.filter((f) => f.type === 'Feature');
     const invalidFeatures = parsedFeatures.filter((f) => f.type === 'Invalid');
 
@@ -150,14 +184,11 @@ const fetchJsonData = async (
 };
 
 const fetchXmlData = async (
-  assetType: AssetType,
+  assetType: AssetTypeString,
   baseUrl: string,
   apiKey: string
 ): Promise<Array<string>> => {
   let page = 0;
-  const bbox = offline
-    ? `&bbox=${testBbox}&bbox-crs=http://www.opengis.net/def/crs/EPSG/0/3067`
-    : '';
   const dataArray: Array<string> = [];
 
   while (true) {

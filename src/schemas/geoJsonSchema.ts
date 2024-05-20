@@ -91,7 +91,7 @@ const trafficSignFeatureSchema = object().shape({
   geometry: pointGeometrySchema.required()
 });
 
-const additionalPanelSchema = object().shape({
+const additionalPanelFeatureSchema = object().shape({
   type: string()
     .required()
     .matches(/(^Feature$)/),
@@ -114,7 +114,7 @@ type Feature =
   | ((
       | InferType<typeof obstacleFeatureSchema>
       | InferType<typeof trafficSignFeatureSchema>
-      | InferType<typeof additionalPanelSchema>
+      | InferType<typeof additionalPanelFeatureSchema>
       | InferType<typeof roadSurfaceFeatureSchema>
     ) & { type: 'Feature' })
   | { type: 'Invalid'; id: string; properties: string };
@@ -140,6 +140,6 @@ export {
   FeatureCollection,
   obstacleFeatureSchema,
   trafficSignFeatureSchema,
-  additionalPanelSchema,
+  additionalPanelFeatureSchema,
   roadSurfaceFeatureSchema
 };

@@ -8,20 +8,45 @@ const isApiResponseType = (
   );
 };
 
-// Keep in sync isAssetType
-interface AssetTypeStrings {
+/**
+ * Scheduled EventBridge trigger event
+ */
+export interface ScheduleEvent {
+  url: string;
+  format: ApiResponseType;
+  municipality: string;
+  assetTypes: AssetTypes;
+}
+export const isScheduleEvent = (event: unknown): event is ScheduleEvent => {
+  if (typeof event !== 'object' || event === null) return false;
+
+  const { url, format, municipality, assetTypes } = event as ScheduleEvent;
+
+  if (
+    typeof url !== 'string' ||
+    !isApiResponseType(format) ||
+    typeof municipality !== 'string' ||
+    assetTypes === null ||
+    typeof assetTypes !== 'object' ||
+    !isAssetTypes(assetTypes)
+  ) {
+    return false;
+  }
+
+  return true;
+};
+
+// Keep in sync with isAssetTypeKey & isAssetTypeString
+interface AssetTypes {
   obstacles?: 'infrao:Rakenne';
   trafficSigns?: 'infrao:Liikennemerkki';
   roadSurfaces?: 'infrao:KatualueenOsa';
 }
 
-const isAssetTypeStrings = (
-  assetType: unknown
-): assetType is AssetTypeStrings => {
-  if (typeof assetType !== 'object' || assetType === null) return false;
+const isAssetTypes = (assetType: unknown): assetType is AssetTypes => {
+  if (!assetType || typeof assetType !== 'object') return false;
 
-  const { obstacles, trafficSigns, roadSurfaces } =
-    assetType as AssetTypeStrings;
+  const { obstacles, trafficSigns, roadSurfaces } = assetType as AssetTypes;
 
   if (
     (!obstacles && !trafficSigns && !roadSurfaces) ||
@@ -35,11 +60,22 @@ const isAssetTypeStrings = (
   return true;
 };
 
-export type AssetType =
-  ScheduleEvent['assetTypes'][keyof ScheduleEvent['assetTypes']];
+export type AssetTypeKey = keyof AssetTypes;
+// Keep in sync AssetTypes
+export const isAssetTypeKey = (
+  assetType: unknown
+): assetType is AssetTypeKey => {
+  if (typeof assetType !== 'string') return false;
 
-// Keep in sync AssetTypeStrings
-export const isAssetType = (assetType: unknown): assetType is AssetType => {
+  return ['obstacles', 'trafficSigns', 'roadSurfaces'].includes(assetType);
+};
+
+export type AssetTypeString =
+  ScheduleEvent['assetTypes'][keyof ScheduleEvent['assetTypes']];
+// Keep in sync AssetTypes
+export const isAssetTypeString = (
+  assetType: unknown
+): assetType is AssetTypeString => {
   if (typeof assetType !== 'string') return false;
 
   return [
@@ -47,33 +83,4 @@ export const isAssetType = (assetType: unknown): assetType is AssetType => {
     'infrao:Liikennemerkki',
     'infrao:KatualueenOsa'
   ].includes(assetType);
-};
-
-/**
- * Scheduled EventBridge trigger event
- */
-export interface ScheduleEvent {
-  url: string;
-  format: ApiResponseType;
-  municipality: string;
-  assetTypes: AssetTypeStrings;
-}
-
-export const isScheduleEvent = (event: unknown): event is ScheduleEvent => {
-  if (typeof event !== 'object' || event === null) return false;
-
-  const { url, format, municipality, assetTypes } = event as ScheduleEvent;
-
-  if (
-    typeof url !== 'string' ||
-    !isApiResponseType(format) ||
-    typeof municipality !== 'string' ||
-    assetTypes === null ||
-    typeof assetTypes !== 'object' ||
-    !isAssetTypeStrings(assetTypes)
-  ) {
-    return false;
-  }
-
-  return true;
 };

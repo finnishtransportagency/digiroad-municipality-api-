@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
-import { offline, offlineApiKey, testBbox, fetchSize } from '@functions/config';
+import { offline, offlineApiKey, bbox, fetchSize } from '@functions/config';
 import { isScheduleEvent, isXmlFeatureCollectionJson } from './types';
 import { middyfy } from '@libs/lambda-tools';
 import { getParameter } from '@libs/ssm-tools';
@@ -49,9 +49,6 @@ const fetchMunicipalityData = async (event: unknown) => {
 
   for (var assetType of Object.entries(event.assetTypes)) {
     let offset = 0;
-    const bbox = offline
-      ? `&bbox=${testBbox}&bbox-crs=http://www.opengis.net/def/crs/EPSG/0/3067`
-      : '';
     const dataArray: Array<string> = [];
     while (true) {
       const url =
