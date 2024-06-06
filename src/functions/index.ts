@@ -5,6 +5,7 @@ export { default as getNearbyLinks } from './getNearbyLinks';
 export { default as execDelta2SQL } from './execDelta2SQL';
 export { default as parseXML } from './parseXML';
 export { default as fetchMunicipalityData } from './fetchMunicipalityData';
+export { default as fetchAndParseData } from './fetchAndParseData';
 export { default as createSchedule } from './createSchedule';
 export { default as listSchedules } from './listSchedules';
 export { default as deleteSchedule } from './deleteSchedule';

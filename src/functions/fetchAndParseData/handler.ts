@@ -1,6 +1,5 @@
 import {
   AssetTypeString,
-  isAssetTypeString,
   isAssetTypeKey,
   isScheduleEvent
 } from '@customTypes/eventTypes';
@@ -14,11 +13,18 @@ import {
 import { middyfy } from '@libs/lambda-tools';
 import { uploadToS3 } from '@libs/s3-tools';
 import { getParameter } from '@libs/ssm-tools';
-import { Feature, FeatureCollection } from '@schemas/geoJsonSchema';
+import {
+  Feature,
+  FeatureCollection,
+  ValidFeature
+} from '@schemas/geoJsonSchema';
 import {
   infraoJsonSchema,
-  infraoObstacleSchema
+  infraoObstacleSchema,
+  infraoTrafficSignSchema
 } from '@schemas/muniResponseSchema';
+import { oldTrafficSignMapping } from '@schemas/trafficSignMapping';
+import { trafficSignsWithTextValue } from '@schemas/trafficSignTypes';
 import axios from 'axios';
 
 const parseFeature = (
@@ -28,24 +34,27 @@ const parseFeature = (
   switch (assetType) {
     case 'infrao:Rakenne': {
       const castedFeature = infraoObstacleSchema.cast(feature);
-      const id = castedFeature.id;
       const properties = castedFeature.properties;
+      const id = properties.yksilointitieto;
       const coordinates = castedFeature.geometry.coordinates;
 
       if (!infraoObstacleSchema.isValidSync(castedFeature))
         return {
           type: 'Invalid',
           id: id,
-          properties: JSON.stringify(feature)
+          properties: {
+            reason: 'Does not match infraoObstacleSchema',
+            feature: JSON.stringify(feature)
+          }
         };
 
       return {
         type: 'Feature',
-        id: id,
+        id: castedFeature.id,
         properties: {
           TYPE: 'OBSTACLE',
-          ID: properties.yksilointitieto,
-          EST_TYYPPI: properties.malli === 'Puomi' ? 2 : 1
+          ID: String(id),
+          EST_TYYPPI: properties.malli === 'Pollari' ? 1 : 2
         },
         geometry: {
           type: 'Point',
@@ -54,10 +63,71 @@ const parseFeature = (
       };
     }
 
-    case 'infrao:Liikennemerkki':
-      //TODO: Implement
-      console.warn(`${assetType} not yet implemented in parseFeature`);
-      break;
+    case 'infrao:Liikennemerkki': {
+      const castedFeature = infraoTrafficSignSchema.cast(feature);
+      const properties = castedFeature.properties;
+      const id = properties.yksilointitieto;
+      const coordinates = castedFeature.geometry.coordinates;
+
+      if (!infraoTrafficSignSchema.isValidSync(castedFeature))
+        return {
+          type: 'Invalid',
+          id: id,
+          properties: {
+            reason: 'Does not match infraoTrafficSignSchema',
+            feature: JSON.stringify(feature)
+          }
+        };
+
+      // Clean this mess pls!!!
+      // v------------------ MESS ------------------v //
+      if (
+        !properties.liikennemerkkityyppi2020 ||
+        properties.liikennemerkkityyppi2020 === 'ei tiedossa'
+      ) {
+        properties.liikennemerkkityyppi2020 = oldTrafficSignMapping[
+          properties.liikennemerkkityyppi as keyof typeof oldTrafficSignMapping
+        ] as string;
+      }
+      if (!properties.liikennemerkkityyppi2020) {
+        return {
+          type: 'Invalid',
+          id: id,
+          properties: {
+            reason: 'Invalid liikennemerkkityyppi2020',
+            feature: JSON.stringify(feature)
+          }
+        };
+      }
+      // ^------------------------------------------^ //
+
+      return {
+        type: 'Feature',
+        id: castedFeature.id,
+        properties: {
+          TYPE:
+            properties.liikennemerkkityyppi2020[0] === 'H'
+              ? 'ADDITIONALPANEL'
+              : 'TRAFFICSIGN',
+          ID: String(id),
+          SUUNTIMA: properties.suunta ? properties.suunta * (180 / Math.PI) : 0,
+          LM_TYYPPI: properties.liikennemerkkityyppi2020,
+          ARVO: trafficSignsWithTextValue.includes(
+            properties.liikennemerkkityyppi2020
+          )
+            ? Number(properties.teksti)
+            : null,
+          TEKSTI: properties.teksti,
+          ...(!(properties.liikennemerkkityyppi2020[0] === 'H') && {
+            LISAKILVET: []
+          })
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: [coordinates[0], coordinates[1]]
+        }
+      };
+    }
 
     case 'infrao:KatualueenOsa':
       //TODO: Implement
@@ -69,9 +139,30 @@ const parseFeature = (
   }
   return {
     type: 'Invalid',
-    id: `Asset type not supported by parseFeature: ${assetType}`,
-    properties: JSON.stringify(feature)
+    id: -1,
+    properties: {
+      reason: `Asset type not supported by parseFeature: ${
+        assetType ?? 'undefined/null'
+      }`,
+      feature: JSON.stringify(feature)
+    }
   };
+};
+
+const matchAdditionalPanels = (
+  features: Array<Feature>
+): Array<ValidFeature> => {
+  const validFeatures = features.filter(
+    (f) => f.type === 'Feature'
+  ) as Array<ValidFeature>;
+  const additionalPanels = validFeatures.filter(
+    (f) => f.properties.TYPE === 'ADDITIONALPANEL'
+  );
+
+  //TODO: Implement additionalpanel matching (check src/functions/parseXML/datatypes/matchAdditionalPanels.ts)
+  console.log('Additional panels:', additionalPanels);
+
+  return [];
 };
 
 const fetchAndParseData = async (event: unknown) => {
@@ -97,7 +188,6 @@ const fetchAndParseData = async (event: unknown) => {
           event.url,
           apiKey
         );
-        console.log('GeoJSON:', geoJson);
         await uploadToS3(
           `dr-kunta-${stage}-bucket`,
           `geojson/${event.municipality}/${assetKey}/${new Date()
@@ -156,7 +246,9 @@ const fetchJsonData = async (
 
   while (true) {
     const { data }: { data: unknown } = await axios.get(
-      `${baseUrl}/collections/${assetType}/items?f=json&crs=http://www.opengis.net/def/crs/EPSG/0/3067&limit=${fetchSize}&offset=${
+      `${baseUrl}/collections/${
+        assetType as string
+      }/items?f=json&crs=http://www.opengis.net/def/crs/EPSG/0/3067&limit=${fetchSize}&offset=${
         page * fetchSize
       }${bbox}`,
       {
@@ -165,16 +257,20 @@ const fetchJsonData = async (
         }
       }
     );
-    const infraoFeatureCollection = await infraoJsonSchema.validate(data);
+    const infraoFeatureCollection = infraoJsonSchema.validateSync(data);
     const parsedFeatures: Array<Feature> = infraoFeatureCollection.features.map(
       (feature) => parseFeature(assetType, feature)
     );
-    const validFeatures = parsedFeatures.filter((f) => f.type === 'Feature');
+
+    const validFeatures =
+      assetType === 'infrao:Liikennemerkki'
+        ? matchAdditionalPanels(parsedFeatures)
+        : parsedFeatures.filter((f) => f.type === 'Feature');
     const invalidFeatures = parsedFeatures.filter((f) => f.type === 'Invalid');
 
     geoJson.features.push(...validFeatures);
     geoJson.invalidInfrao.sum += invalidFeatures.length;
-    geoJson.invalidInfrao.IDs.push(...invalidFeatures.map((f) => f.id));
+    geoJson.invalidInfrao.IDs.push(...invalidFeatures.map((f) => Number(f.id)));
 
     if (infraoFeatureCollection.numberReturned < fetchSize) break;
     page++;
@@ -193,7 +289,9 @@ const fetchXmlData = async (
 
   while (true) {
     const { data }: { data: unknown } = await axios.get(
-      `${baseUrl}/collections/${assetType}/items?f=xml&crs=http://www.opengis.net/def/crs/EPSG/0/3067&limit=${fetchSize}&offset=${
+      `${baseUrl}/collections/${
+        assetType as string
+      }/items?f=xml&crs=http://www.opengis.net/def/crs/EPSG/0/3067&limit=${fetchSize}&offset=${
         page * fetchSize
       }${bbox}`,
       {

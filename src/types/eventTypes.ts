@@ -42,7 +42,6 @@ interface AssetTypes {
   trafficSigns?: 'infrao:Liikennemerkki';
   roadSurfaces?: 'infrao:KatualueenOsa';
 }
-
 const isAssetTypes = (assetType: unknown): assetType is AssetTypes => {
   if (!assetType || typeof assetType !== 'object') return false;
 

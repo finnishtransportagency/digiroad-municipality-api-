@@ -1,4 +1,4 @@
-import { InferType, array, number, object, string } from 'yup';
+import { InferType, array, mixed, number, object, string } from 'yup';
 import {
   allowedAdditionalPanel,
   allowedTrafficSigns
@@ -9,9 +9,7 @@ import {
  * @field EST_TYYPPI: 1 = Suljettu yhteys, 2 = Avattava puomi
  */
 const obstaclePropertiesSchema = object().shape({
-  TYPE: string()
-    .required()
-    .matches(/(^OBSTACLE$)/),
+  TYPE: mixed().oneOf(['OBSTACLE']).required(),
   ID: string().required(),
   EST_TYYPPI: number().required().oneOf([1, 2])
 });
@@ -22,9 +20,7 @@ const obstaclePropertiesSchema = object().shape({
  * @field VARI: 1 = Sininen, 2 = Keltainen
  */
 const additionalPanelPropertiesSchema = object().shape({
-  TYPE: string()
-    .required()
-    .matches(/(^ADDITIONALPANEL$)/),
+  TYPE: mixed().oneOf(['ADDITIONALPANEL']).required(),
   ID: string().required(),
   SUUNTIMA: number().max(360).min(0),
   LM_TYYPPI: string().required().oneOf(allowedAdditionalPanel),
@@ -41,9 +37,7 @@ const additionalPanelPropertiesSchema = object().shape({
  * @field KOKO: 1 = Pienikokoinen merkki, 2 = Normaalikokoinen merkki (oletus), 3 = Suurikokoinen merkki
  */
 const trafficSignPropertiesSchema = object().shape({
-  TYPE: string()
-    .required()
-    .matches(/(^TRAFFICSIGN$)/),
+  TYPE: mixed().oneOf(['TRAFFICSIGN']).required(),
   ID: string().required(),
   SUUNTIMA: number().required().max(360).min(0),
   LM_TYYPPI: string().required().oneOf(allowedTrafficSigns),
@@ -53,18 +47,24 @@ const trafficSignPropertiesSchema = object().shape({
   RAKENNE: number().oneOf([1, 2, 3, 4, 5, 6]).notRequired(),
   KUNTO: number().oneOf([1, 2, 3, 4, 5]).notRequired(),
   KOKO: number().oneOf([1, 2, 3]).notRequired(),
-  LISAKILVET: array().of(additionalPanelPropertiesSchema).notRequired().max(5)
+  LISAKILVET: array()
+    .of(additionalPanelPropertiesSchema)
+    .when('LM_TYYPPI', {
+      is: (value: string) => value[0] === 'H',
+      then: (schema) => schema.notRequired(),
+      otherwise: (schema) => schema.required().max(5)
+    })
 });
 
-// TODO
-const surfacePropertiesSchema = object().shape({});
+// TODO implement all fields
+const surfacePropertiesSchema = object().shape({
+  TYPE: mixed().oneOf(['SURFACE']).required()
+});
 // ^------------------------------------------^ //
 
 // v--------------- GEOMETRIES ---------------v //
 const pointGeometrySchema = object().shape({
-  type: string()
-    .required()
-    .matches(/(^Point$)/),
+  type: mixed().oneOf(['Point']).required(),
   coordinates: array().of(number().required()).length(2).required()
 });
 
@@ -74,50 +74,50 @@ const areaGeometrySchema = object().shape({});
 
 // v---------------- FEATURES ----------------v //
 const obstacleFeatureSchema = object().shape({
-  type: string()
-    .required()
-    .matches(/(^Feature$)/),
+  type: mixed().oneOf(['Feature']).required(),
   id: string().required(),
   properties: obstaclePropertiesSchema,
   geometry: pointGeometrySchema.required()
 });
 
 const trafficSignFeatureSchema = object().shape({
-  type: string()
-    .required()
-    .matches(/(^Feature$)/),
+  type: mixed().oneOf(['Feature']).required(),
   id: string().required(),
   properties: trafficSignPropertiesSchema,
   geometry: pointGeometrySchema.required()
 });
 
 const additionalPanelFeatureSchema = object().shape({
-  type: string()
-    .required()
-    .matches(/(^Feature$)/),
+  type: mixed().oneOf(['Feature']).required(),
   id: string().required(),
   properties: additionalPanelPropertiesSchema,
   geometry: pointGeometrySchema.required()
 });
 
 const roadSurfaceFeatureSchema = object().shape({
-  type: string()
-    .required()
-    .matches(/(^Feature$)/),
+  type: mixed().oneOf(['Feature']).required(),
   id: string().required(),
   properties: surfacePropertiesSchema,
   geometry: areaGeometrySchema.required()
 });
 // ^------------------------------------------^ //
 
-type Feature =
-  | ((
-      | InferType<typeof obstacleFeatureSchema>
-      | InferType<typeof trafficSignFeatureSchema>
-      | InferType<typeof additionalPanelFeatureSchema>
-      | InferType<typeof roadSurfaceFeatureSchema>
-    ) & { type: 'Feature' })
-  | { type: 'Invalid'; id: string; properties: string };
+type ValidFeature =
+  | InferType<typeof obstacleFeatureSchema>
+  | InferType<typeof trafficSignFeatureSchema>
+  | InferType<typeof additionalPanelFeatureSchema>
+  | InferType<typeof roadSurfaceFeatureSchema>;
+
+interface InvalidFeature {
+  type: 'Invalid';
+  id: number;
+  properties: {
+    reason: string;
+    feature: string;
+  };
+}
+
+type Feature = ValidFeature | InvalidFeature;
 
 interface FeatureCollection {
   type: 'FeatureCollection';
@@ -131,11 +131,13 @@ interface FeatureCollection {
   features: Array<Feature>;
   invalidInfrao: {
     sum: number;
-    IDs: Array<string>;
+    IDs: Array<number>;
   };
 }
 
 export {
+  ValidFeature,
+  InvalidFeature,
   Feature,
   FeatureCollection,
   obstacleFeatureSchema,

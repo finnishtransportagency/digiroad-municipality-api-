@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import type { AWS } from '@serverless/typescript';
-import * as dotenv from 'dotenv'
-dotenv.config()
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 import {
   calculateDelta,
@@ -13,7 +13,8 @@ import {
   fetchMunicipalityData,
   createSchedule,
   listSchedules,
-  deleteSchedule
+  deleteSchedule,
+  fetchAndParseData
 } from '@functions/index';
 import { offline } from '@functions/config';
 
@@ -82,6 +83,7 @@ const serverlessConfiguration: AWS = {
   },
   // import the function via paths
   functions: {
+    fetchAndParseData,
     parseXML,
     calculateDelta,
     matchRoadLink,
@@ -649,7 +651,7 @@ const serverlessConfiguration: AWS = {
                     Resource: [
                       `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/matchRoadLink/*`,
                       `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/getNearbyLinksRequestPayload/*`
-                  ]
+                    ]
                   },
                   {
                     Effect: 'Allow',
