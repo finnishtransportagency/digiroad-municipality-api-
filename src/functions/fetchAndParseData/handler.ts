@@ -214,10 +214,10 @@ const matchAdditionalPanels = (
       'LISAKILVET' in mainPanel.properties &&
       mainPanel.properties.LISAKILVET.length > 0
     ) {
-      console.log(mainPanel.properties.LISAKILVET);
+      /* console.log(mainPanel.properties.LISAKILVET); */
     }
   }
-  console.log(additionalPanels.length);
+  /* console.log(additionalPanels.length); */
   /* console.log(rejectedAdditionalPanels); */
 
   return mainPanels;
@@ -320,10 +320,7 @@ const fetchJsonData = async (
       (feature) => parseFeature(assetType, feature)
     );
 
-    const validFeatures =
-      assetType === 'infrao:Liikennemerkki'
-        ? matchAdditionalPanels(parsedFeatures)
-        : parsedFeatures.filter((f) => f.type === 'Feature');
+    const validFeatures = parsedFeatures.filter((f) => f.type === 'Feature');
     const invalidFeatures = parsedFeatures.filter((f) => f.type === 'Invalid');
 
     geoJson.features.push(...validFeatures);
@@ -333,6 +330,23 @@ const fetchJsonData = async (
     if (infraoFeatureCollection.numberReturned < fetchSize) break;
     page++;
   }
+
+  if (assetType === 'infrao:Liikennemerkki') {
+    const matchedPanels = matchAdditionalPanels(geoJson.features);
+    geoJson.features = matchedPanels;
+  }
+
+  let panelCount = 0;
+  for (const panel of geoJson.features) {
+    if (
+      'LISAKILVET' in panel.properties &&
+      panel.properties.LISAKILVET.length > 0
+    ) {
+      console.log(panel.properties.LISAKILVET);
+      panelCount += panel.properties.LISAKILVET.length;
+    }
+  }
+  console.log('count:', panelCount);
 
   return geoJson;
 };
