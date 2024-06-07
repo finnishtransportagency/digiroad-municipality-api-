@@ -105,8 +105,8 @@ const roadSurfaceFeatureSchema = object().shape({
 type ValidFeature =
   | InferType<typeof obstacleFeatureSchema>
   | InferType<typeof trafficSignFeatureSchema>
-  | InferType<typeof additionalPanelFeatureSchema>
-  | InferType<typeof roadSurfaceFeatureSchema>;
+  | InferType<typeof additionalPanelFeatureSchema>;
+// | InferType<typeof roadSurfaceFeatureSchema>;
 
 interface InvalidFeature {
   type: 'Invalid';

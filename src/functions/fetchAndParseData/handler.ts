@@ -149,6 +149,23 @@ const parseFeature = (
   };
 };
 
+const getDistance = (
+  additionalPanelCoords: Array<number>,
+  mainPanelCoords: Array<number>
+): number => {
+  const dx = additionalPanelCoords[0] - mainPanelCoords[0];
+  const dy = additionalPanelCoords[1] - mainPanelCoords[1];
+  return Math.sqrt(dx * dx + dy * dy);
+};
+
+const similarBearing = (
+  additionalPanelBearing: number,
+  mainPanelBearing: number
+): boolean => {
+  const diff = Math.abs(additionalPanelBearing - mainPanelBearing);
+  return diff <= 45 || diff >= 315;
+};
+
 const matchAdditionalPanels = (
   features: Array<Feature>
 ): Array<ValidFeature> => {
@@ -158,11 +175,52 @@ const matchAdditionalPanels = (
   const additionalPanels = validFeatures.filter(
     (f) => f.properties.TYPE === 'ADDITIONALPANEL'
   );
+  const mainPanels = validFeatures.filter(
+    (f) => f.properties.TYPE !== 'ADDITIONALPANEL'
+  );
+  const rejectedAdditionalPanels: Array<Feature> = [];
+  for (const additionalPanel of additionalPanels) {
+    let matched = false;
+    for (const mainPanel of mainPanels) {
+      const distance = getDistance(
+        additionalPanel.geometry.coordinates,
+        mainPanel.geometry.coordinates
+      );
+      if (
+        'SUUNTIMA' in additionalPanel.properties &&
+        'SUUNTIMA' in mainPanel.properties
+      ) {
+        if (
+          distance <= 2 &&
+          similarBearing(
+            additionalPanel.properties.SUUNTIMA,
+            mainPanel.properties.SUUNTIMA
+          )
+        ) {
+          if ('LISAKILVET' in mainPanel.properties) {
+            mainPanel.properties.LISAKILVET.push(additionalPanel.properties);
+            matched = true;
+            break;
+          }
+        }
+      }
+    }
+    if (!matched) {
+      rejectedAdditionalPanels.push(additionalPanel);
+    }
+  }
+  for (const mainPanel of mainPanels) {
+    if (
+      'LISAKILVET' in mainPanel.properties &&
+      mainPanel.properties.LISAKILVET.length > 0
+    ) {
+      console.log(mainPanel.properties.LISAKILVET);
+    }
+  }
+  console.log(additionalPanels.length);
+  /* console.log(rejectedAdditionalPanels); */
 
-  //TODO: Implement additionalpanel matching (check src/functions/parseXML/datatypes/matchAdditionalPanels.ts)
-  console.log('Additional panels:', additionalPanels);
-
-  return [];
+  return mainPanels;
 };
 
 const fetchAndParseData = async (event: unknown) => {
