@@ -209,16 +209,8 @@ const matchAdditionalPanels = (
       rejectedAdditionalPanels.push(additionalPanel);
     }
   }
-  for (const mainPanel of mainPanels) {
-    if (
-      'LISAKILVET' in mainPanel.properties &&
-      mainPanel.properties.LISAKILVET.length > 0
-    ) {
-      /* console.log(mainPanel.properties.LISAKILVET); */
-    }
-  }
-  /* console.log(additionalPanels.length); */
-  /* console.log(rejectedAdditionalPanels); */
+
+  console.log(rejectedAdditionalPanels.length);
 
   return mainPanels;
 };
@@ -335,18 +327,6 @@ const fetchJsonData = async (
     const matchedPanels = matchAdditionalPanels(geoJson.features);
     geoJson.features = matchedPanels;
   }
-
-  let panelCount = 0;
-  for (const panel of geoJson.features) {
-    if (
-      'LISAKILVET' in panel.properties &&
-      panel.properties.LISAKILVET.length > 0
-    ) {
-      console.log(panel.properties.LISAKILVET);
-      panelCount += panel.properties.LISAKILVET.length;
-    }
-  }
-  console.log('count:', panelCount);
 
   return geoJson;
 };
