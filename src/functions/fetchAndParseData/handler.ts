@@ -188,7 +188,9 @@ const matchAdditionalPanels = (
       );
       if (
         'SUUNTIMA' in additionalPanel.properties &&
-        'SUUNTIMA' in mainPanel.properties
+        additionalPanel.properties.SUUNTIMA !== undefined &&
+        'SUUNTIMA' in mainPanel.properties &&
+        mainPanel.properties.SUUNTIMA !== undefined
       ) {
         if (
           distance <= 2 &&
@@ -197,7 +199,10 @@ const matchAdditionalPanels = (
             mainPanel.properties.SUUNTIMA
           )
         ) {
-          if ('LISAKILVET' in mainPanel.properties) {
+          if (
+            'LISAKILVET' in mainPanel.properties &&
+            mainPanel.properties.LISAKILVET !== undefined
+          ) {
             mainPanel.properties.LISAKILVET.push(additionalPanel.properties);
             matched = true;
             break;
