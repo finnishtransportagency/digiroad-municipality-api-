@@ -1,6 +1,6 @@
 import { array, date, mixed, number, object, string } from 'yup';
 import {
-  allowedTrafficSigns,
+  trafficSignRules,
   trafficSignsWithTextValue
 } from './trafficSignTypes';
 import { oldTrafficSignMapping } from './trafficSignMapping';

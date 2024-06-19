@@ -1,7 +1,7 @@
 import { InferType, array, mixed, number, object, string } from 'yup';
 import {
   allowedAdditionalPanel,
-  allowedTrafficSigns
+  trafficSignRules
 } from './trafficSignTypes';
 
 // v--------------- PROPERTIES ---------------v //
@@ -40,7 +40,7 @@ const trafficSignPropertiesSchema = object().shape({
   TYPE: mixed().oneOf(['TRAFFICSIGN']).required(),
   ID: string().required(),
   SUUNTIMA: number().required().max(360).min(0),
-  LM_TYYPPI: string().required().oneOf(allowedTrafficSigns),
+  LM_TYYPPI: string().required().oneOf(trafficSignRules),
   ARVO: number().notRequired(),
   TEKSTI: string().notRequired(),
   LISATIETO: string().notRequired(),
