@@ -1,8 +1,6 @@
 import { InferType, array, mixed, number, object, string } from 'yup';
-import {
-  allowedAdditionalPanel,
-  trafficSignRules
-} from './trafficSignTypes';
+import { trafficSignRules } from './trafficSignTypes';
+import { areaGeometrySchema, pointGeometrySchema } from './geometrySchema';
 
 // v--------------- PROPERTIES ---------------v //
 /**
@@ -62,16 +60,6 @@ const surfacePropertiesSchema = object().shape({
 });
 // ^------------------------------------------^ //
 
-// v--------------- GEOMETRIES ---------------v //
-const pointGeometrySchema = object().shape({
-  type: mixed().oneOf(['Point']).required(),
-  coordinates: array().of(number().required()).length(2).required()
-});
-
-// TODO
-const areaGeometrySchema = object().shape({});
-// ^------------------------------------------^ //
-
 // v---------------- FEATURES ----------------v //
 const obstacleFeatureSchema = object().shape({
   type: mixed().oneOf(['Feature']).required(),
@@ -106,7 +94,8 @@ type ValidFeature =
   | InferType<typeof obstacleFeatureSchema>
   | InferType<typeof trafficSignFeatureSchema>
   | InferType<typeof additionalPanelFeatureSchema>;
-// | InferType<typeof roadSurfaceFeatureSchema>;
+// TODO enable after implementing surfacePropertiesSchema & areaGeometrySchema
+//| InferType<typeof roadSurfaceFeatureSchema>;
 
 interface InvalidFeature {
   type: 'Invalid';

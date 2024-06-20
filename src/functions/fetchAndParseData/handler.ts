@@ -24,7 +24,7 @@ import {
   infraoTrafficSignSchema
 } from '@schemas/muniResponseSchema';
 import { oldTrafficSignMapping } from '@schemas/trafficSignMapping';
-import { trafficSignsWithTextValue } from '@schemas/trafficSignTypes';
+import { trafficSignRules } from '@schemas/trafficSignTypes';
 import axios from 'axios';
 
 const parseFeature = (
@@ -110,9 +110,11 @@ const parseFeature = (
               ? 'ADDITIONALPANEL'
               : 'TRAFFICSIGN',
           ID: String(id),
-          SUUNTIMA: properties.suunta ? properties.suunta * (180 / Math.PI) : 0,
+          SUUNTIMA: properties.suunta
+            ? properties.suunta * (180 / Math.PI)
+            : undefined,
           LM_TYYPPI: properties.liikennemerkkityyppi2020,
-          ARVO: trafficSignsWithTextValue.includes(
+          ARVO: Object.keys(trafficSignRules).includes(
             properties.liikennemerkkityyppi2020
           )
             ? Number(properties.teksti)
