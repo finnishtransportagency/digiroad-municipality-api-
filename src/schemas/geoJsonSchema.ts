@@ -1,5 +1,5 @@
 import { InferType, array, mixed, number, object, string } from 'yup';
-import { trafficSignRules } from './trafficSignTypes';
+import { createTrafficSignText, trafficSignRules } from './trafficSignTypes';
 import { areaGeometrySchema, pointGeometrySchema } from './geometrySchema';
 
 // v--------------- PROPERTIES ---------------v //
@@ -21,7 +21,18 @@ const additionalPanelPropertiesSchema = object().shape({
   TYPE: mixed().oneOf(['ADDITIONALPANEL']).required(),
   ID: string().required(),
   SUUNTIMA: number().max(360).min(0),
-  LM_TYYPPI: string().required().oneOf(allowedAdditionalPanel),
+  LM_TYYPPI: string()
+    .required()
+    .oneOf(
+      Object.keys(trafficSignRules)
+        .filter(
+          (trafficSignCode) =>
+            trafficSignRules[trafficSignCode as keyof typeof trafficSignRules]
+              .type === 'ADDITIONALPANEL'
+        )
+        .map(createTrafficSignText)
+    ),
+  // TODO: specify the range of ARVO when max and/or min values are known (trafficSignRules)
   ARVO: number().notRequired(),
   TEKSTI: string().notRequired(),
   KOKO: number().oneOf([1, 2, 3]).notRequired(),
@@ -37,10 +48,21 @@ const additionalPanelPropertiesSchema = object().shape({
 const trafficSignPropertiesSchema = object().shape({
   TYPE: mixed().oneOf(['TRAFFICSIGN']).required(),
   ID: string().required(),
-  SUUNTIMA: number().required().max(360).min(0),
-  LM_TYYPPI: string().required().oneOf(trafficSignRules),
+  SUUNTIMA: number().notRequired().max(360).min(0),
+  LM_TYYPPI: string()
+    .required()
+    .oneOf(
+      Object.keys(trafficSignRules)
+        .filter(
+          (trafficSignCode) =>
+            trafficSignRules[trafficSignCode as keyof typeof trafficSignRules]
+              .type === 'TRAFFICSIGN'
+        )
+        .map(createTrafficSignText)
+    ),
+  // TODO: specify the range of ARVO when max and/or min values are known (trafficSignRules)
   ARVO: number().notRequired(),
-  TEKSTI: string().notRequired(),
+  TEKSTI: string().max(128).notRequired(),
   LISATIETO: string().notRequired(),
   RAKENNE: number().oneOf([1, 2, 3, 4, 5, 6]).notRequired(),
   KUNTO: number().oneOf([1, 2, 3, 4, 5]).notRequired(),

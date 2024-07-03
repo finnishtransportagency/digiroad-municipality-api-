@@ -16,15 +16,18 @@ import { getParameter } from '@libs/ssm-tools';
 import {
   Feature,
   FeatureCollection,
-  ValidFeature
+  ValidFeature,
+  trafficSignFeatureSchema
 } from '@schemas/geoJsonSchema';
 import {
   infraoJsonSchema,
   infraoObstacleSchema,
   infraoTrafficSignSchema
 } from '@schemas/muniResponseSchema';
-import { oldTrafficSignMapping } from '@schemas/trafficSignMapping';
-import { trafficSignRules } from '@schemas/trafficSignTypes';
+import {
+  createTrafficSignText,
+  trafficSignRules
+} from '@schemas/trafficSignTypes';
 import axios from 'axios';
 
 const parseFeature = (
@@ -67,7 +70,6 @@ const parseFeature = (
       const castedFeature = infraoTrafficSignSchema.cast(feature);
       const properties = castedFeature.properties;
       const id = properties.yksilointitieto;
-      const coordinates = castedFeature.geometry.coordinates;
 
       if (!infraoTrafficSignSchema.isValidSync(castedFeature))
         return {
@@ -79,48 +81,41 @@ const parseFeature = (
           }
         };
 
-      // Clean this mess pls!!!
-      // v------------------ MESS ------------------v //
-      if (
-        !properties.liikennemerkkityyppi2020 ||
-        properties.liikennemerkkityyppi2020 === 'ei tiedossa'
-      ) {
-        properties.liikennemerkkityyppi2020 = oldTrafficSignMapping[
-          properties.liikennemerkkityyppi as keyof typeof oldTrafficSignMapping
-        ] as string;
-      }
-      if (!properties.liikennemerkkityyppi2020) {
+      //console.log('properties:', properties);
+      const trafficSignCode =
+        properties.liikennemerkkityyppi2020 === 'INVALID_CODE'
+          ? properties.liikennemerkkityyppi
+          : properties.liikennemerkkityyppi2020;
+      //console.log('trafficSignCode:', trafficSignCode);
+
+      if (trafficSignCode === 'INVALID_CODE')
         return {
           type: 'Invalid',
           id: id,
           properties: {
-            reason: 'Invalid liikennemerkkityyppi2020',
+            reason: 'Invalid liikennemerkkityyppi & liikennemerkkityyppi2020',
             feature: JSON.stringify(feature)
           }
         };
-      }
-      // ^------------------------------------------^ //
 
-      return {
+      const coordinates = castedFeature.geometry.coordinates;
+      const geoJson = trafficSignFeatureSchema.cast({
         type: 'Feature',
         id: castedFeature.id,
         properties: {
-          TYPE:
-            properties.liikennemerkkityyppi2020[0] === 'H'
-              ? 'ADDITIONALPANEL'
-              : 'TRAFFICSIGN',
+          TYPE: trafficSignCode[0] === 'H' ? 'ADDITIONALPANEL' : 'TRAFFICSIGN',
           ID: String(id),
           SUUNTIMA: properties.suunta
             ? properties.suunta * (180 / Math.PI)
-            : undefined,
-          LM_TYYPPI: properties.liikennemerkkityyppi2020,
+            : null,
+          LM_TYYPPI: createTrafficSignText(trafficSignCode),
           ARVO: Object.keys(trafficSignRules).includes(
             properties.liikennemerkkityyppi2020
           )
             ? Number(properties.teksti)
             : null,
           TEKSTI: properties.teksti,
-          ...(!(properties.liikennemerkkityyppi2020[0] === 'H') && {
+          ...(!(trafficSignCode[0] === 'H') && {
             LISAKILVET: []
           })
         },
@@ -128,7 +123,11 @@ const parseFeature = (
           type: 'Point',
           coordinates: [coordinates[0], coordinates[1]]
         }
-      };
+      });
+
+      // TODO: Validate geoJson
+
+      return geoJson;
     }
 
     case 'infrao:KatualueenOsa':
@@ -168,6 +167,12 @@ const similarBearing = (
   return diff <= 45 || diff >= 315;
 };
 
+/**
+ * Goes through all traffic signs and adds additional panels to the main signs LISAKILVET array
+ *
+ * @param features All traffic signs to be matched
+ * @returns Main traffic signs with additional panels added to them
+ */
 const matchAdditionalPanels = (
   features: Array<Feature>
 ): Array<ValidFeature> => {
@@ -217,8 +222,6 @@ const matchAdditionalPanels = (
     }
   }
 
-  console.log(rejectedAdditionalPanels.length);
-
   return mainPanels;
 };
 
@@ -264,7 +267,7 @@ const fetchAndParseData = async (event: unknown) => {
         console.log('XML dataArray:', dataArray);
         // TODO: Parse XML data
         // TODO: Save GeoJSON to S3
-        console.log(`${event.format} parsing not yet implemented`);
+        console.warn(`${event.format} parsing not yet implemented`);
         break;
       }
 

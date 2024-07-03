@@ -1,5 +1,7 @@
 import { array, date, mixed, number, object, string } from 'yup';
 import { pointGeometrySchema } from './geometrySchema';
+import { trafficSignRules } from './trafficSignTypes';
+import { trafficSignMapping } from './trafficSignMapping';
 
 /**
  * Shallow check for the most important fields.
@@ -41,9 +43,23 @@ const infraoTrafficSignSchema = object({
     suunta: number().notRequired().max(360).min(0),
     // TODO: required when liikennemerkkityyppi is speed limit sign
     teksti: string().notRequired(),
-    // TODO: implement conditional formatting for new traffic sign codes
-    liikennemerkkityyppi: string(),
-    liikennemerkkityyppi2020: string().required()
+    liikennemerkkityyppi: string()
+      .transform((code: string) => {
+        const splitType = code.trim().split(' '); // e.g. ['A10'] or ['141.a', 'Töyssyjä']
+        const code2020 = splitType[0];
+        if (Object.keys(trafficSignRules).includes(code2020)) return code2020;
+        const mapping = trafficSignMapping[code2020.split('.')[0]]; // This split might not work for all cases
+        if (!mapping) return 'INVALID_CODE';
+        if (mapping.hasSubCode)
+          return mapping.code[splitType[1]] ?? 'INVALID_CODE';
+        return mapping.code.default ?? 'INVALID_CODE';
+      })
+      .required(),
+    liikennemerkkityyppi2020: string()
+      .transform((code: string) =>
+        Object.keys(trafficSignRules).includes(code) ? code : 'INVALID_CODE'
+      )
+      .required()
   }).required()
 }).required();
 

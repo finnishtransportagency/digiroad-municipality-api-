@@ -3,7 +3,7 @@ import {
   InvokeCommandOutput,
   Lambda
 } from '@aws-sdk/client-lambda';
-import { offline } from '@functions/config';
+import { offline, stage } from '@functions/config';
 import middy from '@middy/core';
 import middyJsonBodyParser from '@middy/http-json-body-parser';
 import { Handler } from 'aws-lambda';
@@ -27,7 +27,7 @@ export const invokeLambda = async (
 ): Promise<InvokeCommandOutput> =>
   await lambda.send(
     new InvokeCommand({
-      FunctionName: `DRKunta-${process.env.STAGE_NAME}-${FunctionName}`,
+      FunctionName: `DRKunta-${stage}-${FunctionName}`,
       InvocationType,
       Payload
     })

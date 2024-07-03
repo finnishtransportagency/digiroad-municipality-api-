@@ -1,4 +1,24 @@
-export const trafficSignRules = {
+/**
+ * Creates a string from the traffic sign code corresponding to the value in Digiroad database.
+ * @param trafficSignCode e.g. 'A1.1'
+ * @returns e.g. 'A1.1 Mutka oikealle'
+ */
+export const createTrafficSignText = (
+  trafficSignCode: keyof typeof trafficSignRules
+): string => `${trafficSignCode} ${trafficSignRules[trafficSignCode].text}`;
+
+interface TrafficSignRules {
+  [key: string]: {
+    text: string;
+    type: 'TRAFFICSIGN' | 'ADDITIONALPANEL';
+    allowedOnKapy: boolean;
+    maxValue: number | null;
+    minValue: number | null;
+    unit: string | null;
+  };
+}
+
+export const trafficSignRules: TrafficSignRules = {
   'A1.1': {
     text: 'Mutka oikealle',
     type: 'TRAFFICSIGN',
@@ -1729,10 +1749,9 @@ export const trafficSignRules = {
   },
   F33: {
     text: 'Kehätien numero',
-    maxValues: 100000,
+    maxValue: 100000,
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
-    maxValue: null,
     minValue: null,
     unit: null
   },
