@@ -1,4 +1,4 @@
-export const offline = process.env.OFFLINE || false;
+export const offline = process.env.OFFLINE === 'true';
 export const stage = process.env.STAGE_NAME || 'dev';
 export const pghost = process.env.PGHOST || 'localhost';
 export const pgport = process.env.PGPORT || '5432';
