@@ -107,14 +107,17 @@ const parseFeature = (
             ID: String(id),
             SUUNTIMA: properties.suunta
               ? properties.suunta * (180 / Math.PI)
-              : null,
+              : 0,
             LM_TYYPPI: createTrafficSignText(trafficSignCode),
+            // TODO: Set ARVO only on corresponding traffic signs. e.g. speed limit signs (check trafficSignRules)
             ARVO: Object.keys(trafficSignRules).includes(
               properties.liikennemerkkityyppi2020
             )
               ? Number(properties.teksti)
               : null,
-            TEKSTI: properties.teksti,
+            TEKSTI: properties.teksti
+              ? properties.teksti.substring(0, 128)
+              : properties.teksti,
             ...(!(trafficSignCode[0] === 'H') && {
               LISAKILVET: []
             })

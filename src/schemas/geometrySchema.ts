@@ -11,6 +11,6 @@ const pointGeometrySchema = object({
 }).required();
 
 // TODO
-const areaGeometrySchema = object().shape({}).required();
+const areaGeometrySchema = object({}).required();
 
 export { pointGeometrySchema, areaGeometrySchema };

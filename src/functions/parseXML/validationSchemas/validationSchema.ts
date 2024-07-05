@@ -1,8 +1,8 @@
 import * as yup from 'yup';
 import {
-  allowedAdditionalPanel,
+  allowedAdditionalPanels,
   allowedTrafficSigns
-} from './trafficSignTypes.js';
+} from '@schemas/trafficSignTypes.js';
 
 const additionalPanelPropertiesSchema = yup.object().shape({
   TYPE: yup
@@ -11,7 +11,7 @@ const additionalPanelPropertiesSchema = yup.object().shape({
     .matches(/(^ADDITIONALPANEL$)/),
   ID: yup.string().required(),
   SUUNTIMA: yup.number().max(360).min(0),
-  LM_TYYPPI: yup.string().required().oneOf(allowedAdditionalPanel),
+  LM_TYYPPI: yup.string().required().oneOf(allowedAdditionalPanels),
   ARVO: yup.number().notRequired(),
   TEKSTI: yup.string().notRequired(),
   KOKO: yup.number().oneOf([1, 2, 3]).notRequired(),

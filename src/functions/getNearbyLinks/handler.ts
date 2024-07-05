@@ -12,10 +12,7 @@ import {
 import { getParameter } from '@libs/ssm-tools';
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
 import { S3KeyObject } from '@functions/typing';
-import {
-  createTrafficSignText,
-  trafficSignRules
-} from '@schemas/trafficSignTypes';
+import { allowedOnKapy } from '@schemas/trafficSignTypes';
 
 const getNearbyLinks = async (event: S3KeyObject) => {
   const data = await getFromS3(
@@ -59,13 +56,7 @@ const getNearbyLinks = async (event: S3KeyObject) => {
     values: [
       requestPayload.municipality,
       JSON.stringify(requestPayload.features),
-      Object.keys(trafficSignRules)
-        .filter(
-          (trafficSignCode) =>
-            trafficSignRules[trafficSignCode as keyof typeof trafficSignRules]
-              .allowedOnKapy
-        )
-        .map(createTrafficSignText)
+      allowedOnKapy
     ]
   };
   const areaQuery = {

@@ -19,15 +19,13 @@ const infraoObstacleSchema = object({
     .matches(/(^\D+\.\d+$)/)
     .required(), // e.g. "Rakenne.123456789"
   geometry: pointGeometrySchema.required(),
-  properties: object()
-    .shape({
-      yksilointitieto: number().required(),
-      alkuHetki: date().required(),
-      loppuHetki: date().min(new Date()).notRequired(),
-      malli: mixed().oneOf(['Pollari', 'Puomi']).required(),
-      rakenne: mixed().oneOf(['kulkuesteet (pollarit, puomit)']).required()
-    })
-    .required()
+  properties: object({
+    yksilointitieto: number().required(),
+    alkuHetki: date().required(),
+    loppuHetki: date().min(new Date()).notRequired(),
+    malli: mixed().oneOf(['Pollari', 'Puomi']).required(),
+    rakenne: mixed().oneOf(['kulkuesteet (pollarit, puomit)']).required()
+  }).required()
 }).required();
 
 const infraoTrafficSignSchema = object({

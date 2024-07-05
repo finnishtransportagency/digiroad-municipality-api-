@@ -1,12 +1,3 @@
-/**
- * Creates a string from the traffic sign code corresponding to the value in Digiroad database.
- * @param trafficSignCode e.g. 'A1.1'
- * @returns e.g. 'A1.1 Mutka oikealle'
- */
-export const createTrafficSignText = (
-  trafficSignCode: keyof typeof trafficSignRules
-): string => `${trafficSignCode} ${trafficSignRules[trafficSignCode].text}`;
-
 interface TrafficSignRules {
   [key: string]: {
     text: string;
@@ -2948,3 +2939,41 @@ export const trafficSignRules: TrafficSignRules = {
     unit: null
   }
 };
+
+/**
+ * Creates a string from the traffic sign code corresponding to the value in Digiroad database.
+ * @param trafficSignCode e.g. 'A1.1'
+ * @returns e.g. 'A1.1 Mutka oikealle'
+ */
+export const createTrafficSignText = (trafficSignCode: string): string =>
+  `${trafficSignCode} ${trafficSignRules[trafficSignCode].text}`;
+
+/**
+ * Traffic sign codes allowed in Digiroad database.
+ * @example ['A1.1 Mutka oikealle', 'A1.2 Mutka vasemmalle', ...]
+ */
+export const allowedTrafficSigns = Object.keys(trafficSignRules)
+  .filter(
+    (trafficSignCode) =>
+      trafficSignRules[trafficSignCode].type === 'TRAFFICSIGN'
+  )
+  .map(createTrafficSignText);
+
+/**
+ * Additional panel codes allowed in Digiroad database.
+ * @example ['H1 Kohde risteävässä suunnassa', 'H2.1 Kohde nuolen suunnassa', ...]
+ */
+export const allowedAdditionalPanels = Object.keys(trafficSignRules)
+  .filter(
+    (trafficSignCode) =>
+      trafficSignRules[trafficSignCode].type === 'ADDITIONALPANEL'
+  )
+  .map(createTrafficSignText);
+
+/**
+ * Traffic sign codes for traffic signs allowed on pedestrian and cycle paths.
+ * @example ['A11 Tietyö', 'A21 Tienristeys', ...]
+ */
+export const allowedOnKapy = Object.keys(trafficSignRules)
+  .filter((trafficSignCode) => trafficSignRules[trafficSignCode].allowedOnKapy)
+  .map(createTrafficSignText);

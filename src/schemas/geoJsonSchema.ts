@@ -1,12 +1,15 @@
 import { InferType, array, mixed, number, object, string } from 'yup';
-import { createTrafficSignText, trafficSignRules } from './trafficSignTypes';
+import {
+  allowedAdditionalPanels,
+  allowedTrafficSigns
+} from '@schemas/trafficSignTypes';
 import { areaGeometrySchema, pointGeometrySchema } from './geometrySchema';
 
 // v--------------- PROPERTIES ---------------v //
 /**
  * @field EST_TYYPPI: 1 = Suljettu yhteys, 2 = Avattava puomi
  */
-const obstaclePropertiesSchema = object().shape({
+const obstaclePropertiesSchema = object({
   TYPE: mixed().oneOf(['OBSTACLE']).required(),
   ID: string().required(),
   EST_TYYPPI: number().required().oneOf([1, 2])
@@ -17,21 +20,11 @@ const obstaclePropertiesSchema = object().shape({
  * @field KALVON_TYYPPI: 1 = R1-luokan kalvo, 2 = R2-luokan kalvo, 3 = R3-luokan kalvo
  * @field VARI: 1 = Sininen, 2 = Keltainen
  */
-const additionalPanelPropertiesSchema = object().shape({
+const additionalPanelPropertiesSchema = object({
   TYPE: mixed().oneOf(['ADDITIONALPANEL']).required(),
   ID: string().required(),
-  SUUNTIMA: number().max(360).min(0),
-  LM_TYYPPI: string()
-    .required()
-    .oneOf(
-      Object.keys(trafficSignRules)
-        .filter(
-          (trafficSignCode) =>
-            trafficSignRules[trafficSignCode as keyof typeof trafficSignRules]
-              .type === 'ADDITIONALPANEL'
-        )
-        .map(createTrafficSignText)
-    ),
+  SUUNTIMA: number().required().max(360).min(0),
+  LM_TYYPPI: string().required().oneOf(allowedAdditionalPanels),
   // TODO: specify the range of ARVO when max and/or min values are known (trafficSignRules)
   ARVO: number().notRequired(),
   TEKSTI: string().notRequired(),
@@ -45,21 +38,11 @@ const additionalPanelPropertiesSchema = object().shape({
  * @field KUNTO: 1 = Erittäin huono, 2 = Huono, 3 = Tyydyttävä, 4 = Hyvä, 5 = Erittäin hyvä
  * @field KOKO: 1 = Pienikokoinen merkki, 2 = Normaalikokoinen merkki (oletus), 3 = Suurikokoinen merkki
  */
-const trafficSignPropertiesSchema = object().shape({
+const trafficSignPropertiesSchema = object({
   TYPE: mixed().oneOf(['TRAFFICSIGN']).required(),
   ID: string().required(),
-  SUUNTIMA: number().notRequired().max(360).min(0),
-  LM_TYYPPI: string()
-    .required()
-    .oneOf(
-      Object.keys(trafficSignRules)
-        .filter(
-          (trafficSignCode) =>
-            trafficSignRules[trafficSignCode as keyof typeof trafficSignRules]
-              .type === 'TRAFFICSIGN'
-        )
-        .map(createTrafficSignText)
-    ),
+  SUUNTIMA: number().required().max(360).min(0),
+  LM_TYYPPI: string().required().oneOf(allowedTrafficSigns),
   // TODO: specify the range of ARVO when max and/or min values are known (trafficSignRules)
   ARVO: number().notRequired(),
   TEKSTI: string().max(128).notRequired(),
@@ -77,34 +60,34 @@ const trafficSignPropertiesSchema = object().shape({
 });
 
 // TODO implement all fields
-const surfacePropertiesSchema = object().shape({
+const surfacePropertiesSchema = object({
   TYPE: mixed().oneOf(['SURFACE']).required()
 });
 // ^------------------------------------------^ //
 
 // v---------------- FEATURES ----------------v //
-const obstacleFeatureSchema = object().shape({
+const obstacleFeatureSchema = object({
   type: mixed().oneOf(['Feature']).required(),
   id: string().required(),
   properties: obstaclePropertiesSchema,
   geometry: pointGeometrySchema.required()
 });
 
-const trafficSignFeatureSchema = object().shape({
+const trafficSignFeatureSchema = object({
   type: mixed().oneOf(['Feature']).required(),
   id: string().required(),
   properties: trafficSignPropertiesSchema,
   geometry: pointGeometrySchema.required()
 });
 
-const additionalPanelFeatureSchema = object().shape({
+const additionalPanelFeatureSchema = object({
   type: mixed().oneOf(['Feature']).required(),
   id: string().required(),
   properties: additionalPanelPropertiesSchema,
   geometry: pointGeometrySchema.required()
 });
 
-const roadSurfaceFeatureSchema = object().shape({
+const roadSurfaceFeatureSchema = object({
   type: mixed().oneOf(['Feature']).required(),
   id: string().required(),
   properties: surfacePropertiesSchema,
