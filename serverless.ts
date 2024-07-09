@@ -19,7 +19,7 @@ import {
 import { offline } from '@functions/config';
 
 const serverlessConfiguration: AWS = {
-  service: 'DRKunta',
+  service: 'dr-kunta',
   frameworkVersion: '3',
   plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-s3-local'],
   provider: {
@@ -61,9 +61,9 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       STAGE_NAME: process.env.STAGE_NAME,
       OPERATOR_EMAIL: process.env.OPERATOR_EMAIL,
-      DIGIROADSECURITYGROUPID: process.env.DIGIROADSECURITYGROUPID,
-      DIGIROADSUBNETAID: process.env.DIGIROADSUBNETAID,
-      DIGIROADSUBNETBID: process.env.DIGIROADSUBNETBID,
+      DR_SECURITY_GROUP_ID: process.env.DR_SECURITY_GROUP_ID,
+      DR_SUBNET_ID_1 : process.env.DR_SUBNET_ID_1,
+      DR_SUBNET_ID_2 : process.env.DR_SUBNET_ID_2 ,
       AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID
     },
     region: 'eu-west-1',
@@ -72,13 +72,13 @@ const serverlessConfiguration: AWS = {
       endpointType: 'PRIVATE',
       vpcEndpointIds: [{ Ref: 'drKuntaEndpoint' }],
       vpc: {
-        securityGroupIds: [process.env.SECURITYGROUPID],
-        subnetIds: [process.env.SUBNETAID, process.env.SUBNETBID]
+        securityGroupIds: [process.env.SECURITY_GROUP_ID],
+        subnetIds: [process.env.SUBNET_ID_1, process.env.SUBNET_ID_2]
       }
     }),
     vpc: {
-      securityGroupIds: [process.env.SECURITYGROUPID],
-      subnetIds: [process.env.SUBNETAID, process.env.SUBNETBID]
+      securityGroupIds: [process.env.SECURITY_GROUP_ID],
+      subnetIds: [process.env.SUBNET_ID_1, process.env.SUBNET_ID_2]
     }
   },
   // import the function via paths
@@ -134,7 +134,7 @@ const serverlessConfiguration: AWS = {
             PrivateDnsEnabled: false,
             SecurityGroupIds: [{ Ref: 'VpceSecurityGroup' }],
             ServiceName: 'com.amazonaws.eu-west-1.execute-api',
-            SubnetIds: [process.env.SUBNETAID, process.env.SUBNETBID],
+            SubnetIds: [process.env.SUBNET_ID_1, process.env.SUBNET_ID_2],
             VpcEndpointType: 'Interface',
             VpcId: process.env.VPCID,
             PolicyDocument: {

@@ -5,8 +5,8 @@ export default {
   maximumRetryAttempts: 0,
   timeout: 300,
   vpc: {
-    securityGroupIds: [process.env.DIGIROADSECURITYGROUPID],
-    subnetIds: [process.env.DIGIROADSUBNETAID, process.env.DIGIROADSUBNETBID]
+    securityGroupIds: [process.env.DR_SECURITY_GROUP_ID],
+    subnetIds: [process.env.DR_SUBNET_ID_1 , process.env.DR_SUBNET_ID_2 ]
   },
   environment: {
     PGHOST: process.env.PGHOST,
