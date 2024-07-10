@@ -1,3 +1,4 @@
+import { stage } from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 
 export default {
@@ -9,7 +10,7 @@ export default {
       http: {
         method: 'post',
         path: 'admin/add',
-        private: process.env.STAGE_NAME === 'dev'
+        private: stage === 'dev'
       }
     }
   ]

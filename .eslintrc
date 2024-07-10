@@ -2,7 +2,7 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    //"project": "./tsconfig.json",
+    "project": "./tsconfig.json",
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint", "prettier"],
@@ -17,7 +17,8 @@
     "no-var": 0,
     "prettier/prettier": 2,
     "@typescript-eslint/array-type": ["error", { "default": "generic" }],
-    "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
+    "@typescript-eslint/consistent-type-definitions": "error",
     "no-constant-condition": 0
-  }
+  },
+  "ignorePatterns": ["dist/", "node_modules/", "testFiles/"]
 }

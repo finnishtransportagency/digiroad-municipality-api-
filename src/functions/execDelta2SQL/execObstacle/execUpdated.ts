@@ -8,8 +8,7 @@ export default async function execUpdatedObstacle(
   dbmodifier: string,
   client: Client
 ) {
-  const obstacleProperties: ObstacleProperties =
-    feature.properties as ObstacleProperties;
+  const obstacleProperties: ObstacleProperties = feature.properties as ObstacleProperties;
 
   const assetTypeID = 220;
 

@@ -1,3 +1,4 @@
+import { smtppassword, smtpusername } from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 
 export default {
@@ -5,8 +6,8 @@ export default {
   maximumRetryAttempts: 0,
   package: { include: ['src/**/*.ejs'] },
   environment: {
-    SMTP_USERNAME_SSM_KEY: process.env.SMTP_USERNAME_SSM_KEY,
-    SMTP_PASSWORD_SSM_KEY: process.env.SMTP_PASSWORD_SSM_KEY
+    SMTP_USERNAME_SSM_KEY: smtpusername,
+    SMTP_PASSWORD_SSM_KEY: smtppassword
   },
   role: 'reportRejectedDeltaRole'
 };

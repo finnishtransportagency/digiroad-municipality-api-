@@ -17,11 +17,7 @@ export default function (
     const endPoint = linkCoordinates[i + 1];
     const lineOnLink = geomFactory.createLineString([startPoint, endPoint]);
     pointPairDistance.initialize();
-    DistanceToPoint.computeDistance(
-      lineOnLink,
-      featureCoordinates,
-      pointPairDistance
-    );
+    DistanceToPoint.computeDistance(lineOnLink, featureCoordinates, pointPairDistance);
 
     if (pointPairDistance.getDistance() !== distanceToFeature) {
       mValue += lineOnLink.getLength();

@@ -31,8 +31,7 @@ export default function (
   let minDistance = Number.MAX_VALUE;
   let minRoadAngle: number;
   let closestLink: LinkObject;
-  let closestLinkCoordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> =
-    [];
+  let closestLinkCoordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> = [];
   let closestPointOnLink: jsts.org.locationtech.jts.geom.Coordinate;
 
   function getAngle(start: LinkPoint, end: LinkPoint) {
@@ -63,16 +62,8 @@ export default function (
             (roadlink.directiontype === 2 && !towardsDigitizing));
       }
       if (accepted) {
-        const startCoordinates = new Coordinate(
-          startPoint.x,
-          startPoint.y,
-          startPoint.z
-        );
-        const endCoordinates = new Coordinate(
-          endPoint.x,
-          endPoint.y,
-          endPoint.z
-        );
+        const startCoordinates = new Coordinate(startPoint.x, startPoint.y, startPoint.z);
+        const endCoordinates = new Coordinate(endPoint.x, endPoint.y, endPoint.z);
         const lineString = geomFactory.createLineString([
           startCoordinates,
           endCoordinates
@@ -84,8 +75,7 @@ export default function (
         );
         const distance = pointPairDistance.getDistance();
         if (distance < minDistance && distance < 10) {
-          const coordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> =
-            [];
+          const coordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> = [];
           for (let k = 0; k < roadlinkPoints.length; k++) {
             const point = roadlinkPoints[k];
             coordinates[k] = new Coordinate(point.x, point.y, point.z);

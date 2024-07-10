@@ -2,7 +2,7 @@ import { middyfy } from '@libs/lambda-tools';
 import { createTransport } from 'nodemailer';
 import * as ejs from 'ejs';
 import * as path from 'path';
-import { offline } from '@functions/config';
+import { email, offline, smtppassword, smtpusername, stage } from '@functions/config';
 import { getParameter } from '@libs/ssm-tools';
 
 interface ReportRejectedDeltaEvent {
@@ -22,16 +22,16 @@ const reportRejectedDelta = async (event: ReportRejectedDeltaEvent) => {
     host: 'email-smtp.eu-west-1.amazonaws.com',
     port: 587,
     auth: {
-      user: await getParameter(process.env.SMTP_USERNAME_SSM_KEY),
-      pass: await getParameter(process.env.SMTP_PASSWORD_SSM_KEY)
+      user: await getParameter(smtpusername),
+      pass: await getParameter(smtppassword)
     }
   });
   let templateName: string;
   let emailSubject: string;
 
   let subjectHeader = '';
-  if (process.env.STAGE_NAME === 'dev') subjectHeader = '[DEV]';
-  if (process.env.STAGE_NAME === 'test') subjectHeader = '[TEST]';
+  if (stage === 'dev') subjectHeader = '[DEV]';
+  if (stage === 'test') subjectHeader = '[TEST]';
 
   switch (event.ReportType) {
     case 'invalidData':
@@ -46,9 +46,9 @@ const reportRejectedDelta = async (event: ReportRejectedDeltaEvent) => {
       return;
   }
 
-  const recipients = process.env.OPERATOR_EMAIL.split(',');
-  event.Body.stage = process.env.STAGE_NAME;
-  event.Body.link = `https://s3.console.aws.amazon.com/s3/object/dr-kunta-${process.env.STAGE_NAME}-bucket?region=eu-west-1&prefix=logs/${event.Municipality}/${event.Body.now}.json`;
+  const recipients = email.split(',');
+  event.Body.stage = stage;
+  event.Body.link = `https://s3.console.aws.amazon.com/s3/object/dr-kunta-${stage}-bucket?region=eu-west-1&prefix=logs/${event.Municipality}/${event.Body.now}.json`;
   const municipalityEmail = await ejs.renderFile(
     path.resolve(__dirname, './templates/' + templateName),
     event

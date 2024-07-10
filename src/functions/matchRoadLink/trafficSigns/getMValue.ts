@@ -32,11 +32,7 @@ export default function (
     const endPoint = linkCoordinates[i + 1];
     const lineOnLink = geomFactory.createLineString([startPoint, endPoint]);
     pointPairDistance.initialize();
-    DistanceToPoint.computeDistance(
-      lineOnLink,
-      featureCoordinates,
-      pointPairDistance
-    );
+    DistanceToPoint.computeDistance(lineOnLink, featureCoordinates, pointPairDistance);
 
     if (pointPairDistance.getDistance() !== distanceToFeature) {
       mValue += lineOnLink.getLength();
@@ -67,22 +63,13 @@ export default function (
 
     const props = feature.properties as TrafficSignProperties;
     if (!towardsDigitizing) {
-      const latDiff =
-        (feature.geometry.coordinates[1] as number) - closestPointOnLink.y;
-      const lonDiff =
-        (feature.geometry.coordinates[0] as number) - closestPointOnLink.x;
+      const latDiff = (feature.geometry.coordinates[1] as number) - closestPointOnLink.y;
+      const lonDiff = (feature.geometry.coordinates[0] as number) - closestPointOnLink.x;
       result.TOWARDSDIGITIZING =
-        ((roadLinkBearingAtPoint <= 45 || roadLinkBearingAtPoint > 315) &&
-          lonDiff > 0) ||
-        (roadLinkBearingAtPoint <= 135 &&
-          roadLinkBearingAtPoint > 45 &&
-          latDiff < 0) ||
-        (roadLinkBearingAtPoint <= 225 &&
-          roadLinkBearingAtPoint > 135 &&
-          lonDiff < 0) ||
-        (roadLinkBearingAtPoint <= 315 &&
-          roadLinkBearingAtPoint > 225 &&
-          latDiff > 0);
+        ((roadLinkBearingAtPoint <= 45 || roadLinkBearingAtPoint > 315) && lonDiff > 0) ||
+        (roadLinkBearingAtPoint <= 135 && roadLinkBearingAtPoint > 45 && latDiff < 0) ||
+        (roadLinkBearingAtPoint <= 225 && roadLinkBearingAtPoint > 135 && lonDiff < 0) ||
+        (roadLinkBearingAtPoint <= 315 && roadLinkBearingAtPoint > 225 && latDiff > 0);
       props.SUUNTIMA = Math.floor(roadLinkBearingAtPoint);
     } else {
       result.TOWARDSDIGITIZING = towardsDigitizing;

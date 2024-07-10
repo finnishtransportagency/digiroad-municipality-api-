@@ -1,4 +1,4 @@
-import { InferType, array, number, object, string } from 'yup';
+import { array, number, object, string } from 'yup';
 import { allowedAdditionalPanels, allowedTrafficSigns } from '@schemas/trafficSignTypes';
 import { areaGeometrySchema, pointGeometrySchema } from './geometrySchema';
 

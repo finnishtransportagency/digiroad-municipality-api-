@@ -1,8 +1,7 @@
 export const oldTrafficSignMapping = {
   '111. Mutka oikealle': 'A1.1 Mutka',
   '112. Mutka vasemmalle': 'A1.2 Mutka',
-  '113. Mutkia, joista ensimmäinen oikealle':
-    'A2.1 Mutkia, joista ensimmäinen oikealle',
+  '113. Mutkia, joista ensimmäinen oikealle': 'A2.1 Mutkia, joista ensimmäinen oikealle',
   '114. Mutkia, joista ensimmäinen vasemmalle': 'A2.2 Mutkia',
   '115. Jyrkkä alamäki': 'A3.2 Jyrkkä mäki',
   '116. Jyrkkä ylämäki': 'A3.1 Jyrkkä mäki',
@@ -30,8 +29,7 @@ export const oldTrafficSignMapping = {
   '165. Liikennevalot': 'A23 Liikennevalot',
   '166. Liikenneympyrä': 'A24 Liikenneympyrä',
   '167. Raitiotie': 'A25 Raitiovaunu',
-  '171. Rautatien tasoristeys ilman puomeja':
-    'A26 Rautatien tasoristeys ilman puomeja',
+  '171. Rautatien tasoristeys ilman puomeja': 'A26 Rautatien tasoristeys ilman puomeja',
   '172. Rautatien tasoristeys, jossa on puomit':
     'A27 Rautatien tasoristeys, jossa on puomit',
   //'173. 174. 175. Rautatien tasoristeyksen lähestymismerkit': -
@@ -44,18 +42,15 @@ export const oldTrafficSignMapping = {
   '211. Etuajo-oikeutettu tie': 'B1 Etuajo-oikeutettu tie',
   '212. Etuajo-oikeuden päättyminen': 'B2 Etuajo-oikeuden päättyminen',
   '221. Etuajo-oikeus kohdattaessa': 'B3 Etuajo-oikeus kohdattaessa',
-  '222. Väistämisvelvollisuus kohdattaessa':
-    'B4 Väistämisvelvollisuus kohdattaessa',
-  '231. Väistämisvelvollisuus risteyksessä':
-    'B5 Väistämisvelvollisuus risteyksessä',
+  '222. Väistämisvelvollisuus kohdattaessa': 'B4 Väistämisvelvollisuus kohdattaessa',
+  '231. Väistämisvelvollisuus risteyksessä': 'B5 Väistämisvelvollisuus risteyksessä',
   '232. Pakollinen pysäyttäminen': 'B6 Pakollinen pysäyttäminen',
   '311. Ajoneuvolla ajo kielletty': 'C1 Ajoneuvolla ajo kielletty',
   '312. Moottorikäyttöisellä ajoneuvolla ajo kielletty':
     'C2 Moottorikäyttöisellä ajoneuvolla ajo kielletty',
   '313. Kuorma- ja pakettiautolla ajo kielletty':
     'C3 Kuorma- ja pakettiautolla ajo kielletty',
-  '314. Ajoneuvoyhdistelmällä ajo kielletty':
-    'C4 Ajoneuvoyhdistelmällä ajo kielletty',
+  '314. Ajoneuvoyhdistelmällä ajo kielletty': 'C4 Ajoneuvoyhdistelmällä ajo kielletty',
   '315. Traktorilla ajo kielletty': 'C5 Traktorilla ajo kielletty',
   '316. Moottoripyörällä ajo kielletty': 'C6 Moottoripyörällä ajo kielletty',
   '317. Moottorikelkalla ajo kielletty': 'C7 Moottorikelkalla ajo kielletty',
@@ -70,14 +65,11 @@ export const oldTrafficSignMapping = {
     'C15 Jalankulku ja polkupyörällä ja mopolla ajo kielletty',
   '325. Ratsastus kielletty': 'C16 Ratsastus kielletty',
   '331. Kielletty ajosuunta': 'C17 Kielletty ajosuunta',
-  '332. Vasemmalle kääntyminen kielletty':
-    'C18 Vasemmalle kääntyminen kielletty',
+  '332. Vasemmalle kääntyminen kielletty': 'C18 Vasemmalle kääntyminen kielletty',
   '333. Oikealle kääntyminen kielletty': 'C19 Oikealle kääntyminen kielletty',
   '334. U-käännös kielletty': 'C20 U-käännös kielletty',
-  '341. Ajoneuvon suurin sallittu leveys':
-    'C21 Ajoneuvon suurin sallittu leveys',
-  '342. Ajoneuvon suurin sallittu korkeus':
-    'C22 Ajoneuvon suurin sallittu korkeus',
+  '341. Ajoneuvon suurin sallittu leveys': 'C21 Ajoneuvon suurin sallittu leveys',
+  '342. Ajoneuvon suurin sallittu korkeus': 'C22 Ajoneuvon suurin sallittu korkeus',
   '343. Ajoneuvon tai ajoneuvoyhdistelmän suurin sallittu pituus':
     'C23 Ajoneuvon tai ajoneuvoyhdistelmän suurin sallittu pituus',
   '344. Ajoneuvon suurin sallittu massa': 'C24 Ajoneuvon suurin sallittu massa',
@@ -90,8 +82,7 @@ export const oldTrafficSignMapping = {
   '351. Ohituskielto': 'C28 Ohituskielto',
   '352. Ohituskielto päättyy': 'C29 Ohituskielto päättyy',
   '353. Ohituskielto kuorma-autolla': 'C30 Ohituskielto kuorma-autolla',
-  '354. Ohituskielto kuorma-autolla päättyy':
-    'C31 Ohituskielto kuorma-autolla päättyy',
+  '354. Ohituskielto kuorma-autolla päättyy': 'C31 Ohituskielto kuorma-autolla päättyy',
   '361. Nopeusrajoitus': 'C32 Nopeusrajoitus',
   '362. Nopeusrajoitus päättyy': 'C33 Nopeusrajoitus päättyy',
   '363. Nopeusrajoitusalue': 'C34 Nopeusrajoitusalue',
@@ -122,12 +113,9 @@ export const oldTrafficSignMapping = {
   '418. Liikenteen jakaja': 'D3.3 Liikenteenjakaja',
   '421. Jalkakäytävä': 'D4 Jalkakäytävä',
   '422. Pyörätie': 'D5 Pyörätie',
-  '423. Yhdistetty pyörätie ja jalkakäytävä':
-    'D6 Yhdistetty pyörätie ja jalkakäytävä',
-  '424. Pyörätie ja jalkakäytävä rinnakkain':
-    'D7.1 Pyörätie ja jalkakäytävä rinnakkain',
-  '425. Pyörätie ja jalkakäytävä rinnakkain':
-    'D7.2 Pyörätie ja jalkakäytävä rinnakkain',
+  '423. Yhdistetty pyörätie ja jalkakäytävä': 'D6 Yhdistetty pyörätie ja jalkakäytävä',
+  '424. Pyörätie ja jalkakäytävä rinnakkain': 'D7.1 Pyörätie ja jalkakäytävä rinnakkain',
+  '425. Pyörätie ja jalkakäytävä rinnakkain': 'D7.2 Pyörätie ja jalkakäytävä rinnakkain',
   '426. Moottorikelkkailureitti': 'D8 Moottorikelkkailureitti',
   '427. Ratsastustie': 'D9 Ratsastustie',
   '511. Suojatie': 'E1 Suojatie',
@@ -215,8 +203,7 @@ export const oldTrafficSignMapping = {
   '679. Linja-autoasema': 'F48 Linja-autoasema',
   '681. Tietyille ajoneuvoille tai ajoneuvoyhdistelmille tarkoitettu reitti':
     'F50 Tietylle ajoneuvolle tarkoitettu reitti',
-  '682. Jalankulkijoille tarkoitettu reitti':
-    'F52 Jalankulkijalle tarkoitettu reitti',
+  '682. Jalankulkijoille tarkoitettu reitti': 'F52 Jalankulkijalle tarkoitettu reitti',
   '683. Vammaisille tarkoitettu reitti': 'F53 Esteetön reitti',
   '684. Vaarallisten aineiden kuljetuksille tarkoitettu reitti':
     'F51 Vaarallisten aineiden kuljetukselle tarkoitettu reitti',
@@ -249,8 +236,7 @@ export const oldTrafficSignMapping = {
   '792. Sammutin': 'G22 Sammutin',
   '771 a. Matkailutie': 'G41.1 Matkailutie',
   '771 b. Matkailutie': 'G41.2 Matkailutie',
-  '772 a. Museo tai historiallinen rakennus':
-    'G23 Museo tai historiallinen rakennus',
+  '772 a. Museo tai historiallinen rakennus': 'G23 Museo tai historiallinen rakennus',
   '772 b. Maailmanperintökohde': 'G24 Maailmanperintökohde',
   '772 c. Luontokohde': 'G25 Luontokohde',
   '772 d. Näköalapaikka': 'G26 Näköalapaikka',
@@ -272,15 +258,12 @@ export const oldTrafficSignMapping = {
   '813. Kohde nuolen suunnassa': 'H2.2 Kohde nuolen suunnassa',
   '814. Vaikutusalueen pituus': 'H3 Vaikutusalueen pituus',
   '815. Etäisyys kohteeseen': 'H4 Etäisyys kohteeseen',
-  '816. Etäisyys pakolliseen pysäyttämiseen':
-    'H5 Etäisyys pakolliseen pysäyttämiseen',
+  '816. Etäisyys pakolliseen pysäyttämiseen': 'H5 Etäisyys pakolliseen pysäyttämiseen',
   '821. Vapaa leveys': 'H6 Vapaa leveys',
   '822. Vapaa korkeus': 'H7 Vapaa korkeus',
   '823. Sähköjohdon korkeus': 'H8 Sähköjohdon korkeus',
-  '824. Vaikutusalue molempiin suuntiin':
-    'H9.1 Vaikutusalue molempiin suuntiin',
-  '825. Vaikutusalue molempiin suuntiin':
-    'H9.2 Vaikutusalue molempiin suuntiin',
+  '824. Vaikutusalue molempiin suuntiin': 'H9.1 Vaikutusalue molempiin suuntiin',
+  '825. Vaikutusalue molempiin suuntiin': 'H9.2 Vaikutusalue molempiin suuntiin',
   '826. Vaikutusalue nuolen suuntaan': 'H10 Vaikutusalue nuolen suuntaan',
   '827. Vaikutusalue alkaa': 'H10 Vaikutusalue nuolen suuntaan',
   '828. Vaikutusalue päättyy': 'H11 Vaikutusalue päättyy',

@@ -2,9 +2,7 @@ export interface S3KeyObject {
   key: string;
 }
 
-export const isS3KeyObject = (
-  s3KeyObject: unknown
-): s3KeyObject is S3KeyObject => {
+export const isS3KeyObject = (s3KeyObject: unknown): s3KeyObject is S3KeyObject => {
   if (typeof s3KeyObject !== 'object' || s3KeyObject === null) {
     return false;
   }

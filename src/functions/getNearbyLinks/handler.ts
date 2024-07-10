@@ -79,13 +79,9 @@ const getNearbyLinks = async (event: S3KeyObject) => {
       WHERE ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067) && acceptable_roadlinks.shape 
       GROUP BY ID,TYPE
       `,
-    values: [
-      requestPayload.municipality,
-      JSON.stringify(requestPayload.features)
-    ]
+    values: [requestPayload.municipality, JSON.stringify(requestPayload.features)]
   };
-  const query =
-    requestPayload.assetType === 'roadSurfaces' ? areaQuery : pointQuery;
+  const query = requestPayload.assetType === 'roadSurfaces' ? areaQuery : pointQuery;
 
   const res = await client.query(query);
   client.end();

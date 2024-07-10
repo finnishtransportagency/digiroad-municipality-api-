@@ -57,66 +57,31 @@ const execDelta2SQL = async (event) => {
     switch (delta.metadata.assetType) {
       case 'obstacles':
         for (const feature of delta.Created) {
-          await execCreatedObstacle(
-            feature,
-            municipality_code,
-            dbmodifier,
-            client
-          );
+          await execCreatedObstacle(feature, municipality_code, dbmodifier, client);
         }
         for (const feature of delta.Deleted) {
-          await execExpiredObstacle(
-            feature,
-            municipality_code,
-            dbmodifier,
-            client
-          );
+          await execExpiredObstacle(feature, municipality_code, dbmodifier, client);
         }
         for (const feature of delta.Updated) {
-          await execUpdatedObstacle(
-            feature,
-            municipality_code,
-            dbmodifier,
-            client
-          );
+          await execUpdatedObstacle(feature, municipality_code, dbmodifier, client);
         }
         break;
       case 'trafficSigns':
         for (const feature of delta.Created) {
-          await execCreatedTrafficSign(
-            feature,
-            municipality_code,
-            dbmodifier,
-            client
-          );
+          await execCreatedTrafficSign(feature, municipality_code, dbmodifier, client);
         }
         for (const feature of delta.Deleted) {
-          await execExpiredTrafficSign(
-            feature,
-            municipality_code,
-            dbmodifier,
-            client
-          );
+          await execExpiredTrafficSign(feature, municipality_code, dbmodifier, client);
         }
         for (const feature of delta.Updated) {
-          await execUpdatedTrafficSign(
-            feature,
-            municipality_code,
-            dbmodifier,
-            client
-          );
+          await execUpdatedTrafficSign(feature, municipality_code, dbmodifier, client);
         }
         break;
       case 'roadSurfaces':
         if (delta.Created.length > 0 || delta.Deleted.length > 0) {
           await execCleanUp(municipality_code, dbmodifier, client);
           for (const feature of delta.Created) {
-            await execCreatedSurface(
-              feature,
-              municipality_code,
-              dbmodifier,
-              client
-            );
+            await execCreatedSurface(feature, municipality_code, dbmodifier, client);
           }
         }
         break;
