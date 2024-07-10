@@ -55,10 +55,10 @@ const serverlessConfiguration: AWS = {
     drSubnetId1: `\${ssm:${drsubnetid1}}`,
     drSubnetId2: `\${ssm:${drsubnetid2}}`,
     subnetId1: `\${ssm:${subnetid1}}`,
-    subnetId2: `\${ssm:${subnetid2}`,
+    subnetId2: `\${ssm:${subnetid2}}`,
     securityGroupId: `\${ssm:${securitygroupid}}`,
     vpcId: `\${ssm:${vpcid}}`,
-    pgPasswordSsmKey: `\${ssm:${pgpassword}`,
+    pgPasswordSsmKey: `\${ssm:${pgpassword}}`,
     smtpUsernameSsmKey: `\${ssm:${smtpusername}}`,
     smtpPasswordSsmKey: `\${ssm:${smtppassword}}`
   },
