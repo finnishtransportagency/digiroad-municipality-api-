@@ -72,8 +72,7 @@ const serverlessConfiguration: AWS = {
       ...(stage === 'dev' && {
         apiKeys: [`DRKuntaOperatorKey`]
       }),
-      ...((stage === 'test' ||
-        stage === 'prod') && {
+      ...((stage === 'test' || stage === 'prod') && {
         resourcePolicy: [
           {
             Effect: 'Allow',
@@ -114,8 +113,7 @@ const serverlessConfiguration: AWS = {
       SMTP_PASSWORD_SSM_KEY: '${self:custom.smtpPasswordSsmKey}'
     },
     region: 'eu-west-1',
-    ...((stage === 'test' ||
-      stage === 'prod') && {
+    ...((stage === 'test' || stage === 'prod') && {
       endpointType: 'PRIVATE',
       vpcEndpointIds: [{ Ref: 'drKuntaEndpoint' }],
       vpc: {
@@ -144,8 +142,7 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
-      ...((stage === 'test' ||
-        stage === 'prod') && {
+      ...((stage === 'test' || stage === 'prod') && {
         VpceSecurityGroup: {
           Type: 'AWS::EC2::SecurityGroup',
           Properties: {
@@ -190,9 +187,7 @@ const serverlessConfiguration: AWS = {
                   Principal: '*',
                   Action: ['execute-api:Invoke'],
                   Effect: 'Allow',
-                  Resource: [
-                    `arn:aws:execute-api:eu-west-1:${awsaccountid}:*/*`
-                  ]
+                  Resource: [`arn:aws:execute-api:eu-west-1:${awsaccountid}:*/*`]
                 }
               ]
             }
@@ -263,9 +258,7 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['ssm:DescribeParameters'],
-                    Resource: [
-                      `arn:aws:ssm:eu-west-1:${awsaccountid}:*`
-                    ]
+                    Resource: [`arn:aws:ssm:eu-west-1:${awsaccountid}:*`]
                   },
                   {
                     Effect: 'Allow',
@@ -330,9 +323,7 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['ssm:DescribeParameters'],
-                    Resource: [
-                      `arn:aws:ssm:eu-west-1:${awsaccountid}:*`
-                    ]
+                    Resource: [`arn:aws:ssm:eu-west-1:${awsaccountid}:*`]
                   },
                   {
                     Effect: 'Allow',
@@ -345,10 +336,7 @@ const serverlessConfiguration: AWS = {
                   },
                   {
                     Effect: 'Allow',
-                    Action: [
-                      'scheduler:GetSchedule',
-                      'scheduler:DeleteSchedule'
-                    ],
+                    Action: ['scheduler:GetSchedule', 'scheduler:DeleteSchedule'],
                     Resource: `arn:aws:scheduler:eu-west-1:${awsaccountid}:schedule/DRKunta-${stage}/DRKunta-${stage}-*`
                   },
                   {
@@ -483,9 +471,7 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['ssm:DescribeParameters'],
-                    Resource: [
-                      `arn:aws:ssm:eu-west-1:${awsaccountid}:*`
-                    ]
+                    Resource: [`arn:aws:ssm:eu-west-1:${awsaccountid}:*`]
                   },
                   {
                     Effect: 'Allow',
@@ -544,11 +530,7 @@ const serverlessConfiguration: AWS = {
                 Statement: [
                   {
                     Effect: 'Allow',
-                    Action: [
-                      's3:ListBucket',
-                      's3:GetObject',
-                      's3:DeleteObject'
-                    ],
+                    Action: ['s3:ListBucket', 's3:GetObject', 's3:DeleteObject'],
                     Resource: `arn:aws:s3:::dr-kunta-${stage}-bucket/geojson/*`
                   },
                   {
@@ -674,16 +656,12 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['ssm:DescribeParameters'],
-                    Resource: [
-                      `arn:aws:ssm:eu-west-1:${awsaccountid}:*`
-                    ]
+                    Resource: [`arn:aws:ssm:eu-west-1:${awsaccountid}:*`]
                   },
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${
-                      awsaccountid
-                    }:parameter${'${self:custom.pgPasswordSsmKey}'}`
+                    Resource: `arn:aws:ssm:eu-west-1:${awsaccountid}:parameter${'${self:custom.pgPasswordSsmKey}'}`
                   },
                   {
                     Effect: 'Allow',
@@ -833,23 +811,17 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['ssm:DescribeParameters'],
-                    Resource: [
-                      `arn:aws:ssm:eu-west-1:${awsaccountid}:*`
-                    ]
+                    Resource: [`arn:aws:ssm:eu-west-1:${awsaccountid}:*`]
                   },
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${
-                      awsaccountid
-                    }:parameter/${'${self:custom.smtpUsernameSsmKey}'}`
+                    Resource: `arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/${'${self:custom.smtpUsernameSsmKey}'}`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${
-                      awsaccountid
-                    }:parameter/${'${self:custom.smtpPasswordSsmKey}'}`
+                    Resource: `arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/${'${self:custom.smtpPasswordSsmKey}'}`
                   }
                 ]
               }
