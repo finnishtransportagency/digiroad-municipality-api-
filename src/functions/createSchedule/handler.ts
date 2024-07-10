@@ -83,12 +83,12 @@ const createSchedule = async (event) => {
     };
   }
   const createScheduleInput = {
-    Name: `DRKunta-${stage}-${event.body.municipality}`,
-    GroupName: `DRKunta-${stage}`,
+    Name: `dr-kunta-${stage}-${event.body.municipality}`,
+    GroupName: `dr-kunta-${stage}`,
     ScheduleExpression: schedule,
     Target: {
-      Arn: `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-fetchMunicipalityData`,
-      RoleArn: `arn:aws:iam::${awsaccountid}:role/DRKunta-${stage}-fetchMunicipalityDataScheduleRole`,
+      Arn: `arn:aws:lambda:eu-west-1:${awsaccountid}:function:dr-kunta-${stage}-fetchAndParseData`,
+      RoleArn: `arn:aws:iam::${awsaccountid}:role/dr-kunta-${stage}-fetchMunicipalityDataScheduleRole`,
       Input: `{
         "municipality": "${event.body.municipality}",
         "url": "${event.body.url}",

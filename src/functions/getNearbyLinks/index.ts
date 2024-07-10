@@ -24,6 +24,5 @@ export default {
     PGPASSWORD_SSM_KEY: pgpassword,
     PGPORT: pgport,
     PGDATABASE: pgdatabase
-  },
-  role: 'DBLambdaRole'
+  }
 };

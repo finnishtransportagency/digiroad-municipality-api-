@@ -23,7 +23,7 @@ const parseXML = async (event: S3Event): Promise<void> => {
 
   let xmlFile: string;
   try {
-    xmlFile = await getFromS3(`dr-kunta-${stage}-bucket`, key);
+    xmlFile = await getFromS3(`dr-kunta-${stage}-bucket-placeholder`, key);
   } catch (e: unknown) {
     if (!(e instanceof Error)) throw e;
     throw new Error(`Could not retrieve file from s3: ${e.message}`);
@@ -144,7 +144,7 @@ const parseXML = async (event: S3Event): Promise<void> => {
   }
 
   await uploadToS3(
-    `dr-kunta-${stage}-bucket`,
+    `dr-kunta-${stage}-bucket-placeholder`,
     `geojson/${municipality}/${assetType}/${now}.json`,
     JSON.stringify(geoJSON)
   );

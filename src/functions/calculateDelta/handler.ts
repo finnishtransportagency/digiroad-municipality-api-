@@ -31,7 +31,7 @@ const calculateDelta = async (event: S3Event) => {
 
   try {
     var keys = await listS3Objects(
-      `dr-kunta-${stage}-bucket`,
+      `dr-kunta-${stage}-bucket-placholder`,
       `geojson/${municipality}/${assetType}/`
     );
     const sortedKeyList = keys.Contents.sort((k) => -k.LastModified.getTime());
@@ -58,7 +58,7 @@ const calculateDelta = async (event: S3Event) => {
 
   try {
     var updateObject = await getAndFormatS3Object(
-      `dr-kunta-${stage}-bucket`,
+      `dr-kunta-${stage}-bucket-placeholder`,
       updateKey
     );
     const valid = await schema.validate(updateObject);
@@ -79,7 +79,7 @@ const calculateDelta = async (event: S3Event) => {
         })
       )
     );
-    await deleteFromS3(`dr-kunta-${stage}-bucket`, updateKey);
+    await deleteFromS3(`dr-kunta-${stage}-bucket-placeholder`, updateKey);
     throw new Error(`Object deleted because of invalid data: ${e.message}`);
   }
 
@@ -87,7 +87,7 @@ const calculateDelta = async (event: S3Event) => {
     refrenceKey === null
       ? { type: 'FeatureCollection', features: [] }
       : await getAndFormatS3Object(
-          `dr-kunta-${stage}-bucket`,
+          `dr-kunta-${stage}-bucket-placeholder`,
           refrenceKey
         );
 
@@ -163,7 +163,7 @@ const calculateDelta = async (event: S3Event) => {
   const now = new Date().toISOString().slice(0, 19);
 
   await uploadToS3(
-    `dr-kunta-${stage}-bucket`,
+    `dr-kunta-${stage}-bucket-placeholder`,
     `calculateDelta/${municipality}/${now}.json`,
     JSON.stringify(payLoad)
   );

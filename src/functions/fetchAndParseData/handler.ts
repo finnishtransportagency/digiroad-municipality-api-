@@ -263,7 +263,7 @@ const fetchAndParseData = async (event: unknown) => {
           apiKey
         );
         await uploadToS3(
-          `dr-kunta-${stage}-bucket`,
+          `dr-kunta-${stage}-bucket-placeholder`,
           `geojson/${event.municipality}/${assetKey}/${new Date()
             .toISOString()
             .slice(0, 19)}.json`,

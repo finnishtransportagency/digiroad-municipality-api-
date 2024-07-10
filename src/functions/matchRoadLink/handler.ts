@@ -25,7 +25,7 @@ const now = new Date().toISOString().slice(0, 19);
 
 const matchRoadLinks = async (event: S3KeyObject) => {
   const delta = JSON.parse(
-    await getFromS3(`dr-kunta-${stage}-bucket`, event.key)
+    await getFromS3(`dr-kunta-${stage}-bucket-placeholder`, event.key)
   ) as unknown;
   if (!isDelta(delta))
     throw new Error(
@@ -48,7 +48,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   };
 
   await uploadToS3(
-    `dr-kunta-${stage}-bucket`,
+    `dr-kunta-${stage}-bucket-placeholder`,
     `getNearbyLinksRequestPayload/${delta.metadata.municipality}/${now}.json`,
     JSON.stringify(getNearbyLinksPayload)
   );
@@ -78,7 +78,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
 
   const allRoadLinks = JSON.parse(
     await getFromS3(
-      `dr-kunta-${stage}-bucket`,
+      `dr-kunta-${stage}-bucket-placeholder`,
       allRoadLinksS3Key
     )
   ) as unknown;
@@ -209,13 +209,13 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   };
 
   await uploadToS3(
-    `dr-kunta-${stage}-bucket`,
+    `dr-kunta-${stage}-bucket-placeholder`,
     `matchRoadLink/${delta.metadata.municipality}/${now}.json`,
     JSON.stringify(execDelta2SQLBody)
   );
 
   await uploadToS3(
-    `dr-kunta-${stage}-bucket`,
+    `dr-kunta-${stage}-bucket-placeholder`,
     `logs/${delta.metadata.municipality}/${now}.json`,
     JSON.stringify(logsBody)
   );

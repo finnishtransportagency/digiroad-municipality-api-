@@ -17,7 +17,7 @@ import { allowedOnKapy } from '@schemas/trafficSignTypes';
 
 const getNearbyLinks = async (event: S3KeyObject) => {
   const data = await getFromS3(
-    `dr-kunta-${stage}-bucket`,
+    `dr-kunta-${stage}-bucket-placeholder`,
     event.key
   );
   const requestPayload = JSON.parse(data) as unknown;
@@ -116,7 +116,7 @@ const getNearbyLinks = async (event: S3KeyObject) => {
 
   const S3ObjectKey = `getNearbyLinks/${requestPayload.municipality}/${now}.json`;
   await uploadToS3(
-    `dr-kunta-${stage}-bucket`,
+    `dr-kunta-${stage}-bucket-placeholder`,
     S3ObjectKey,
     JSON.stringify(res.rows)
   );

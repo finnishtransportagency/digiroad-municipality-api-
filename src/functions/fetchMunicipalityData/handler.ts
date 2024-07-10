@@ -76,7 +76,7 @@ const fetchMunicipalityData = async (event: unknown) => {
     const now = new Date().toISOString().slice(0, 19);
 
     await uploadToS3(
-      `dr-kunta-${stage}-bucket`,
+      `dr-kunta-${stage}-bucket-placeholder`,
       `infrao/${event.municipality}/${assetType[0]}/${now}.xml`,
       payload
     );

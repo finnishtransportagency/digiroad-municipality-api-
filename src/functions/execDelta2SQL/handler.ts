@@ -25,7 +25,7 @@ import { getFromS3 } from '@libs/s3-tools';
 
 const execDelta2SQL = async (event) => {
   const data = await getFromS3(
-    `dr-kunta-${stage}-bucket`,
+    `dr-kunta-${stage}-bucket-placeholder`,
     event.key
   );
   const delta = JSON.parse(data) as unknown;
