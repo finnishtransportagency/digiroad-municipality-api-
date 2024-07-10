@@ -3,7 +3,7 @@ name: Build & deploy to AWS
 on:
     push:
       branches:
-        - pipeline
+        - actions-migration
 
 permissions:
     id-token: write
