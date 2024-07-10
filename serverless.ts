@@ -102,16 +102,16 @@ const serverlessConfiguration: AWS = {
       STAGE_NAME: stage,
       OPERATOR_EMAIL: email,
       DR_SECURITY_GROUP_ID: `\${ssm:${drsecuritygroupid}}`,
-      DR_SUBNET_ID_1: '${self.custom:drSubnetId1}',
-      DR_SUBNET_ID_2: '${self.custom:drSubnetId2}',
+      DR_SUBNET_ID_1: '${self:custom.drSubnetId1}',
+      DR_SUBNET_ID_2: '${self:custom.drSubnetId2}',
       AWS_ACCOUNT_ID: awsaccountid,
       PGHOST: `\${ssm:${pghost}}`,
       PGPORT: `\${ssm:${pgport}}`,
       PGDATABASE: `\${ssm:${pgdatabase}}`,
       PGUSER: `\${ssm:${pguser}}`,
-      PGPASSWORD_SSM_KEY: '${self.custom:pgPasswordSsmKey}',
-      SMTP_USERNAME_SSM_KEY: '${self.custom:smtpUsernameSsmKey}',
-      SMTP_PASSWORD_SSM_KEY: '${self.custom:smtpPasswordSsmKey}'
+      PGPASSWORD_SSM_KEY: '${self:custom.pgPasswordSsmKey}',
+      SMTP_USERNAME_SSM_KEY: '${self:custom.smtpUsernameSsmKey}',
+      SMTP_PASSWORD_SSM_KEY: '${self:custom.smtpPasswordSsmKey}'
     },
     region: 'eu-west-1',
     ...((stage === 'test' ||
@@ -119,13 +119,13 @@ const serverlessConfiguration: AWS = {
       endpointType: 'PRIVATE',
       vpcEndpointIds: [{ Ref: 'drKuntaEndpoint' }],
       vpc: {
-        securityGroupIds: ['${self.custom:securityGroupId}'],
-        subnetIds: ['${self.custom:subnetId1}', '${self.custom:subnetId2}']
+        securityGroupIds: ['${self:custom.securityGroupId}'],
+        subnetIds: ['${self:custom.subnetId1}', '${self:custom.subnetId2}']
       }
     }),
     vpc: {
-      securityGroupIds: ['${self.custom:securityGroupId}'],
-      subnetIds: ['${self.custom:subnetId1}', '${self.custom:subnetId2}']
+      securityGroupIds: ['${self:custom.securityGroupId}'],
+      subnetIds: ['${self:custom.subnetId1}', '${self:custom.subnetId2}']
     }
   },
   // import the function via paths
@@ -172,7 +172,7 @@ const serverlessConfiguration: AWS = {
                 ToPort: 443
               }
             ],
-            VpcId: '${self.custom:vpcId}'
+            VpcId: '${self:custom.vpcId}'
           }
         },
         drKuntaEndpoint: {
@@ -181,9 +181,9 @@ const serverlessConfiguration: AWS = {
             PrivateDnsEnabled: false,
             SecurityGroupIds: [{ Ref: 'VpceSecurityGroup' }],
             ServiceName: 'com.amazonaws.eu-west-1.execute-api',
-            SubnetIds: ['${self.custom:subnetId1}', '${self.custom:subnetId2}'],
+            SubnetIds: ['${self:custom.subnetId1}', '${self:custom.subnetId2}'],
             VpcEndpointType: 'Interface',
-            VpcId: '${self.custom:vpcId}',
+            VpcId: '${self:custom.vpcId}',
             PolicyDocument: {
               Statement: [
                 {
@@ -683,7 +683,7 @@ const serverlessConfiguration: AWS = {
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
                     Resource: `arn:aws:ssm:eu-west-1:${
                       awsaccountid
-                    }:parameter${'${self.custom:pgPasswordSsmKey}'}`
+                    }:parameter${'${self:custom.pgPasswordSsmKey}'}`
                   },
                   {
                     Effect: 'Allow',
@@ -842,14 +842,14 @@ const serverlessConfiguration: AWS = {
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
                     Resource: `arn:aws:ssm:eu-west-1:${
                       awsaccountid
-                    }:parameter/${'${self.custom:smtpUsernameSsmKey}'}`
+                    }:parameter/${'${self:custom.smtpUsernameSsmKey}'}`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
                     Resource: `arn:aws:ssm:eu-west-1:${
                       awsaccountid
-                    }:parameter/${'${self.custom:smtpPasswordSsmKey}'}`
+                    }:parameter/${'${self:custom.smtpPasswordSsmKey}'}`
                   }
                 ]
               }
