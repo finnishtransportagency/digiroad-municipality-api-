@@ -47,4 +47,8 @@ jobs:
                 PGPASSWORD_SSM_KEY: ${{ secrets.PGPASSWORD_SSM_KEY }}
                 SMTP_USERNAME_SSM_KEY: ${{ secrets.SMTP_USERNAME_SSM_KEY }}
                 SMTP_PASSWORD_SSM_KEY: ${{ secrets.SMTP_PASSWORD_SSM_KEY }}
-
+                PGHOST: ${{ secrets.PGHOST }}
+                PGPORT: ${{ secrets.PGPORT }}
+                PGDATABASE: ${{ secrets.PGDATABASE }}
+                PGUSER: ${{ secrets.PGUSER }}
+                VPCID: ${{ secrets.VPCID }}

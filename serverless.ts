@@ -22,6 +22,27 @@ const serverlessConfiguration: AWS = {
   service: 'dr-kunta',
   frameworkVersion: '3',
   plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-s3-local'],
+  custom: {
+    esbuild: {
+      bundle: true,
+      minify: false,
+      sourcemap: true,
+      exclude: ['aws-sdk'],
+      target: 'node18',
+      define: { 'require.resolve': undefined },
+      platform: 'node',
+      concurrency: 10
+    },
+    drSubnetId1: `\${ssm:${process.env.DR_SUBNET_ID_1}}`,
+    drSubnetId2: `\${ssm:${process.env.DR_SUBNET_ID_2}}`,
+    subnetId1: `\${ssm:${process.env.SUBNET_ID_1}}`,
+    subnetId2: `\${ssm:${process.env.SUBNET_ID_2}`,
+    securityGroupId: `\${ssm:${process.env.SECURITY_GROUP_ID}}`,
+    vpcId: `\${ssm:${process.env.VPCID}}`,
+    pgPasswordSsmKey: `\${ssm:${process.env.PGPASSWORD_SSM_KEY}}`,
+    smtpUsernameSsmKey: `\${ssm:${process.env.SMTP_USERNAME_SSM_KEY}}`,
+    smtpPasswordSsmKey: `\${ssm:${process.env.SMTP_PASSWORD_SSM_KEY}}`
+  },
   provider: {
     name: 'aws',
     runtime: offline ? 'nodejs16.x' : 'nodejs18.x',
@@ -61,10 +82,17 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       STAGE_NAME: process.env.STAGE_NAME,
       OPERATOR_EMAIL: process.env.OPERATOR_EMAIL,
-      DR_SECURITY_GROUP_ID: process.env.DR_SECURITY_GROUP_ID,
-      DR_SUBNET_ID_1 : process.env.DR_SUBNET_ID_1,
-      DR_SUBNET_ID_2 : process.env.DR_SUBNET_ID_2 ,
-      AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID
+      DR_SECURITY_GROUP_ID: `\${ssm:${process.env.DR_SECURITY_GROUP_ID}}`,
+      DR_SUBNET_ID_1: '${self.custom:drSubnetId1}',
+      DR_SUBNET_ID_2: '${self.custom:drSubnetId2}',
+      AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID,
+      PGHOST: `\${ssm:${process.env.PGHOST}}`,
+      PGPORT: `\${ssm:${process.env.PGPORT}}`,
+      PGDATABASE: `\${ssm:${process.env.PGDATABASE}}`,
+      PGUSER: `\${ssm:${process.env.PGUSER}}`,
+      PGPASSWORD_SSM_KEY: '${self.custom:pgPasswordSsmKey}',
+      SMTP_USERNAME_SSM_KEY: '${self.custom:smtpUsernameSsmKey}',
+      SMTP_PASSWORD_SSM_KEY: '${self.custom:smtpPasswordSsmKey}'
     },
     region: 'eu-west-1',
     ...((process.env.STAGE_NAME === 'test' ||
@@ -72,13 +100,13 @@ const serverlessConfiguration: AWS = {
       endpointType: 'PRIVATE',
       vpcEndpointIds: [{ Ref: 'drKuntaEndpoint' }],
       vpc: {
-        securityGroupIds: [process.env.SECURITY_GROUP_ID],
-        subnetIds: [process.env.SUBNET_ID_1, process.env.SUBNET_ID_2]
+        securityGroupIds: ['${self.custom:securityGroupId}'],
+        subnetIds: ['${self.custom:subnetId1}', '${self.custom:subnetId2}']
       }
     }),
     vpc: {
-      securityGroupIds: [process.env.SECURITY_GROUP_ID],
-      subnetIds: [process.env.SUBNET_ID_1, process.env.SUBNET_ID_2]
+      securityGroupIds: ['${self.custom:securityGroupId}'],
+      subnetIds: ['${self.custom:subnetId1}', '${self.custom:subnetId2}']
     }
   },
   // import the function via paths
@@ -125,7 +153,7 @@ const serverlessConfiguration: AWS = {
                 ToPort: 443
               }
             ],
-            VpcId: process.env.VPCID
+            VpcId: '${self.custom:vpcId}'
           }
         },
         drKuntaEndpoint: {
@@ -134,9 +162,9 @@ const serverlessConfiguration: AWS = {
             PrivateDnsEnabled: false,
             SecurityGroupIds: [{ Ref: 'VpceSecurityGroup' }],
             ServiceName: 'com.amazonaws.eu-west-1.execute-api',
-            SubnetIds: [process.env.SUBNET_ID_1, process.env.SUBNET_ID_2],
+            SubnetIds: ['${self.custom:subnetId1}', '${self.custom:subnetId2}'],
             VpcEndpointType: 'Interface',
-            VpcId: process.env.VPCID,
+            VpcId: '${self.custom:vpcId}',
             PolicyDocument: {
               Statement: [
                 {
@@ -634,7 +662,7 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter${process.env.PGPASSWORD_SSM_KEY}`
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter${'${self.custom:pgPasswordSsmKey}'}`
                   },
                   {
                     Effect: 'Allow',
@@ -791,12 +819,12 @@ const serverlessConfiguration: AWS = {
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/${process.env.SMTP_USERNAME_SSM_KEY}`
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/${'${self.custom:smtpUsernameSsmKey}'}`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/${process.env.SMTP_PASSWORD_SSM_KEY}`
+                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/${'${self.custom:smtpPasswordSsmKey}'}`
                   }
                 ]
               }
@@ -806,19 +834,7 @@ const serverlessConfiguration: AWS = {
       }
     }
   },
-  package: { individually: true },
-  custom: {
-    esbuild: {
-      bundle: true,
-      minify: false,
-      sourcemap: true,
-      exclude: ['aws-sdk'],
-      target: 'node18',
-      define: { 'require.resolve': undefined },
-      platform: 'node',
-      concurrency: 10
-    }
-  }
+  package: { individually: true }
 };
 
 module.exports = serverlessConfiguration;
