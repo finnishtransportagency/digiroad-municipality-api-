@@ -13,6 +13,7 @@ import {
 } from './validationSchemas/validationSchema';
 import { S3Event } from 'aws-lambda';
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
+import { stage } from '@functions/config';
 
 const parseXML = async (event: S3Event): Promise<void> => {
   const now = new Date().toISOString().slice(0, 19);
@@ -22,7 +23,7 @@ const parseXML = async (event: S3Event): Promise<void> => {
 
   let xmlFile: string;
   try {
-    xmlFile = await getFromS3(`dr-kunta-${process.env.STAGE_NAME}-bucket`, key);
+    xmlFile = await getFromS3(`dr-kunta-${stage}-bucket`, key);
   } catch (e: unknown) {
     if (!(e instanceof Error)) throw e;
     throw new Error(`Could not retrieve file from s3: ${e.message}`);
@@ -143,7 +144,7 @@ const parseXML = async (event: S3Event): Promise<void> => {
   }
 
   await uploadToS3(
-    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    `dr-kunta-${stage}-bucket`,
     `geojson/${municipality}/${assetType}/${now}.json`,
     JSON.stringify(geoJSON)
   );

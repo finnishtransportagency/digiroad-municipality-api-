@@ -4,12 +4,13 @@ import {
   ListSchedulesCommand,
   GetScheduleCommand
 } from '@aws-sdk/client-scheduler';
+import { stage } from '@functions/config';
 
 const listSchedules = async () => {
   const scheduler = new SchedulerClient({});
 
   const listScheduleInput = {
-    GroupName: `DRKunta-${process.env.STAGE_NAME}`
+    GroupName: `DRKunta-${stage}`
   };
 
   const listScheduleCommand = new ListSchedulesCommand(listScheduleInput);
@@ -20,7 +21,7 @@ const listSchedules = async () => {
     for (const schedule of listScheduleResponse.Schedules) {
       const getScheduleInput = {
         Name: schedule.Name,
-        GroupName: `DRKunta-${process.env.STAGE_NAME}`
+        GroupName: `DRKunta-${stage}`
       };
       const getScheduleCommand = new GetScheduleCommand(getScheduleInput);
       const getScheduleResponse = await scheduler.send(getScheduleCommand);

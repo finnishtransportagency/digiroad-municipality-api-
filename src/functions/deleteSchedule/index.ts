@@ -1,3 +1,4 @@
+import { stage } from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 
 export default {
@@ -10,7 +11,7 @@ export default {
       http: {
         method: 'delete',
         path: 'admin/remove/{municipality}',
-        private: process.env.STAGE_NAME === 'dev'
+        private: stage === 'dev'
       }
     }
   ]

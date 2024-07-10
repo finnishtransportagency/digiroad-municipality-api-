@@ -9,6 +9,7 @@ import {
   GetScheduleCommand,
   DeleteScheduleCommand
 } from '@aws-sdk/client-scheduler';
+import { stage } from '@functions/config';
 
 const deleteSchedule = async (event) => {
   const municipality = event.pathParameters.municipality;
@@ -17,11 +18,11 @@ const deleteSchedule = async (event) => {
   const ssm = new SSM({});
 
   const scheduleInput = {
-    Name: `DRKunta-${process.env.STAGE_NAME}-${municipality}`,
-    GroupName: `DRKunta-${process.env.STAGE_NAME}`
+    Name: `DRKunta-${stage}-${municipality}`,
+    GroupName: `DRKunta-${stage}`
   };
   const parameterInput = {
-    Name: `/DRKunta/${process.env.STAGE_NAME}/${municipality}`
+    Name: `/DRKunta/${stage}/${municipality}`
   };
 
   const getScheduleCommand = new GetScheduleCommand(scheduleInput);

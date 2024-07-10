@@ -16,6 +16,7 @@ import {
   FeatureType
 } from '@functions/typing';
 import { isDelta, isFeatureRoadlinkMap } from './types';
+import { stage } from '@functions/config';
 
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
@@ -24,7 +25,7 @@ const now = new Date().toISOString().slice(0, 19);
 
 const matchRoadLinks = async (event: S3KeyObject) => {
   const delta = JSON.parse(
-    await getFromS3(`dr-kunta-${process.env.STAGE_NAME}-bucket`, event.key)
+    await getFromS3(`dr-kunta-${stage}-bucket`, event.key)
   ) as unknown;
   if (!isDelta(delta))
     throw new Error(
@@ -47,7 +48,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   };
 
   await uploadToS3(
-    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    `dr-kunta-${stage}-bucket`,
     `getNearbyLinksRequestPayload/${delta.metadata.municipality}/${now}.json`,
     JSON.stringify(getNearbyLinksPayload)
   );
@@ -77,7 +78,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
 
   const allRoadLinks = JSON.parse(
     await getFromS3(
-      `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+      `dr-kunta-${stage}-bucket`,
       allRoadLinksS3Key
     )
   ) as unknown;
@@ -208,13 +209,13 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   };
 
   await uploadToS3(
-    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    `dr-kunta-${stage}-bucket`,
     `matchRoadLink/${delta.metadata.municipality}/${now}.json`,
     JSON.stringify(execDelta2SQLBody)
   );
 
   await uploadToS3(
-    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    `dr-kunta-${stage}-bucket`,
     `logs/${delta.metadata.municipality}/${now}.json`,
     JSON.stringify(logsBody)
   );

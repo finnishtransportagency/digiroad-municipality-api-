@@ -1,3 +1,4 @@
+import { stage } from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 
 export default {
@@ -7,7 +8,7 @@ export default {
   events: [
     {
       s3: {
-        bucket: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+        bucket: `dr-kunta-${stage}-bucket`,
         event: 's3:ObjectCreated:*',
         existing: true,
         rules: [{ prefix: 'infrao/' }]

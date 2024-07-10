@@ -11,6 +11,7 @@ import {
   SchedulerClient,
   CreateScheduleCommand
 } from '@aws-sdk/client-scheduler';
+import { awsaccountid, stage } from '@functions/config';
 
 const inputSchema = {
   type: 'object',
@@ -52,7 +53,7 @@ const createSchedule = async (event) => {
   const ssm = new SSM({});
 
   const putParameterInput = {
-    Name: `/DRKunta/${process.env.STAGE_NAME}/${event.body.municipality}`,
+    Name: `/DRKunta/${stage}/${event.body.municipality}`,
     Value: event.body.key,
     Type: 'String'
   };
@@ -82,12 +83,12 @@ const createSchedule = async (event) => {
     };
   }
   const createScheduleInput = {
-    Name: `DRKunta-${process.env.STAGE_NAME}-${event.body.municipality}`,
-    GroupName: `DRKunta-${process.env.STAGE_NAME}`,
+    Name: `DRKunta-${stage}-${event.body.municipality}`,
+    GroupName: `DRKunta-${stage}`,
     ScheduleExpression: schedule,
     Target: {
-      Arn: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityData`,
-      RoleArn: `arn:aws:iam::${process.env.AWS_ACCOUNT_ID}:role/DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataScheduleRole`,
+      Arn: `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-fetchMunicipalityData`,
+      RoleArn: `arn:aws:iam::${awsaccountid}:role/DRKunta-${stage}-fetchMunicipalityDataScheduleRole`,
       Input: `{
         "municipality": "${event.body.municipality}",
         "url": "${event.body.url}",
@@ -116,7 +117,7 @@ const createSchedule = async (event) => {
     await scheduler.send(creteScheduleCommand);
   } catch (e: unknown) {
     const deleteParameterInput = {
-      Name: `/DRKunta/${process.env.STAGE_NAME}/${event.body.municipality}`
+      Name: `/DRKunta/${stage}/${event.body.municipality}`
     };
     const deleteParameterCommand = new DeleteParameterCommand(
       deleteParameterInput

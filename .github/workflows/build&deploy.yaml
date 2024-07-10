@@ -51,4 +51,4 @@ jobs:
                 PGPORT: ${{ secrets.PGPORT }}
                 PGDATABASE: ${{ secrets.PGDATABASE }}
                 PGUSER: ${{ secrets.PGUSER }}
-                VPCID: ${{ secrets.VPCID }}
+                VPC_ID: ${{ secrets.VPC_ID }}

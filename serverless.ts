@@ -16,7 +16,26 @@ import {
   deleteSchedule,
   fetchAndParseData
 } from '@functions/index';
-import { offline } from '@functions/config';
+import {
+  offline,
+  drsubnetid1,
+  drsubnetid2,
+  subnetid1,
+  subnetid2,
+  securitygroupid,
+  vpcid,
+  smtpusername,
+  smtppassword,
+  pgpassword,
+  stage,
+  email,
+  drsecuritygroupid,
+  awsaccountid,
+  pghost,
+  pgport,
+  pgdatabase,
+  pguser
+} from '@functions/config';
 
 const serverlessConfiguration: AWS = {
   service: 'dr-kunta',
@@ -33,28 +52,28 @@ const serverlessConfiguration: AWS = {
       platform: 'node',
       concurrency: 10
     },
-    drSubnetId1: `\${ssm:${process.env.DR_SUBNET_ID_1}}`,
-    drSubnetId2: `\${ssm:${process.env.DR_SUBNET_ID_2}}`,
-    subnetId1: `\${ssm:${process.env.SUBNET_ID_1}}`,
-    subnetId2: `\${ssm:${process.env.SUBNET_ID_2}`,
-    securityGroupId: `\${ssm:${process.env.SECURITY_GROUP_ID}}`,
-    vpcId: `\${ssm:${process.env.VPCID}}`,
-    pgPasswordSsmKey: `\${ssm:${process.env.PGPASSWORD_SSM_KEY}}`,
-    smtpUsernameSsmKey: `\${ssm:${process.env.SMTP_USERNAME_SSM_KEY}}`,
-    smtpPasswordSsmKey: `\${ssm:${process.env.SMTP_PASSWORD_SSM_KEY}}`
+    drSubnetId1: `\${ssm:${drsubnetid1}}`,
+    drSubnetId2: `\${ssm:${drsubnetid2}}`,
+    subnetId1: `\${ssm:${subnetid1}}`,
+    subnetId2: `\${ssm:${subnetid2}`,
+    securityGroupId: `\${ssm:${securitygroupid}}`,
+    vpcId: `\${ssm:${vpcid}}`,
+    pgPasswordSsmKey: `\${ssm:${pgpassword}`,
+    smtpUsernameSsmKey: `\${ssm:${smtpusername}}`,
+    smtpPasswordSsmKey: `\${ssm:${smtppassword}}`
   },
   provider: {
     name: 'aws',
     runtime: offline ? 'nodejs16.x' : 'nodejs18.x',
-    stage: process.env.STAGE_NAME,
+    stage: stage,
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
-      ...(process.env.STAGE_NAME === 'dev' && {
+      ...(stage === 'dev' && {
         apiKeys: [`DRKuntaOperatorKey`]
       }),
-      ...((process.env.STAGE_NAME === 'test' ||
-        process.env.STAGE_NAME === 'prod') && {
+      ...((stage === 'test' ||
+        stage === 'prod') && {
         resourcePolicy: [
           {
             Effect: 'Allow',
@@ -77,26 +96,26 @@ const serverlessConfiguration: AWS = {
       })
     },
     environment: {
-      OFFLINE: process.env.OFFLINE,
+      OFFLINE: String(offline),
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
-      STAGE_NAME: process.env.STAGE_NAME,
-      OPERATOR_EMAIL: process.env.OPERATOR_EMAIL,
-      DR_SECURITY_GROUP_ID: `\${ssm:${process.env.DR_SECURITY_GROUP_ID}}`,
+      STAGE_NAME: stage,
+      OPERATOR_EMAIL: email,
+      DR_SECURITY_GROUP_ID: `\${ssm:${drsecuritygroupid}}`,
       DR_SUBNET_ID_1: '${self.custom:drSubnetId1}',
       DR_SUBNET_ID_2: '${self.custom:drSubnetId2}',
-      AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID,
-      PGHOST: `\${ssm:${process.env.PGHOST}}`,
-      PGPORT: `\${ssm:${process.env.PGPORT}}`,
-      PGDATABASE: `\${ssm:${process.env.PGDATABASE}}`,
-      PGUSER: `\${ssm:${process.env.PGUSER}}`,
+      AWS_ACCOUNT_ID: awsaccountid,
+      PGHOST: `\${ssm:${pghost}}`,
+      PGPORT: `\${ssm:${pgport}}`,
+      PGDATABASE: `\${ssm:${pgdatabase}}`,
+      PGUSER: `\${ssm:${pguser}}`,
       PGPASSWORD_SSM_KEY: '${self.custom:pgPasswordSsmKey}',
       SMTP_USERNAME_SSM_KEY: '${self.custom:smtpUsernameSsmKey}',
       SMTP_PASSWORD_SSM_KEY: '${self.custom:smtpPasswordSsmKey}'
     },
     region: 'eu-west-1',
-    ...((process.env.STAGE_NAME === 'test' ||
-      process.env.STAGE_NAME === 'prod') && {
+    ...((stage === 'test' ||
+      stage === 'prod') && {
       endpointType: 'PRIVATE',
       vpcEndpointIds: [{ Ref: 'drKuntaEndpoint' }],
       vpc: {
@@ -125,13 +144,13 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
-      ...((process.env.STAGE_NAME === 'test' ||
-        process.env.STAGE_NAME === 'prod') && {
+      ...((stage === 'test' ||
+        stage === 'prod') && {
         VpceSecurityGroup: {
           Type: 'AWS::EC2::SecurityGroup',
           Properties: {
-            GroupDescription: `DRKunta-${process.env.STAGE_NAME}-vpce-security-group`,
-            GroupName: `DRKunta-${process.env.STAGE_NAME}-vpce-security-group`,
+            GroupDescription: `DRKunta-${stage}-vpce-security-group`,
+            GroupName: `DRKunta-${stage}-vpce-security-group`,
             SecurityGroupEgress: [
               {
                 CidrIp: '0.0.0.0/0',
@@ -172,7 +191,7 @@ const serverlessConfiguration: AWS = {
                   Action: ['execute-api:Invoke'],
                   Effect: 'Allow',
                   Resource: [
-                    `arn:aws:execute-api:eu-west-1:${process.env.AWS_ACCOUNT_ID}:*/*`
+                    `arn:aws:execute-api:eu-west-1:${awsaccountid}:*/*`
                   ]
                 }
               ]
@@ -183,13 +202,13 @@ const serverlessConfiguration: AWS = {
       drKuntaScheduleGroup: {
         Type: 'AWS::Scheduler::ScheduleGroup',
         Properties: {
-          Name: `DRKunta-${process.env.STAGE_NAME}`
+          Name: `DRKunta-${stage}`
         }
       },
       drKuntaBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
-          BucketName: `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+          BucketName: `dr-kunta-${stage}-bucket`,
           LifecycleConfiguration: {
             Rules: [
               {
@@ -219,7 +238,7 @@ const serverlessConfiguration: AWS = {
       createScheduleRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: `DRKunta-${process.env.STAGE_NAME}-createScheduleRole`,
+          RoleName: `DRKunta-${stage}-createScheduleRole`,
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -237,7 +256,7 @@ const serverlessConfiguration: AWS = {
           ],
           Policies: [
             {
-              PolicyName: `DRKunta-${process.env.STAGE_NAME}-createSchedulePolicy`,
+              PolicyName: `DRKunta-${stage}-createSchedulePolicy`,
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
@@ -245,7 +264,7 @@ const serverlessConfiguration: AWS = {
                     Effect: 'Allow',
                     Action: ['ssm:DescribeParameters'],
                     Resource: [
-                      `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:*`
+                      `arn:aws:ssm:eu-west-1:${awsaccountid}:*`
                     ]
                   },
                   {
@@ -256,12 +275,12 @@ const serverlessConfiguration: AWS = {
                       'ssm:PutParameter',
                       'ssm:DeleteParameter'
                     ],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/DRKunta/${process.env.STAGE_NAME}/*`
+                    Resource: `arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/DRKunta/${stage}/*`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['scheduler:CreateSchedule'],
-                    Resource: `arn:aws:scheduler:eu-west-1:${process.env.AWS_ACCOUNT_ID}:schedule/DRKunta-${process.env.STAGE_NAME}/DRKunta-${process.env.STAGE_NAME}-*`
+                    Resource: `arn:aws:scheduler:eu-west-1:${awsaccountid}:schedule/DRKunta-${stage}/DRKunta-${stage}-*`
                   },
                   {
                     Effect: 'Allow',
@@ -270,11 +289,11 @@ const serverlessConfiguration: AWS = {
                       'logs:CreateLogStream',
                       'logs:PutLogEvents'
                     ],
-                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
+                    Resource: `arn:aws:logs:eu-west-1:${awsaccountid}:log-groups:/aws/lambda/*:*:*`
                   },
                   {
                     Action: ['iam:PassRole'],
-                    Resource: `arn:aws:iam::${process.env.AWS_ACCOUNT_ID}:role/DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataScheduleRole`,
+                    Resource: `arn:aws:iam::${awsaccountid}:role/DRKunta-${stage}-fetchMunicipalityDataScheduleRole`,
                     Effect: 'Allow'
                   }
                 ]
@@ -286,7 +305,7 @@ const serverlessConfiguration: AWS = {
       deleteScheduleRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: `DRKunta-${process.env.STAGE_NAME}-deleteScheduleRole`,
+          RoleName: `DRKunta-${stage}-deleteScheduleRole`,
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -304,7 +323,7 @@ const serverlessConfiguration: AWS = {
           ],
           Policies: [
             {
-              PolicyName: `DRKunta-${process.env.STAGE_NAME}-deleteSchedulePolicy`,
+              PolicyName: `DRKunta-${stage}-deleteSchedulePolicy`,
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
@@ -312,7 +331,7 @@ const serverlessConfiguration: AWS = {
                     Effect: 'Allow',
                     Action: ['ssm:DescribeParameters'],
                     Resource: [
-                      `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:*`
+                      `arn:aws:ssm:eu-west-1:${awsaccountid}:*`
                     ]
                   },
                   {
@@ -322,7 +341,7 @@ const serverlessConfiguration: AWS = {
                       'ssm:GetParameters',
                       'ssm:DeleteParameter'
                     ],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/DRKunta/${process.env.STAGE_NAME}/*`
+                    Resource: `arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/DRKunta/${stage}/*`
                   },
                   {
                     Effect: 'Allow',
@@ -330,7 +349,7 @@ const serverlessConfiguration: AWS = {
                       'scheduler:GetSchedule',
                       'scheduler:DeleteSchedule'
                     ],
-                    Resource: `arn:aws:scheduler:eu-west-1:${process.env.AWS_ACCOUNT_ID}:schedule/DRKunta-${process.env.STAGE_NAME}/DRKunta-${process.env.STAGE_NAME}-*`
+                    Resource: `arn:aws:scheduler:eu-west-1:${awsaccountid}:schedule/DRKunta-${stage}/DRKunta-${stage}-*`
                   },
                   {
                     Effect: 'Allow',
@@ -339,7 +358,7 @@ const serverlessConfiguration: AWS = {
                       'logs:CreateLogStream',
                       'logs:PutLogEvents'
                     ],
-                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
+                    Resource: `arn:aws:logs:eu-west-1:${awsaccountid}:log-groups:/aws/lambda/*:*:*`
                   }
                 ]
               }
@@ -350,7 +369,7 @@ const serverlessConfiguration: AWS = {
       listSchedulesRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: `DRKunta-${process.env.STAGE_NAME}-listSchedulesRole`,
+          RoleName: `DRKunta-${stage}-listSchedulesRole`,
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -368,19 +387,19 @@ const serverlessConfiguration: AWS = {
           ],
           Policies: [
             {
-              PolicyName: `DRKunta-${process.env.STAGE_NAME}-listSchedulesPolicy`,
+              PolicyName: `DRKunta-${stage}-listSchedulesPolicy`,
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
                   {
                     Effect: 'Allow',
                     Action: ['scheduler:ListSchedules'],
-                    Resource: `arn:aws:scheduler:eu-west-1:${process.env.AWS_ACCOUNT_ID}:schedule/*/*`
+                    Resource: `arn:aws:scheduler:eu-west-1:${awsaccountid}:schedule/*/*`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['scheduler:GetSchedule'],
-                    Resource: `arn:aws:scheduler:eu-west-1:${process.env.AWS_ACCOUNT_ID}:schedule/DRKunta-${process.env.STAGE_NAME}/*`
+                    Resource: `arn:aws:scheduler:eu-west-1:${awsaccountid}:schedule/DRKunta-${stage}/*`
                   },
                   {
                     Effect: 'Allow',
@@ -389,7 +408,7 @@ const serverlessConfiguration: AWS = {
                       'logs:CreateLogStream',
                       'logs:PutLogEvents'
                     ],
-                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
+                    Resource: `arn:aws:logs:eu-west-1:${awsaccountid}:log-groups:/aws/lambda/*:*:*`
                   }
                 ]
               }
@@ -400,7 +419,7 @@ const serverlessConfiguration: AWS = {
       fetchMunicipalityDataScheduleRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: `DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataScheduleRole`,
+          RoleName: `DRKunta-${stage}-fetchMunicipalityDataScheduleRole`,
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -418,7 +437,7 @@ const serverlessConfiguration: AWS = {
           ],
           Policies: [
             {
-              PolicyName: `DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataSchedulePolicy`,
+              PolicyName: `DRKunta-${stage}-fetchMunicipalityDataSchedulePolicy`,
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
@@ -426,8 +445,8 @@ const serverlessConfiguration: AWS = {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
                     Resource: [
-                      `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityData:*`,
-                      `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityData`
+                      `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-fetchMunicipalityData:*`,
+                      `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-fetchMunicipalityData`
                     ]
                   }
                 ]
@@ -439,7 +458,7 @@ const serverlessConfiguration: AWS = {
       fetchMunicipalityDataRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: `DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataRole`,
+          RoleName: `DRKunta-${stage}-fetchMunicipalityDataRole`,
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -457,7 +476,7 @@ const serverlessConfiguration: AWS = {
           ],
           Policies: [
             {
-              PolicyName: `DRKunta-${process.env.STAGE_NAME}-fetchMunicipalityDataPolicy`,
+              PolicyName: `DRKunta-${stage}-fetchMunicipalityDataPolicy`,
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
@@ -465,23 +484,23 @@ const serverlessConfiguration: AWS = {
                     Effect: 'Allow',
                     Action: ['ssm:DescribeParameters'],
                     Resource: [
-                      `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:*`
+                      `arn:aws:ssm:eu-west-1:${awsaccountid}:*`
                     ]
                   },
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/DRKunta/${process.env.STAGE_NAME}/*`
+                    Resource: `arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/DRKunta/${stage}/*`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['s3:PutObject', 's3:PutObjectAcl'],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/infrao/*`
+                    Resource: `arn:aws:s3:::dr-kunta-${stage}-bucket/infrao/*`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['s3:ListBucket'],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket`
+                    Resource: `arn:aws:s3:::dr-kunta-${stage}-bucket`
                   },
                   {
                     Effect: 'Allow',
@@ -490,7 +509,7 @@ const serverlessConfiguration: AWS = {
                       'logs:CreateLogStream',
                       'logs:PutLogEvents'
                     ],
-                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
+                    Resource: `arn:aws:logs:eu-west-1:${awsaccountid}:log-groups:/aws/lambda/*:*:*`
                   }
                 ]
               }
@@ -501,7 +520,7 @@ const serverlessConfiguration: AWS = {
       calculateDeltaRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: `DRKunta-${process.env.STAGE_NAME}-calculateDeltaRole`,
+          RoleName: `DRKunta-${stage}-calculateDeltaRole`,
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -519,7 +538,7 @@ const serverlessConfiguration: AWS = {
           ],
           Policies: [
             {
-              PolicyName: `DRKunta-${process.env.STAGE_NAME}-calculateDeltaPolicy`,
+              PolicyName: `DRKunta-${stage}-calculateDeltaPolicy`,
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
@@ -530,22 +549,22 @@ const serverlessConfiguration: AWS = {
                       's3:GetObject',
                       's3:DeleteObject'
                     ],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/geojson/*`
+                    Resource: `arn:aws:s3:::dr-kunta-${stage}-bucket/geojson/*`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['s3:ListBucket'],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket`
+                    Resource: `arn:aws:s3:::dr-kunta-${stage}-bucket`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-matchRoadLink`
+                    Resource: `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-matchRoadLink`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`
+                    Resource: `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-reportRejectedDelta`
                   },
                   {
                     Effect: 'Allow',
@@ -554,12 +573,12 @@ const serverlessConfiguration: AWS = {
                       'logs:CreateLogStream',
                       'logs:PutLogEvents'
                     ],
-                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-group:/aws/lambda/*`
+                    Resource: `arn:aws:logs:eu-west-1:${awsaccountid}:log-group:/aws/lambda/*`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['s3:PutObject', 's3:PutObjectAcl'],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/calculateDelta/*`
+                    Resource: `arn:aws:s3:::dr-kunta-${stage}-bucket/calculateDelta/*`
                   }
                 ]
               }
@@ -570,7 +589,7 @@ const serverlessConfiguration: AWS = {
       parseXMLRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: `DRKunta-${process.env.STAGE_NAME}-parseXMLRole`,
+          RoleName: `DRKunta-${stage}-parseXMLRole`,
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -588,29 +607,29 @@ const serverlessConfiguration: AWS = {
           ],
           Policies: [
             {
-              PolicyName: `DRKunta-${process.env.STAGE_NAME}-parseXMLPolicy`,
+              PolicyName: `DRKunta-${stage}-parseXMLPolicy`,
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
                   {
                     Effect: 'Allow',
                     Action: ['s3:ListBucket', 's3:GetObject'],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/infrao/*`
+                    Resource: `arn:aws:s3:::dr-kunta-${stage}-bucket/infrao/*`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['s3:PutObject', 's3:PutObjectAcl'],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/geojson/*`
+                    Resource: `arn:aws:s3:::dr-kunta-${stage}-bucket/geojson/*`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['s3:ListBucket'],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket`
+                    Resource: `arn:aws:s3:::dr-kunta-${stage}-bucket`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`
+                    Resource: `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-reportRejectedDelta`
                   },
                   {
                     Effect: 'Allow',
@@ -619,7 +638,7 @@ const serverlessConfiguration: AWS = {
                       'logs:CreateLogStream',
                       'logs:PutLogEvents'
                     ],
-                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-group:/aws/lambda/*`
+                    Resource: `arn:aws:logs:eu-west-1:${awsaccountid}:log-group:/aws/lambda/*`
                   }
                 ]
               }
@@ -630,7 +649,7 @@ const serverlessConfiguration: AWS = {
       DBLambdaRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: `DRKunta-${process.env.STAGE_NAME}-DBLambdaRole`,
+          RoleName: `DRKunta-${stage}-DBLambdaRole`,
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -648,7 +667,7 @@ const serverlessConfiguration: AWS = {
           ],
           Policies: [
             {
-              PolicyName: `DRKunta-${process.env.STAGE_NAME}-DBLambdaPolicy`,
+              PolicyName: `DRKunta-${stage}-DBLambdaPolicy`,
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
@@ -656,13 +675,15 @@ const serverlessConfiguration: AWS = {
                     Effect: 'Allow',
                     Action: ['ssm:DescribeParameters'],
                     Resource: [
-                      `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:*`
+                      `arn:aws:ssm:eu-west-1:${awsaccountid}:*`
                     ]
                   },
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter${'${self.custom:pgPasswordSsmKey}'}`
+                    Resource: `arn:aws:ssm:eu-west-1:${
+                      awsaccountid
+                    }:parameter${'${self.custom:pgPasswordSsmKey}'}`
                   },
                   {
                     Effect: 'Allow',
@@ -671,20 +692,20 @@ const serverlessConfiguration: AWS = {
                       'logs:CreateLogStream',
                       'logs:PutLogEvents'
                     ],
-                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
+                    Resource: `arn:aws:logs:eu-west-1:${awsaccountid}:log-groups:/aws/lambda/*:*:*`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['s3:ListBucket', 's3:GetObject'],
                     Resource: [
-                      `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/matchRoadLink/*`,
-                      `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/getNearbyLinksRequestPayload/*`
+                      `arn:aws:s3:::dr-kunta-${stage}-bucket/matchRoadLink/*`,
+                      `arn:aws:s3:::dr-kunta-${stage}-bucket/getNearbyLinksRequestPayload/*`
                     ]
                   },
                   {
                     Effect: 'Allow',
                     Action: ['s3:PutObject', 's3:PutObjectAcl'],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/getNearbyLinks/*`
+                    Resource: `arn:aws:s3:::dr-kunta-${stage}-bucket/getNearbyLinks/*`
                   }
                 ]
               }
@@ -695,7 +716,7 @@ const serverlessConfiguration: AWS = {
       matchRoadLinkRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: `DRKunta-${process.env.STAGE_NAME}-matchRoadLinkRole`,
+          RoleName: `DRKunta-${stage}-matchRoadLinkRole`,
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -713,24 +734,24 @@ const serverlessConfiguration: AWS = {
           ],
           Policies: [
             {
-              PolicyName: `DRKunta-${process.env.STAGE_NAME}-matchRoadLinkPolicy`,
+              PolicyName: `DRKunta-${stage}-matchRoadLinkPolicy`,
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-reportRejectedDelta`
+                    Resource: `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-reportRejectedDelta`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-getNearbyLinks`
+                    Resource: `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-getNearbyLinks`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['lambda:InvokeFunction'],
-                    Resource: `arn:aws:lambda:eu-west-1:${process.env.AWS_ACCOUNT_ID}:function:DRKunta-${process.env.STAGE_NAME}-execDelta2SQL`
+                    Resource: `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-execDelta2SQL`
                   },
                   {
                     Effect: 'Allow',
@@ -739,23 +760,23 @@ const serverlessConfiguration: AWS = {
                       'logs:CreateLogStream',
                       'logs:PutLogEvents'
                     ],
-                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
+                    Resource: `arn:aws:logs:eu-west-1:${awsaccountid}:log-groups:/aws/lambda/*:*:*`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['s3:ListBucket', 's3:GetObject'],
                     Resource: [
-                      `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/calculateDelta/*`,
-                      `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/getNearbyLinks/*`
+                      `arn:aws:s3:::dr-kunta-${stage}-bucket/calculateDelta/*`,
+                      `arn:aws:s3:::dr-kunta-${stage}-bucket/getNearbyLinks/*`
                     ]
                   },
                   {
                     Effect: 'Allow',
                     Action: ['s3:PutObject', 's3:PutObjectAcl'],
                     Resource: [
-                      `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/matchRoadLink/*`,
-                      `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/logs/*`,
-                      `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/getNearbyLinksRequestPayload/*`
+                      `arn:aws:s3:::dr-kunta-${stage}-bucket/matchRoadLink/*`,
+                      `arn:aws:s3:::dr-kunta-${stage}-bucket/logs/*`,
+                      `arn:aws:s3:::dr-kunta-${stage}-bucket/getNearbyLinksRequestPayload/*`
                     ]
                   }
                 ]
@@ -767,7 +788,7 @@ const serverlessConfiguration: AWS = {
       reportRejectedDeltaRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDeltaRole`,
+          RoleName: `DRKunta-${stage}-reportRejectedDeltaRole`,
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -785,7 +806,7 @@ const serverlessConfiguration: AWS = {
           ],
           Policies: [
             {
-              PolicyName: `DRKunta-${process.env.STAGE_NAME}-reportRejectedDeltaPolicy`,
+              PolicyName: `DRKunta-${stage}-reportRejectedDeltaPolicy`,
               PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [
@@ -796,7 +817,7 @@ const serverlessConfiguration: AWS = {
                       'logs:CreateLogStream',
                       'logs:PutLogEvents'
                     ],
-                    Resource: `arn:aws:logs:eu-west-1:${process.env.AWS_ACCOUNT_ID}:log-groups:/aws/lambda/*:*:*`
+                    Resource: `arn:aws:logs:eu-west-1:${awsaccountid}:log-groups:/aws/lambda/*:*:*`
                   },
                   {
                     Effect: 'Allow',
@@ -807,24 +828,28 @@ const serverlessConfiguration: AWS = {
                       's3:GetObject',
                       's3:DeleteObject'
                     ],
-                    Resource: `arn:aws:s3:::dr-kunta-${process.env.STAGE_NAME}-bucket/*`
+                    Resource: `arn:aws:s3:::dr-kunta-${stage}-bucket/*`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['ssm:DescribeParameters'],
                     Resource: [
-                      `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:*`
+                      `arn:aws:ssm:eu-west-1:${awsaccountid}:*`
                     ]
                   },
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/${'${self.custom:smtpUsernameSsmKey}'}`
+                    Resource: `arn:aws:ssm:eu-west-1:${
+                      awsaccountid
+                    }:parameter/${'${self.custom:smtpUsernameSsmKey}'}`
                   },
                   {
                     Effect: 'Allow',
                     Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-                    Resource: `arn:aws:ssm:eu-west-1:${process.env.AWS_ACCOUNT_ID}:parameter/${'${self.custom:smtpPasswordSsmKey}'}`
+                    Resource: `arn:aws:ssm:eu-west-1:${
+                      awsaccountid
+                    }:parameter/${'${self.custom:smtpPasswordSsmKey}'}`
                   }
                 ]
               }

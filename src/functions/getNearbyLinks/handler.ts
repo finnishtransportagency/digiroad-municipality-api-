@@ -7,7 +7,8 @@ import {
   pgport,
   pgdatabase,
   pguser,
-  pgpassword
+  pgpassword,
+  stage
 } from '@functions/config';
 import { getParameter } from '@libs/ssm-tools';
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
@@ -16,7 +17,7 @@ import { allowedOnKapy } from '@schemas/trafficSignTypes';
 
 const getNearbyLinks = async (event: S3KeyObject) => {
   const data = await getFromS3(
-    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    `dr-kunta-${stage}-bucket`,
     event.key
   );
   const requestPayload = JSON.parse(data) as unknown;
@@ -115,7 +116,7 @@ const getNearbyLinks = async (event: S3KeyObject) => {
 
   const S3ObjectKey = `getNearbyLinks/${requestPayload.municipality}/${now}.json`;
   await uploadToS3(
-    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    `dr-kunta-${stage}-bucket`,
     S3ObjectKey,
     JSON.stringify(res.rows)
   );

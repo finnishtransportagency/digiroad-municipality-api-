@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
-import { offline, offlineApiKey, bbox, fetchSize } from '@functions/config';
+import { offline, offlineApiKey, bbox, fetchSize, stage } from '@functions/config';
 import { isScheduleEvent, isXmlFeatureCollectionJson } from './types';
 import { middyfy } from '@libs/lambda-tools';
 import { getParameter } from '@libs/ssm-tools';
@@ -44,7 +44,7 @@ const fetchMunicipalityData = async (event: unknown) => {
   const apiKey = offline
     ? offlineApiKey
     : await getParameter(
-        `/DRKunta/${process.env.STAGE_NAME}/${event.municipality}`
+        `/DRKunta/${stage}/${event.municipality}`
       );
 
   for (var assetType of Object.entries(event.assetTypes)) {
@@ -76,7 +76,7 @@ const fetchMunicipalityData = async (event: unknown) => {
     const now = new Date().toISOString().slice(0, 19);
 
     await uploadToS3(
-      `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+      `dr-kunta-${stage}-bucket`,
       `infrao/${event.municipality}/${assetType[0]}/${now}.xml`,
       payload
     );
