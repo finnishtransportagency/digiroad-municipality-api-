@@ -28,13 +28,14 @@ import {
   smtppassword,
   pgpassword,
   stage,
-  email,
   drsecuritygroupid,
   awsaccountid,
   pghost,
   pgport,
   pgdatabase,
-  pguser
+  pguser,
+  awscloudformationrole,
+  email
 } from '@functions/config';
 
 const serverlessConfiguration: AWS = {
@@ -66,6 +67,7 @@ const serverlessConfiguration: AWS = {
     name: 'aws',
     runtime: offline ? 'nodejs16.x' : 'nodejs18.x',
     stage: stage,
+    iam: { deploymentRole: `arn:aws:iam::${awsaccountid}:role/${awscloudformationrole}` },
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,

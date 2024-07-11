@@ -22,3 +22,4 @@ export const smtppassword = process.env.SMTP_PASSWORD_SSM_KEY || '';
 export const email = process.env.OPERATOR_EMAIL || '';
 export const drsecuritygroupid = process.env.DR_SECURITY_GROUP_ID || '';
 export const awsaccountid = process.env.AWS_ACCOUNT_ID || '';
+export const awscloudformationrole = process.env.AWS_CLOUDFORMATION_ROLE || '';
