@@ -38,6 +38,8 @@ import {
   email
 } from '@functions/config';
 
+console.log('test', awsaccountid, awscloudformationrole)
+
 const serverlessConfiguration: AWS = {
   service: 'dr-kunta',
   frameworkVersion: '3',
