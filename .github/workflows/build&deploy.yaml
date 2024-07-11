@@ -52,3 +52,4 @@ jobs:
                 PGDATABASE: ${{ secrets.PGDATABASE }}
                 PGUSER: ${{ secrets.PGUSER }}
                 VPC_ID: ${{ secrets.VPC_ID }}
+                AWS_CLOUDFORMATION_ROLE: ${{ secrets.AWS_CLOUDFORMATION_ROLE }}
