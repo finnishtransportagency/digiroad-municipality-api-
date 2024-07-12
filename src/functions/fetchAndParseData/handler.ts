@@ -4,36 +4,34 @@ import {
   isScheduleEvent
 } from '@customTypes/eventTypes';
 import {
+  AdditionalPanelType,
+  Feature,
+  FeatureCollection,
+  InvalidFeature,
+  TrafficSignType,
+  ValidFeature
+} from '@customTypes/featureTypes';
+import {
   fetchSize,
   offline,
   offlineApiKey,
   stage,
-  bbox
+  bbox,
+  bucketName
 } from '@functions/config';
 import { middyfy } from '@libs/lambda-tools';
 import { uploadToS3 } from '@libs/s3-tools';
 import { getParameter } from '@libs/ssm-tools';
-import {
-  Feature,
-  FeatureCollection,
-  ValidFeature,
-  trafficSignFeatureSchema
-} from '@schemas/geoJsonSchema';
+import { trafficSignFeatureSchema } from '@schemas/geoJsonSchema';
 import {
   infraoJsonSchema,
   infraoObstacleSchema,
   infraoTrafficSignSchema
 } from '@schemas/muniResponseSchema';
-import {
-  createTrafficSignText,
-  trafficSignRules
-} from '@schemas/trafficSignTypes';
+import { createTrafficSignText, trafficSignRules } from '@schemas/trafficSignTypes';
 import axios from 'axios';
 
-const parseFeature = (
-  assetType: AssetTypeString,
-  feature: unknown
-): Feature => {
+const parseFeature = (assetType: AssetTypeString, feature: unknown): Feature => {
   try {
     switch (assetType) {
       case 'infrao:Rakenne': {
@@ -102,12 +100,9 @@ const parseFeature = (
           type: 'Feature',
           id: castedFeature.id,
           properties: {
-            TYPE:
-              trafficSignCode[0] === 'H' ? 'ADDITIONALPANEL' : 'TRAFFICSIGN',
+            TYPE: trafficSignCode[0] === 'H' ? 'ADDITIONALPANEL' : 'TRAFFICSIGN',
             ID: String(id),
-            SUUNTIMA: properties.suunta
-              ? properties.suunta * (180 / Math.PI)
-              : 0,
+            SUUNTIMA: properties.suunta ? properties.suunta * (180 / Math.PI) : 0,
             LM_TYYPPI: createTrafficSignText(trafficSignCode),
             // TODO: Set ARVO only on corresponding traffic signs. e.g. speed limit signs (check trafficSignRules)
             ARVO: Object.keys(trafficSignRules).includes(
@@ -158,7 +153,7 @@ const parseFeature = (
     type: 'Invalid',
     id: -1,
     properties: {
-      reason: `Asset type not supported by parseFeature: ${assetType}`,
+      reason: `Asset type not supported by parseFeature: ${assetType ?? 'undefined'}`,
       feature: JSON.stringify(feature)
     }
   };
@@ -187,17 +182,13 @@ const similarBearing = (
  * @param features All traffic signs to be matched
  * @returns Main traffic signs with additional panels added to them
  */
-const matchAdditionalPanels = (
-  features: Array<Feature>
-): Array<ValidFeature> => {
-  const validFeatures = features.filter(
-    (f) => f.type === 'Feature'
-  ) as Array<ValidFeature>;
+const matchAdditionalPanels = (features: Array<Feature>): Array<ValidFeature> => {
+  const validFeatures = features.filter((f): f is ValidFeature => f.type === 'Feature');
   const additionalPanels = validFeatures.filter(
-    (f) => f.properties.TYPE === 'ADDITIONALPANEL'
+    (f): f is AdditionalPanelType => f.properties.TYPE === 'ADDITIONALPANEL'
   );
   const mainPanels = validFeatures.filter(
-    (f) => f.properties.TYPE !== 'ADDITIONALPANEL'
+    (f): f is TrafficSignType => f.properties.TYPE === 'TRAFFICSIGN'
   );
   const rejectedAdditionalPanels: Array<Feature> = [];
   for (const additionalPanel of additionalPanels) {
@@ -263,7 +254,7 @@ const fetchAndParseData = async (event: unknown) => {
           apiKey
         );
         await uploadToS3(
-          `dr-kunta-${stage}-bucket`,
+          bucketName,
           `geojson/${event.municipality}/${assetKey}/${new Date()
             .toISOString()
             .slice(0, 19)}.json`,
@@ -337,8 +328,12 @@ const fetchJsonData = async (
       (feature) => parseFeature(assetType, feature)
     );
 
-    const validFeatures = parsedFeatures.filter((f) => f.type === 'Feature');
-    const invalidFeatures = parsedFeatures.filter((f) => f.type === 'Invalid');
+    const validFeatures = parsedFeatures.filter(
+      (f): f is ValidFeature => f.type === 'Feature'
+    );
+    const invalidFeatures = parsedFeatures.filter(
+      (f): f is InvalidFeature => f.type === 'Invalid'
+    );
 
     geoJson.features.push(...validFeatures);
     geoJson.invalidInfrao.sum += invalidFeatures.length;

@@ -16,6 +16,7 @@ import {
   FeatureType
 } from '@functions/typing';
 import { isDelta, isFeatureRoadlinkMap } from './types';
+import { bucketName } from '@functions/config';
 
 // Max offset permitted from middle of linestring
 const MAX_OFFSET = 2;
@@ -23,14 +24,9 @@ const MAX_OFFSET = 2;
 const now = new Date().toISOString().slice(0, 19);
 
 const matchRoadLinks = async (event: S3KeyObject) => {
-  const delta = JSON.parse(
-    await getFromS3(`dr-kunta-${process.env.STAGE_NAME}-bucket`, event.key)
-  ) as unknown;
+  const delta = JSON.parse(await getFromS3(bucketName, event.key)) as unknown;
   if (!isDelta(delta))
-    throw new Error(
-      `S3 object ${event.key} is not valid Delta object:\n`,
-      delta
-    );
+    throw new Error(`S3 object ${event.key} is not valid Delta object:\n`, delta);
 
   let rejectsAmount = 0;
   let features: Array<DrKuntaFeature> = delta.Created.concat(delta.Updated);
@@ -47,7 +43,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   };
 
   await uploadToS3(
-    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    bucketName,
     `getNearbyLinksRequestPayload/${delta.metadata.municipality}/${now}.json`,
     JSON.stringify(getNearbyLinksPayload)
   );
@@ -76,10 +72,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   const allRoadLinksS3Key = parsedResult.key;
 
   const allRoadLinks = JSON.parse(
-    await getFromS3(
-      `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-      allRoadLinksS3Key
-    )
+    await getFromS3(bucketName, allRoadLinksS3Key)
   ) as unknown;
   if (!Array.isArray(allRoadLinks) || !allRoadLinks.every(isFeatureRoadlinkMap))
     throw new Error(
@@ -89,8 +82,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   for (let p = 0; p < features.length; p++) {
     const feature = features[p];
     const roadLinks: Array<LinkObject> | undefined = allRoadLinks.find(
-      (i) =>
-        i.id === feature.properties.ID && i.type === feature.properties.TYPE
+      (i) => i.id === feature.properties.ID && i.type === feature.properties.TYPE
     )?.roadlinks;
     if (roadLinks) {
       switch (feature.properties.TYPE) {
@@ -138,11 +130,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
           break;
         }
         case FeatureType.Surface: {
-          const surfaceMatchResults = matchSurface(
-            roadLinks,
-            feature,
-            geomFactory
-          );
+          const surfaceMatchResults = matchSurface(roadLinks, feature, geomFactory);
 
           if (!surfaceMatchResults) {
             console.error('matchResult is undefined');
@@ -208,13 +196,13 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   };
 
   await uploadToS3(
-    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    bucketName,
     `matchRoadLink/${delta.metadata.municipality}/${now}.json`,
     JSON.stringify(execDelta2SQLBody)
   );
 
   await uploadToS3(
-    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
+    bucketName,
     `logs/${delta.metadata.municipality}/${now}.json`,
     JSON.stringify(logsBody)
   );

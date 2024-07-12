@@ -17,16 +17,14 @@ import {
   pgport,
   pgdatabase,
   pguser,
-  pgpassword
+  pgpassword,
+  bucketName
 } from '@functions/config';
 import { getParameter } from '@libs/ssm-tools';
 import { getFromS3 } from '@libs/s3-tools';
 
 const execDelta2SQL = async (event) => {
-  const data = await getFromS3(
-    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    event.key
-  );
+  const data = await getFromS3(bucketName, event.key);
   const delta = JSON.parse(data) as unknown;
 
   const client = new Client({

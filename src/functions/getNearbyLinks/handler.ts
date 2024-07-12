@@ -7,7 +7,8 @@ import {
   pgport,
   pgdatabase,
   pguser,
-  pgpassword
+  pgpassword,
+  bucketName
 } from '@functions/config';
 import { getParameter } from '@libs/ssm-tools';
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
@@ -15,10 +16,7 @@ import { S3KeyObject } from '@functions/typing';
 import { allowedOnKapy } from '@schemas/trafficSignTypes';
 
 const getNearbyLinks = async (event: S3KeyObject) => {
-  const data = await getFromS3(
-    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    event.key
-  );
+  const data = await getFromS3(bucketName, event.key);
   const requestPayload = JSON.parse(data) as unknown;
 
   const client = new Client({
@@ -114,11 +112,7 @@ const getNearbyLinks = async (event: S3KeyObject) => {
   const now = new Date().toISOString().slice(0, 19);
 
   const S3ObjectKey = `getNearbyLinks/${requestPayload.municipality}/${now}.json`;
-  await uploadToS3(
-    `dr-kunta-${process.env.STAGE_NAME}-bucket`,
-    S3ObjectKey,
-    JSON.stringify(res.rows)
-  );
+  await uploadToS3(bucketName, S3ObjectKey, JSON.stringify(res.rows));
 
   return { key: S3ObjectKey };
 };
