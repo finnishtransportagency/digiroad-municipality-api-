@@ -63,7 +63,8 @@ const serverlessConfiguration: AWS = {
     vpcId: `\${ssm:${vpcid}}`,
     pgPasswordSsmKey: `\${ssm:${pgpassword}}`,
     smtpUsernameSsmKey: `\${ssm:${smtpusername}}`,
-    smtpPasswordSsmKey: `\${ssm:${smtppassword}}`
+    smtpPasswordSsmKey: `\${ssm:${smtppassword}}`,
+    drSecurityGroupId: `\${ssm:${drsecuritygroupid}}`,
   },
   provider: {
     name: 'aws',
@@ -104,7 +105,7 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       STAGE_NAME: stage,
       OPERATOR_EMAIL: email,
-      DR_SECURITY_GROUP_ID: `\${ssm:${drsecuritygroupid}}`,
+      DR_SECURITY_GROUP_ID: '${self:custom.drSecurityGroupId}',
       DR_SUBNET_ID_1: '${self:custom.drSubnetId1}',
       DR_SUBNET_ID_2: '${self:custom.drSubnetId2}',
       AWS_ACCOUNT_ID: awsaccountid,

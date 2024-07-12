@@ -15,8 +15,8 @@ export default {
   maximumRetryAttempts: 0,
   timeout: 60,
   vpc: {
-    securityGroupIds: [drsecuritygroupid],
-    subnetIds: [drsubnetid1, drsubnetid2]
+    securityGroupIds: ['${self:custom.drSecurityGroupId}'],
+    subnetIds: ['${self:custom.drSubnetId1}', '${self:custom.drSubnetId2}']
   },
   environment: {
     PGHOST: pghost,
