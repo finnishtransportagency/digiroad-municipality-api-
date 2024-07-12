@@ -1,8 +1,5 @@
 import { handlerPath } from '@libs/handler-resolver';
 import {
-  drsecuritygroupid,
-  drsubnetid1,
-  drsubnetid2,
   pgdatabase,
   pghost,
   pgpassword,

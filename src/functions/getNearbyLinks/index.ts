@@ -1,7 +1,4 @@
 import {
-  drsecuritygroupid,
-  drsubnetid1,
-  drsubnetid2,
   pgdatabase,
   pghost,
   pgpassword,
