@@ -38,8 +38,6 @@ import {
   email
 } from '@functions/config';
 
-console.log('test', awsaccountid, awscloudformationrole)
-
 const serverlessConfiguration: AWS = {
   service: 'dr-kunta',
   frameworkVersion: '3',
@@ -64,7 +62,7 @@ const serverlessConfiguration: AWS = {
     pgPasswordSsmKey: `\${ssm:${pgpassword}}`,
     smtpUsernameSsmKey: `\${ssm:${smtpusername}}`,
     smtpPasswordSsmKey: `\${ssm:${smtppassword}}`,
-    drSecurityGroupId: `\${ssm:${drsecuritygroupid}}`,
+    drSecurityGroupId: `\${ssm:${drsecuritygroupid}}`
   },
   provider: {
     name: 'aws',
@@ -230,6 +228,38 @@ const serverlessConfiguration: AWS = {
                 ExpirationInDays: 30,
                 Prefix: '/infrao/',
                 Status: 'Enabled'
+              }
+            ]
+          },
+          NotificationConfiguration: {
+            LambdaConfigurations: [
+              {
+                Event: 's3:ObjectCreated',
+                Function: { 'Fn::GetAtt': ['CalculateDeltaLambdaFunction', 'arn'] },
+                Filter: {
+                  S3Key: {
+                    Rules: [
+                      {
+                        Name: 'prefix',
+                        Value: 'geojson/'
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                Event: 's3:ObjectCreated:*',
+                Function: { 'Fn::GetAtt': ['ParseXMLLambdaFunction', 'arn'] },
+                Filter: {
+                  S3Key: {
+                    Rules: [
+                      {
+                        Name: 'prefix',
+                        Value: 'infrao/'
+                      }
+                    ]
+                  }
+                }
               }
             ]
           }
