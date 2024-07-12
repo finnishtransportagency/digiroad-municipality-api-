@@ -48,10 +48,7 @@ export const listS3Objects = async (
     })
   );
 
-export const getFromS3 = async (
-  bucketName: string,
-  fileName: string
-): Promise<string> =>
+export const getFromS3 = async (bucketName: string, fileName: string): Promise<string> =>
   await (
     await s3.send(
       new GetObjectCommand({

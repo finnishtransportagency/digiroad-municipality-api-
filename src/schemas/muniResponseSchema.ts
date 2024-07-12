@@ -1,4 +1,4 @@
-import { array, date, mixed, number, object, string } from 'yup';
+import { array, date, number, object, string } from 'yup';
 import { pointGeometrySchema } from './geometrySchema';
 import { trafficSignRules } from './trafficSignTypes';
 import { trafficSignMapping } from './trafficSignMapping';
@@ -8,13 +8,13 @@ import { trafficSignMapping } from './trafficSignMapping';
  * Contents of the features array are not checked!!!
  */
 const infraoJsonSchema = object({
-  type: mixed().oneOf(['FeatureCollection']).required(),
+  type: string().oneOf(['FeatureCollection']).required(),
   numberReturned: number().required(),
   features: array().required() // Content in not checked
 }).required();
 
 const infraoObstacleSchema = object({
-  type: mixed().oneOf(['Feature']).required(),
+  type: string().oneOf(['Feature']).required(),
   id: string()
     .matches(/(^\D+\.\d+$)/)
     .required(), // e.g. "Rakenne.123456789"
@@ -23,13 +23,13 @@ const infraoObstacleSchema = object({
     yksilointitieto: number().required(),
     alkuHetki: date().required(),
     loppuHetki: date().min(new Date()).notRequired(),
-    malli: mixed().oneOf(['Pollari', 'Puomi']).required(),
-    rakenne: mixed().oneOf(['kulkuesteet (pollarit, puomit)']).required()
+    malli: string().oneOf(['Pollari', 'Puomi']).required(),
+    rakenne: string().oneOf(['kulkuesteet (pollarit, puomit)']).required()
   }).required()
 }).required();
 
 const infraoTrafficSignSchema = object({
-  type: mixed().oneOf(['Feature']).required(),
+  type: string().oneOf(['Feature']).required(),
   id: string()
     .matches(/(^\D+\.\d+$)/)
     .required(), // e.g. "Liikennemerkki.123456789"
@@ -50,12 +50,10 @@ const infraoTrafficSignSchema = object({
             .transform((code: string) => {
               const splitType = code.trim().split(' '); // e.g. ['A10'] or ['141.a', 'Töyssyjä']
               const code2020 = splitType[0];
-              if (Object.keys(trafficSignRules).includes(code2020))
-                return code2020;
+              if (Object.keys(trafficSignRules).includes(code2020)) return code2020;
               const mapping = trafficSignMapping[code2020.split('.')[0]]; // This split might not work for all cases
               if (!mapping) return 'INVALID_CODE';
-              if (mapping.hasSubCode)
-                return mapping.code[splitType[1]] ?? 'INVALID_CODE';
+              if (mapping.hasSubCode) return mapping.code[splitType[1]] ?? 'INVALID_CODE';
               return mapping.code.default ?? 'INVALID_CODE';
             })
             .required(),

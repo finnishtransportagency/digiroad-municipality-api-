@@ -1,11 +1,9 @@
+import { ValidFeature } from './featureTypes';
+
 type ApiResponseType = 'gml' | 'xml' | 'json';
 
-const isApiResponseType = (
-  responseType: unknown
-): responseType is ApiResponseType => {
-  return (
-    responseType === 'gml' || responseType === 'xml' || responseType === 'json'
-  );
+const isApiResponseType = (responseType: unknown): responseType is ApiResponseType => {
+  return responseType === 'gml' || responseType === 'xml' || responseType === 'json';
 };
 
 /**
@@ -36,6 +34,23 @@ export const isScheduleEvent = (event: unknown): event is ScheduleEvent => {
   return true;
 };
 
+/**
+ * Update payload saved to S3
+ */
+export interface UpdatePayload {
+  Created: Array<ValidFeature>;
+  Updated: Array<ValidFeature>;
+  Deleted: Array<ValidFeature>;
+  metadata: {
+    municipality: string;
+    assetType: string;
+  };
+  invalidInfrao: {
+    sum: number;
+    IDs: Array<number>;
+  };
+}
+
 // Keep in sync with isAssetTypeKey & isAssetTypeString
 interface AssetTypes {
   obstacles?: 'infrao:Rakenne';
@@ -59,27 +74,27 @@ const isAssetTypes = (assetType: unknown): assetType is AssetTypes => {
   return true;
 };
 
+/**
+ * 'obstacles' | 'trafficSigns' | 'roadSurfaces'
+ */
 export type AssetTypeKey = keyof AssetTypes;
 // Keep in sync AssetTypes
-export const isAssetTypeKey = (
-  assetType: unknown
-): assetType is AssetTypeKey => {
+export const isAssetTypeKey = (assetType: unknown): assetType is AssetTypeKey => {
   if (typeof assetType !== 'string') return false;
 
   return ['obstacles', 'trafficSigns', 'roadSurfaces'].includes(assetType);
 };
 
+/**
+ * 'infrao:Rakenne' | 'infrao:Liikennemerkki' | 'infrao:KatualueenOsa'
+ */
 export type AssetTypeString =
   ScheduleEvent['assetTypes'][keyof ScheduleEvent['assetTypes']];
 // Keep in sync AssetTypes
-export const isAssetTypeString = (
-  assetType: unknown
-): assetType is AssetTypeString => {
+export const isAssetTypeString = (assetType: unknown): assetType is AssetTypeString => {
   if (typeof assetType !== 'string') return false;
 
-  return [
-    'infrao:Rakenne',
-    'infrao:Liikennemerkki',
-    'infrao:KatualueenOsa'
-  ].includes(assetType);
+  return ['infrao:Rakenne', 'infrao:Liikennemerkki', 'infrao:KatualueenOsa'].includes(
+    assetType
+  );
 };

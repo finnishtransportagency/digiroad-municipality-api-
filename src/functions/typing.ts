@@ -137,7 +137,7 @@ export interface PayloadFeature {
   metadata?: {
     OFFSET_LIMIT?: number;
     municipality: string;
-    assetType?: string;
+    assetType: string;
   };
   invalidInfrao?: {
     sum: number;

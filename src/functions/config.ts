@@ -1,5 +1,6 @@
 export const offline = process.env.OFFLINE === 'true';
 export const stage = process.env.STAGE_NAME || 'dev';
+export const bucketName = `dr-kunta-${stage}-bucket`;
 export const pghost = process.env.PGHOST || 'localhost';
 export const pgport = process.env.PGPORT || '5432';
 export const pgdatabase = process.env.PGDATABASE || 'digiroad2';
