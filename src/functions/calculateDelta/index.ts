@@ -11,7 +11,6 @@ export default {
       s3: {
         bucket: `dr-kunta-${stage}-bucket-placeholder`,
         event: 's3:ObjectCreated:*',
-        existing: true,
         rules: [{ prefix: 'geojson/' }]
       }
     }
