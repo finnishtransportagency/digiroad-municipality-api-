@@ -9,8 +9,6 @@ import {
   reportRejectedDelta,
   getNearbyLinks,
   execDelta2SQL,
-  parseXML,
-  fetchMunicipalityData,
   createSchedule,
   listSchedules,
   deleteSchedule,
@@ -84,13 +82,11 @@ const serverlessConfiguration: AWS = {
   // import the function via paths
   functions: {
     fetchAndParseData,
-    parseXML,
     calculateDelta,
     matchRoadLink,
     reportRejectedDelta,
     getNearbyLinks,
     execDelta2SQL,
-    fetchMunicipalityData,
     createSchedule,
     listSchedules,
     deleteSchedule
