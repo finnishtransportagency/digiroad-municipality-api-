@@ -116,7 +116,7 @@ export default async function execUpdatedTrafficSign(
       ), _enumerated_value AS (
         SELECT enumerated_value.id
         FROM enumerated_value, _property
-      WHERE property_id = _property.id AND name_fi ~ ($2)
+      WHERE property_id = _property.id AND name_fi = ($2)
       LIMIT 1
       )
       
