@@ -59,14 +59,15 @@ const matchRoadLinks = async (event: S3KeyObject) => {
           })
         )
       )
-    ).Payload
+    ).Payload || 'getNearbyLinks Payload was undefined'
   ).toString();
 
   const parsedResult = JSON.parse(invocationResult) as unknown;
   if (!isS3KeyObject(parsedResult)) {
     throw new Error(
-      `getNearbyLinks lambda invocation result is not valid S3KeyObject:\n`,
-      parsedResult
+      `getNearbyLinks lambda invocation result is not valid S3KeyObject:\n${JSON.stringify(
+        parsedResult
+      )}`
     );
   }
   const allRoadLinksS3Key = parsedResult.key;
@@ -131,8 +132,8 @@ const matchRoadLinks = async (event: S3KeyObject) => {
         }
         case FeatureType.Surface: {
           const surfaceMatchResults = matchSurface(roadLinks, feature, geomFactory);
-
-          if (!surfaceMatchResults) {
+          console.log('surfaceMatchResults:\n', surfaceMatchResults);
+          /* if (!surfaceMatchResults) {
             console.error('matchResult is undefined');
             return;
           }
@@ -145,7 +146,8 @@ const matchRoadLinks = async (event: S3KeyObject) => {
           feature.properties = {
             ...feature.properties,
             ...surfaceMatchResults
-          };
+          }; */
+          console.warn('Surface matching is not implemented yet');
           break;
         }
       }

@@ -14,21 +14,20 @@ export default function (
   let MAX_OFFSET = 5;
   if (trafficSignProperties.SUUNTIMA) {
     const result = matchBearing(roadLinks, feature, geomFactory);
-    if (result) {
-      return getMValue(
-        result.feature,
-        result.closestLinkCoordinates,
-        result.closestLink,
-        result.minDistance,
-        result.closestPointOnLink,
-        result.featureCoordinates,
-        result.pointPairDistance,
-        result.geomFactory,
-        MAX_OFFSET,
-        result.minRoadAngle,
-        result.towardsDigitizing
-      );
-    }
+    if (!result || !result.closestLink || !result.closestPointOnLink) return undefined;
+    return getMValue(
+      result.feature,
+      result.closestLinkCoordinates,
+      result.closestLink,
+      result.minDistance,
+      result.closestPointOnLink,
+      result.featureCoordinates,
+      result.pointPairDistance,
+      result.geomFactory,
+      MAX_OFFSET,
+      result.minRoadAngle,
+      result.towardsDigitizing
+    );
     MAX_OFFSET = 2;
   }
   if (trafficSignProperties.OSOITE) {
@@ -41,9 +40,9 @@ export default function (
   }
   const pointPairDistance = new PointPairDistance();
   let minDistance = Number.MAX_VALUE;
-  let closestLink: LinkObject;
+  let closestLink: LinkObject | undefined;
   let closestLinkCoordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> = [];
-  let closestPointOnLink: jsts.org.locationtech.jts.geom.Coordinate;
+  let closestPointOnLink: jsts.org.locationtech.jts.geom.Coordinate | undefined;
 
   const featureCoordinates = new Coordinate(
     feature.geometry.coordinates[0] as number,
@@ -68,6 +67,7 @@ export default function (
       closestPointOnLink = pointPairDistance.getCoordinate(0);
     }
   }
+  if (!closestLink || !closestPointOnLink) return undefined;
   pointPairDistance.initialize();
   return getMValue(
     feature,
