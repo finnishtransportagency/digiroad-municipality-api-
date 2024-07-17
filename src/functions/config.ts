@@ -23,3 +23,7 @@ export const smtppassword = process.env.SMTP_PASSWORD_SSM_KEY || '';
 export const email = process.env.OPERATOR_EMAIL || '';
 export const drsecuritygroupid = process.env.DR_SECURITY_GROUP_ID || '';
 export const awsaccountid = process.env.AWS_ACCOUNT_ID || '';
+/**
+ * Maximum offset from the middle of the linestring when matching obstacles and traffic signs
+ */
+export const MAX_OFFSET = Number(process.env.MAX_OFFSET) || 2;

@@ -16,17 +16,17 @@ import {
   FeatureType
 } from '@functions/typing';
 import { isDelta, isFeatureRoadlinkMap } from './types';
-import { bucketName } from '@functions/config';
-
-// Max offset permitted from middle of linestring
-const MAX_OFFSET = 2;
+import { bucketName, MAX_OFFSET } from '@functions/config';
 
 const now = new Date().toISOString().slice(0, 19);
 
 const matchRoadLinks = async (event: S3KeyObject) => {
+  console.log('matchRoadLinks event:', event);
   const delta = JSON.parse(await getFromS3(bucketName, event.key)) as unknown;
   if (!isDelta(delta))
-    throw new Error(`S3 object ${event.key} is not valid Delta object:\n`, delta);
+    throw new Error(
+      `S3 object ${event.key} is not valid Delta object:\n${JSON.stringify(delta)}`
+    );
 
   let rejectsAmount = 0;
   let features: Array<DrKuntaFeature> = delta.Created.concat(delta.Updated);
