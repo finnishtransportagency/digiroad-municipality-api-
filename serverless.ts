@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import type { AWS } from '@serverless/typescript';
+import type { Serverless } from 'serverless/aws'
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -35,7 +35,7 @@ import {
   pguser
 } from '@functions/config';
 
-const serverlessConfiguration: AWS = {
+const serverlessConfiguration: Serverless = {
   service: 'DRKunta',
   frameworkVersion: '3',
   plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-s3-local'],
@@ -112,7 +112,7 @@ const serverlessConfiguration: AWS = {
     },
     region: 'eu-west-1',
     ...((stage === 'test' || stage === 'prod') && {
-      endpointType: 'PRIVATE',
+      endpointType: 'private',
       vpcEndpointIds: [{ Ref: 'drKuntaEndpoint' }],
       vpc: {
         securityGroupIds: ['${self:custom.securityGroupId}'],
