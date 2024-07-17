@@ -1,7 +1,6 @@
 import { ValidFeature } from './featureTypes';
 
 type ApiResponseType = 'gml' | 'xml' | 'json';
-
 const isApiResponseType = (responseType: unknown): responseType is ApiResponseType => {
   return responseType === 'gml' || responseType === 'xml' || responseType === 'json';
 };
@@ -43,7 +42,7 @@ export interface UpdatePayload {
   Deleted: Array<ValidFeature>;
   metadata: {
     municipality: string;
-    assetType: string;
+    assetType: AssetTypeKey;
   };
   invalidInfrao: {
     sum: number;
