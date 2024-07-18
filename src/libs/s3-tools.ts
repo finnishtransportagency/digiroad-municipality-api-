@@ -48,15 +48,19 @@ export const listS3Objects = async (
     })
   );
 
-export const getFromS3 = async (bucketName: string, fileName: string): Promise<string> =>
-  await (
-    await s3.send(
-      new GetObjectCommand({
-        Bucket: bucketName,
-        Key: fileName
-      })
-    )
-  ).Body.transformToString();
+export const getFromS3 = async (
+  bucketName: string,
+  fileName: string
+): Promise<string> => {
+  const s3Response = await s3.send(
+    new GetObjectCommand({
+      Bucket: bucketName,
+      Key: fileName
+    })
+  );
+  if (!s3Response.Body) throw new Error('No body in S3 response');
+  return s3Response.Body.transformToString();
+};
 
 export const deleteFromS3 = async (
   bucketName: string,
