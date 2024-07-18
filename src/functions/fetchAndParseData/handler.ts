@@ -19,6 +19,7 @@ import {
   bbox,
   bucketName
 } from '@functions/config';
+import { getDistance, similarBearing } from '@libs/spatial-tools';
 import { middyfy } from '@libs/lambda-tools';
 import { uploadToS3 } from '@libs/s3-tools';
 import { getParameter } from '@libs/ssm-tools';
@@ -157,23 +158,6 @@ const parseFeature = (assetType: AssetTypeString, feature: unknown): Feature => 
       feature: JSON.stringify(feature)
     }
   };
-};
-
-const getDistance = (
-  additionalPanelCoords: Array<number>,
-  mainPanelCoords: Array<number>
-): number => {
-  const dx = additionalPanelCoords[0] - mainPanelCoords[0];
-  const dy = additionalPanelCoords[1] - mainPanelCoords[1];
-  return Math.sqrt(dx * dx + dy * dy);
-};
-
-const similarBearing = (
-  additionalPanelBearing: number,
-  mainPanelBearing: number
-): boolean => {
-  const diff = Math.abs(additionalPanelBearing - mainPanelBearing);
-  return diff <= 45 || diff >= 315;
 };
 
 /**
