@@ -1,4 +1,5 @@
 import { LinkObject, matchResultObject } from '@functions/typing';
+import { getDistance3D } from '@libs/spatial-tools';
 import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
 
 export default function (
@@ -29,11 +30,6 @@ export default function (
     const ratio = distance2D / lineOnLink.getLength();
     closestPointOnLink.z = startPoint.z + (endPoint.z - startPoint.z) * ratio;
 
-    const distance3D = Math.sqrt(
-      Math.pow(closestPointOnLink.x - startPoint.x, 2) +
-        Math.pow(closestPointOnLink.y - startPoint.y, 2) +
-        Math.pow(closestPointOnLink.z - startPoint.z, 2)
-    );
     const result: matchResultObject = <matchResultObject>{};
     result.DR_LINK_ID = link.linkId;
     /**
@@ -41,7 +37,7 @@ export default function (
      * that are done in Digiroad to reduce unneccesary copies of assets in the database.
      */
 
-    result.DR_M_VALUE = mValue + distance3D;
+    result.DR_M_VALUE = mValue + getDistance3D(closestPointOnLink, startPoint);
     result.DR_OFFSET = distanceToFeature;
     result.DR_REJECTED = distanceToFeature >= MAX_OFFSET;
     result.DR_GEOMETRY = closestPointOnLink;

@@ -4,7 +4,7 @@ import {
   TrafficSignType,
   ValidFeature
 } from '@customTypes/featureTypes';
-import { getDistance, similarBearing } from '@libs/spatial-tools';
+import { getDistance2D, similarBearing } from '@libs/spatial-tools';
 
 /**
  * Goes through all traffic signs and adds additional panels to the main signs LISAKILVET array
@@ -24,7 +24,7 @@ export default (features: Array<Feature>): Array<ValidFeature> => {
   for (const additionalPanel of additionalPanels) {
     let matched = false;
     for (const mainPanel of mainPanels) {
-      const distance = getDistance(
+      const distance = getDistance2D(
         additionalPanel.geometry.coordinates,
         mainPanel.geometry.coordinates
       );

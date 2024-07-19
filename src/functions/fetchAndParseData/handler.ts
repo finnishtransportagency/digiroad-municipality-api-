@@ -58,7 +58,8 @@ const fetchAndParseData = async (event: unknown) => {
         break;
       }
 
-      case 'gml' || 'xml': {
+      case 'gml':
+      case 'xml': {
         const dataArray: Array<string> = await fetchXmlData(
           event.assetTypes[assetKey],
           event.url,

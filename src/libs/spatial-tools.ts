@@ -1,17 +1,34 @@
+import { PointCoordinates } from '@customTypes/featureTypes';
+
 /**
  * Calculates the distance between two points
- * @param {Array<number>} coordinatesA - The coordinates of the first point
- * @param {Array<number>} coordinatesB - The coordinates of the second point
+ * @param {PointCoordinates} pointA - The coordinates of the first point
+ * @param {PointCoordinates} pointB - The coordinates of the second point
  */
-export const getDistance = (
-  coordinatesA: Array<number>,
-  coordinatesB: Array<number>
+export const getDistance2D = (
+  pointA: PointCoordinates,
+  pointB: PointCoordinates
 ): number => {
-  if (coordinatesA.length < 2 || coordinatesB.length < 2)
-    throw new Error('Invalid coordinates');
-  const dx = coordinatesA[0] - coordinatesB[0];
-  const dy = coordinatesA[1] - coordinatesB[1];
+  const dx = pointA.x - pointB.x;
+  const dy = pointA.y - pointB.y;
   return Math.sqrt(dx * dx + dy * dy);
+};
+
+/**
+ * Calculates the distance between two points in 3D space
+ * @param {PointCoordinates} pointA - The coordinates of the first point
+ * @param {PointCoordinates} pointB - The coordinates of the second point
+ */
+export const getDistance3D = (
+  pointA: PointCoordinates,
+  pointB: PointCoordinates
+): number => {
+  if (!pointA.z || !pointB.z) throw new Error('Z-coordinate is missing');
+  return Math.sqrt(
+    Math.pow(pointA.x - pointB.x, 2) +
+      Math.pow(pointA.y - pointB.y, 2) +
+      Math.pow(pointA.z - pointB.z, 2)
+  );
 };
 
 /**
