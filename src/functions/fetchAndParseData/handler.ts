@@ -4,11 +4,9 @@ import {
   isScheduleEvent
 } from '@customTypes/eventTypes';
 import {
-  AdditionalPanelType,
   Feature,
   FeatureCollection,
   InvalidFeature,
-  TrafficSignType,
   ValidFeature
 } from '@customTypes/featureTypes';
 import {
@@ -19,200 +17,13 @@ import {
   bbox,
   bucketName
 } from '@functions/config';
-import { getDistance, similarBearing } from '@libs/spatial-tools';
 import { middyfy } from '@libs/lambda-tools';
 import { uploadToS3 } from '@libs/s3-tools';
 import { getParameter } from '@libs/ssm-tools';
-import { trafficSignFeatureSchema } from '@schemas/geoJsonSchema';
-import {
-  infraoJsonSchema,
-  infraoObstacleSchema,
-  infraoTrafficSignSchema
-} from '@schemas/muniResponseSchema';
-import { createTrafficSignText, trafficSignRules } from '@schemas/trafficSignTypes';
+import { infraoJsonSchema } from '@schemas/muniResponseSchema';
 import axios from 'axios';
-
-const parseFeature = (assetType: AssetTypeString, feature: unknown): Feature => {
-  try {
-    switch (assetType) {
-      case 'infrao:Rakenne': {
-        const castedFeature = infraoObstacleSchema.cast(feature);
-        const properties = castedFeature.properties;
-        const id = properties.yksilointitieto;
-        const coordinates = castedFeature.geometry.coordinates;
-
-        if (!infraoObstacleSchema.isValidSync(castedFeature))
-          return {
-            type: 'Invalid',
-            id: id,
-            properties: {
-              reason: 'Does not match infraoObstacleSchema',
-              feature: JSON.stringify(feature)
-            }
-          };
-
-        return {
-          type: 'Feature',
-          id: castedFeature.id,
-          properties: {
-            TYPE: 'OBSTACLE',
-            ID: String(id),
-            EST_TYYPPI: properties.malli === 'Pollari' ? 1 : 2
-          },
-          geometry: {
-            type: 'Point',
-            coordinates: [coordinates[0], coordinates[1]]
-          }
-        };
-      }
-
-      case 'infrao:Liikennemerkki': {
-        const castedFeature = infraoTrafficSignSchema.cast(feature);
-        const properties = castedFeature.properties;
-        const id = properties.yksilointitieto;
-
-        if (!infraoTrafficSignSchema.isValidSync(castedFeature))
-          return {
-            type: 'Invalid',
-            id: id,
-            properties: {
-              reason: 'Does not match infraoTrafficSignSchema',
-              feature: JSON.stringify(feature)
-            }
-          };
-
-        const trafficSignCode =
-          properties.liikennemerkkityyppi2020 === 'INVALID_CODE'
-            ? properties.liikennemerkkityyppi
-            : properties.liikennemerkkityyppi2020;
-
-        if (trafficSignCode === 'INVALID_CODE')
-          return {
-            type: 'Invalid',
-            id: id,
-            properties: {
-              reason: 'Invalid liikennemerkkityyppi & liikennemerkkityyppi2020',
-              feature: JSON.stringify(feature)
-            }
-          };
-
-        const coordinates = castedFeature.geometry.coordinates;
-        const geoJson = trafficSignFeatureSchema.cast({
-          type: 'Feature',
-          id: castedFeature.id,
-          properties: {
-            TYPE: trafficSignCode[0] === 'H' ? 'ADDITIONALPANEL' : 'TRAFFICSIGN',
-            ID: String(id),
-            SUUNTIMA: properties.suunta ? properties.suunta * (180 / Math.PI) : 0,
-            LM_TYYPPI: createTrafficSignText(trafficSignCode),
-            // TODO: Set ARVO only on corresponding traffic signs. e.g. speed limit signs (check trafficSignRules)
-            ARVO: Object.keys(trafficSignRules).includes(
-              properties.liikennemerkkityyppi2020
-            )
-              ? Number(properties.teksti)
-              : null,
-            TEKSTI: properties.teksti
-              ? properties.teksti.substring(0, 128)
-              : properties.teksti,
-            ...(!(trafficSignCode[0] === 'H') && {
-              LISAKILVET: []
-            })
-          },
-          geometry: {
-            type: 'Point',
-            coordinates: [coordinates[0], coordinates[1]]
-          }
-        });
-
-        // TODO: Validate geoJson
-
-        return geoJson;
-      }
-
-      case 'infrao:KatualueenOsa':
-        //TODO: Implement
-        console.warn(`${assetType} not yet implemented in parseFeature`);
-        break;
-
-      default:
-        console.warn('Asset type not supported by parseFeature:', assetType);
-    }
-  } catch (e: unknown) {
-    if (!(e instanceof Error)) throw e;
-    console.error('Error in parseFeature:', e.message);
-    console.info('Invalid feature:', feature);
-    return {
-      type: 'Invalid',
-      id: -1,
-      properties: {
-        reason: e.message,
-        feature: JSON.stringify(feature)
-      }
-    };
-  }
-  return {
-    type: 'Invalid',
-    id: -1,
-    properties: {
-      reason: `Asset type not supported by parseFeature: ${assetType ?? 'undefined'}`,
-      feature: JSON.stringify(feature)
-    }
-  };
-};
-
-/**
- * Goes through all traffic signs and adds additional panels to the main signs LISAKILVET array
- *
- * @param features All traffic signs to be matched
- * @returns Main traffic signs with additional panels added to them
- */
-const matchAdditionalPanels = (features: Array<Feature>): Array<ValidFeature> => {
-  const validFeatures = features.filter((f): f is ValidFeature => f.type === 'Feature');
-  const additionalPanels = validFeatures.filter(
-    (f): f is AdditionalPanelType => f.properties.TYPE === 'ADDITIONALPANEL'
-  );
-  const mainPanels = validFeatures.filter(
-    (f): f is TrafficSignType => f.properties.TYPE === 'TRAFFICSIGN'
-  );
-  const rejectedAdditionalPanels: Array<Feature> = [];
-  for (const additionalPanel of additionalPanels) {
-    let matched = false;
-    for (const mainPanel of mainPanels) {
-      const distance = getDistance(
-        additionalPanel.geometry.coordinates,
-        mainPanel.geometry.coordinates
-      );
-      if (
-        'SUUNTIMA' in additionalPanel.properties &&
-        additionalPanel.properties.SUUNTIMA !== undefined &&
-        'SUUNTIMA' in mainPanel.properties &&
-        mainPanel.properties.SUUNTIMA !== undefined
-      ) {
-        if (
-          distance <= 2 &&
-          similarBearing(
-            additionalPanel.properties.SUUNTIMA,
-            mainPanel.properties.SUUNTIMA
-          )
-        ) {
-          if (
-            'LISAKILVET' in mainPanel.properties &&
-            mainPanel.properties.LISAKILVET !== undefined
-          ) {
-            mainPanel.properties.LISAKILVET.push(additionalPanel.properties);
-            matched = true;
-            break;
-          }
-        }
-      }
-    }
-    if (!matched) {
-      rejectedAdditionalPanels.push(additionalPanel);
-    }
-  }
-
-  return mainPanels;
-};
+import parseFeature from './parseFeature';
+import matchAdditionalPanels from './matchAdditionalPanels';
 
 const fetchAndParseData = async (event: unknown) => {
   if (!isScheduleEvent(event)) {
