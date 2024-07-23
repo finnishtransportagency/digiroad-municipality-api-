@@ -11,12 +11,11 @@ import {
   PayloadFeature,
   DrKuntaFeature,
   LinkObject,
-  S3KeyObject,
-  isS3KeyObject,
   FeatureType
 } from '@functions/typing';
 import { isDelta, isFeatureRoadlinkMap } from './types';
 import { bucketName, MAX_OFFSET } from '@functions/config';
+import { isS3KeyObject, S3KeyObject } from '@customTypes/eventTypes';
 
 const now = new Date().toISOString().slice(0, 19);
 

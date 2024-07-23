@@ -52,7 +52,6 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.71",
     "@types/ejs": "^3.1.5",
-    "@types/jsts": "^0.17.22",
     "@types/node": "^18.15.0",
     "@types/nodemailer": "^6.4.14",
     "@types/pg": "^8.6.5",

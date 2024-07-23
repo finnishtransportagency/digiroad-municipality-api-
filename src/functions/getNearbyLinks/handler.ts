@@ -12,10 +12,10 @@ import {
 } from '@functions/config';
 import { getParameter } from '@libs/ssm-tools';
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
-import { S3KeyObject } from '@functions/typing';
 import { allowedOnKapy } from '@schemas/trafficSignTypes';
+import { S3KeyObject } from '@customTypes/eventTypes';
 
-const getNearbyLinks = async (event: S3KeyObject) => {
+const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
   const data = await getFromS3(bucketName, event.key);
   const requestPayload = JSON.parse(data) as unknown;
 

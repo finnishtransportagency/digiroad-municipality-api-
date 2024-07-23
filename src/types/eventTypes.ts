@@ -51,6 +51,13 @@ export interface UpdatePayload {
 }
 
 // Keep in sync with isAssetTypeKey & isAssetTypeString
+/**
+ * {
+ *   obstacles?: 'infrao:Rakenne';
+ *   trafficSigns?: 'infrao:Liikennemerkki';
+ *   roadSurfaces?: 'infrao:KatualueenOsa';
+ * }
+ */
 interface AssetTypes {
   obstacles?: 'infrao:Rakenne';
   trafficSigns?: 'infrao:Liikennemerkki';
@@ -96,4 +103,24 @@ export const isAssetTypeString = (assetType: unknown): assetType is AssetTypeStr
   return ['infrao:Rakenne', 'infrao:Liikennemerkki', 'infrao:KatualueenOsa'].includes(
     assetType
   );
+};
+
+/**
+ * Lambda invocation event containing the S3 key of the payload
+ */
+export interface S3KeyObject {
+  key: string;
+}
+export const isS3KeyObject = (s3KeyObject: unknown): s3KeyObject is S3KeyObject => {
+  if (!s3KeyObject || typeof s3KeyObject !== 'object') {
+    return false;
+  }
+
+  const { key } = s3KeyObject as S3KeyObject;
+
+  if (typeof key !== 'string') {
+    return false;
+  }
+
+  return true;
 };

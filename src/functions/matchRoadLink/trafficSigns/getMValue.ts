@@ -4,7 +4,7 @@ import {
   DrKuntaFeature,
   TrafficSignProperties
 } from '@functions/typing';
-import { getDistance3D } from '@libs/spatial-tools';
+import { getDistance3D, getLinkBearing } from '@libs/spatial-tools';
 import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
 
 export default function (
@@ -20,17 +20,14 @@ export default function (
   roadAngle?: number,
   towardsDigitizing?: boolean
 ) {
-  function getAngle(
-    start: jsts.org.locationtech.jts.geom.Coordinate,
-    end: jsts.org.locationtech.jts.geom.Coordinate
-  ) {
-    return 180 + Math.atan2(start.x - end.x, start.y - end.y) * (180 / Math.PI);
-  }
-
   let mValue = 0;
   for (let i = 0; i < linkCoordinates.length - 1; i++) {
     const startPoint = linkCoordinates[i];
     const endPoint = linkCoordinates[i + 1];
+    const linkBearing = getLinkBearing(
+      [startPoint.x, startPoint.y],
+      [endPoint.x, endPoint.y]
+    );
     const lineOnLink = geomFactory.createLineString([startPoint, endPoint]);
     pointPairDistance.initialize();
     DistanceToPoint.computeDistance(lineOnLink, featureCoordinates, pointPairDistance);
@@ -40,11 +37,11 @@ export default function (
       continue;
     }
 
-    if (roadAngle && roadAngle !== getAngle(startPoint, endPoint)) {
+    if (roadAngle && roadAngle !== linkBearing) {
       mValue += lineOnLink.getLength();
       continue;
     }
-    const roadLinkBearingAtPoint = getAngle(startPoint, endPoint);
+    const roadLinkBearingAtPoint = linkBearing;
     pointPairDistance.initialize(closestPointOnLink, startPoint);
     const distance2D = pointPairDistance.getDistance();
     const ratio = distance2D / lineOnLink.getLength();
@@ -53,9 +50,9 @@ export default function (
     const result: matchResultObject = <matchResultObject>{};
     result.DR_LINK_ID = link.linkId;
     /*
-        The reason why M-value is calculated like this is to match the geometry-calculations that are done in Digiroad
-        to reduce unneccesary copies of assets in the database. 
-        */
+    The reason why M-value is calculated like this is to match the geometry-calculations that are done in Digiroad
+    to reduce unneccesary copies of assets in the database.
+    */
 
     const props = feature.properties as TrafficSignProperties;
     if (!towardsDigitizing) {

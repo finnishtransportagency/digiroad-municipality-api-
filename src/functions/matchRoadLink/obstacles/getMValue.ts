@@ -37,7 +37,12 @@ export default function (
      * that are done in Digiroad to reduce unneccesary copies of assets in the database.
      */
 
-    result.DR_M_VALUE = mValue + getDistance3D(closestPointOnLink, startPoint);
+    result.DR_M_VALUE =
+      mValue +
+      getDistance3D(
+        [closestPointOnLink.x, closestPointOnLink.y, closestPointOnLink.z],
+        [startPoint.x, startPoint.y, startPoint.z]
+      );
     result.DR_OFFSET = distanceToFeature;
     result.DR_REJECTED = distanceToFeature >= MAX_OFFSET;
     result.DR_GEOMETRY = closestPointOnLink;

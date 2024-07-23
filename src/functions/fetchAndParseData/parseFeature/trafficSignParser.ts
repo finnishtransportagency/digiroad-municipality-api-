@@ -54,7 +54,7 @@ export default (feature: unknown): Feature => {
     },
     geometry: {
       type: 'Point',
-      coordinates: [coordinates.x, coordinates.y]
+      coordinates: [coordinates[0], coordinates[1]]
     }
   });
 };
