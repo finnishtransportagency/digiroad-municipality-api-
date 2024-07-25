@@ -13,11 +13,21 @@ import {
 import { getParameter } from '@libs/ssm-tools';
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
 import { allowedOnKapy } from '@schemas/trafficSignTypes';
-import { S3KeyObject } from '@customTypes/eventTypes';
+import { isGetNearbyLinksPayload, S3KeyObject } from '@customTypes/eventTypes';
+import { gnlPayloadSchema } from '@schemas/getNearbyLinksSchema';
 
 const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
-  const data = await getFromS3(bucketName, event.key);
-  const requestPayload = JSON.parse(data) as unknown;
+  const s3Response = JSON.parse(await getFromS3(bucketName, event.key)) as unknown;
+  const payload = gnlPayloadSchema.cast(s3Response);
+  if (!isGetNearbyLinksPayload(payload))
+    throw new Error(
+      `S3 object ${
+        event.key
+      } is not valid GetNearbyLinksPayload object:\n${JSON.stringify(payload).slice(
+        0,
+        1000
+      )}`
+    );
 
   const client = new Client({
     host: pghost,
@@ -51,11 +61,7 @@ const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
         AND ((features#>'{properties}'->>'TYPE') != 'TRAFFICSIGN' OR (features#>'{properties}'->>'LM_TYYPPI') = ANY(($3)::text[]) OR acceptable_roadlinks.functional_class != 8)
       GROUP BY ID,TYPE
       `,
-    values: [
-      requestPayload.municipality,
-      JSON.stringify(requestPayload.features),
-      allowedOnKapy
-    ]
+    values: [payload.municipality, JSON.stringify(payload.features), allowedOnKapy]
   };
   const areaQuery = {
     text: `
@@ -79,9 +85,9 @@ const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
       WHERE ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067) && acceptable_roadlinks.shape 
       GROUP BY ID,TYPE
       `,
-    values: [requestPayload.municipality, JSON.stringify(requestPayload.features)]
+    values: [payload.municipality, JSON.stringify(payload.features)]
   };
-  const query = requestPayload.assetType === 'roadSurfaces' ? areaQuery : pointQuery;
+  const query = payload.assetType === 'roadSurfaces' ? areaQuery : pointQuery;
 
   const res = await client.query(query);
   client.end();
@@ -94,7 +100,7 @@ const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
       roadlink.points = pointObjects;
       delete roadlink.f1;
       delete roadlink.f2;
-      if (requestPayload.assetType === 'roadSurfaces') {
+      if (payload.assetType === 'roadSurfaces') {
         roadlink.geometrylength = roadlink.f3;
       } else {
         roadlink.directiontype = roadlink.f3;
@@ -107,7 +113,7 @@ const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
 
   const now = new Date().toISOString().slice(0, 19);
 
-  const S3ObjectKey = `getNearbyLinks/${requestPayload.municipality}/${now}.json`;
+  const S3ObjectKey = `getNearbyLinks/${payload.municipality}/${now}.json`;
   await uploadToS3(bucketName, S3ObjectKey, JSON.stringify(res.rows));
 
   return { key: S3ObjectKey };

@@ -1,4 +1,7 @@
+import { InferType } from 'yup';
 import { ValidFeature } from './featureTypes';
+import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
+import { gnlPayloadSchema } from '@schemas/getNearbyLinksSchema';
 
 type ApiResponseType = 'gml' | 'xml' | 'json';
 const isApiResponseType = (responseType: unknown): responseType is ApiResponseType => {
@@ -36,19 +39,17 @@ export const isScheduleEvent = (event: unknown): event is ScheduleEvent => {
 /**
  * Update payload saved to S3
  */
-export interface UpdatePayload {
+export type UpdatePayload = Pick<
+  InferType<typeof updatePayloadSchema>,
+  'metadata' | 'invalidInfrao'
+> & {
   Created: Array<ValidFeature>;
   Updated: Array<ValidFeature>;
   Deleted: Array<ValidFeature>;
-  metadata: {
-    municipality: string;
-    assetType: AssetTypeKey;
-  };
-  invalidInfrao: {
-    sum: number;
-    IDs: Array<number>;
-  };
-}
+};
+export const isUpdatePayload = (payload: unknown): payload is UpdatePayload => {
+  return updatePayloadSchema.isValidSync(payload);
+};
 
 // Keep in sync with isAssetTypeKey & isAssetTypeString
 /**
@@ -123,4 +124,16 @@ export const isS3KeyObject = (s3KeyObject: unknown): s3KeyObject is S3KeyObject 
   }
 
   return true;
+};
+
+export type GetNearbyLinksPayload = Omit<
+  InferType<typeof gnlPayloadSchema>,
+  'features'
+> & {
+  features: Array<ValidFeature>;
+};
+export const isGetNearbyLinksPayload = (
+  payload: unknown
+): payload is GetNearbyLinksPayload => {
+  return gnlPayloadSchema.isValidSync(payload);
 };

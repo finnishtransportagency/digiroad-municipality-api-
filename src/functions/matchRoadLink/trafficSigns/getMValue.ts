@@ -68,7 +68,12 @@ export default function (
       result.TOWARDSDIGITIZING = towardsDigitizing;
     }
 
-    result.DR_M_VALUE = mValue + getDistance3D(closestPointOnLink, startPoint);
+    result.DR_M_VALUE =
+      mValue +
+      getDistance3D(
+        [closestPointOnLink.x, closestPointOnLink.y, closestPointOnLink.z],
+        [startPoint.x, startPoint.y, startPoint.z]
+      );
     result.DR_OFFSET = distanceToFeature;
     result.DR_REJECTED = distanceToFeature >= MAX_OFFSET;
     result.DR_GEOMETRY = closestPointOnLink;
