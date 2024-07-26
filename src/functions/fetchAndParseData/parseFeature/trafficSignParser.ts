@@ -1,5 +1,5 @@
 import { Feature } from '@customTypes/featureTypes';
-import { trafficSignFeatureSchema } from '@schemas/geoJsonSchema';
+import { GeoJsonFeatureType, trafficSignFeatureSchema } from '@schemas/geoJsonSchema';
 import { infraoTrafficSignSchema } from '@schemas/muniResponseSchema';
 import { createTrafficSignText, trafficSignRules } from '@schemas/trafficSignTypes';
 
@@ -39,7 +39,10 @@ export default (feature: unknown): Feature => {
     type: 'Feature',
     id: castedFeature.id,
     properties: {
-      TYPE: trafficSignCode[0] === 'H' ? 'ADDITIONALPANEL' : 'TRAFFICSIGN',
+      TYPE:
+        trafficSignCode[0] === 'H'
+          ? GeoJsonFeatureType.AdditionalPanel
+          : GeoJsonFeatureType.TrafficSign,
       ID: String(id),
       SUUNTIMA: properties.suunta ? properties.suunta * (180 / Math.PI) : 0,
       LM_TYYPPI: createTrafficSignText(trafficSignCode),

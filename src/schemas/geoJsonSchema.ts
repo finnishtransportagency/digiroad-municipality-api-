@@ -2,12 +2,19 @@ import { array, number, object, string } from 'yup';
 import { allowedAdditionalPanels, allowedTrafficSigns } from '@schemas/trafficSignTypes';
 import { areaGeometrySchema, pointGeometrySchema } from './geometrySchema';
 
+enum GeoJsonFeatureType {
+  Obstacle = 'OBSTACLE',
+  AdditionalPanel = 'ADDITIONALPANEL',
+  TrafficSign = 'TRAFFICSIGN',
+  Surface = 'SURFACE'
+}
+
 // v--------------- PROPERTIES ---------------v //
 /**
  * @field EST_TYYPPI: 1 = Suljettu yhteys, 2 = Avattava puomi
  */
 const obstaclePropertiesSchema = object({
-  TYPE: string().oneOf(['OBSTACLE']).required(),
+  TYPE: string().oneOf([GeoJsonFeatureType.Obstacle]).required(),
   ID: string().required(),
   EST_TYYPPI: number().required().oneOf([1, 2])
 });
@@ -18,7 +25,7 @@ const obstaclePropertiesSchema = object({
  * @field VARI: 1 = Sininen, 2 = Keltainen
  */
 const additionalPanelPropertiesSchema = object({
-  TYPE: string().oneOf(['ADDITIONALPANEL']).required(),
+  TYPE: string().oneOf([GeoJsonFeatureType.AdditionalPanel]).required(),
   ID: string().required(),
   SUUNTIMA: number().required().max(360).min(0),
   LM_TYYPPI: string().required().oneOf(allowedAdditionalPanels),
@@ -36,7 +43,7 @@ const additionalPanelPropertiesSchema = object({
  * @field KOKO: 1 = Pienikokoinen merkki, 2 = Normaalikokoinen merkki (oletus), 3 = Suurikokoinen merkki
  */
 const trafficSignPropertiesSchema = object({
-  TYPE: string().oneOf(['TRAFFICSIGN']).required(),
+  TYPE: string().oneOf([GeoJsonFeatureType.TrafficSign]).required(),
   ID: string().required(),
   SUUNTIMA: number().required().max(360).min(0),
   LM_TYYPPI: string().required().oneOf(allowedTrafficSigns),
@@ -58,7 +65,7 @@ const trafficSignPropertiesSchema = object({
 
 // TODO implement all fields
 const surfacePropertiesSchema = object({
-  TYPE: string().oneOf(['SURFACE']).required()
+  TYPE: string().oneOf([GeoJsonFeatureType.Surface]).required()
 });
 // ^------------------------------------------^ //
 
@@ -113,6 +120,7 @@ const geoJsonSchema = object({
 }).required();
 
 export {
+  GeoJsonFeatureType,
   geoJsonSchema,
   obstacleFeatureSchema,
   trafficSignFeatureSchema,
