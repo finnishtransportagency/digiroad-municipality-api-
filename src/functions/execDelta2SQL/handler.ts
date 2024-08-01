@@ -1,5 +1,4 @@
 import { middyfy } from '@libs/lambda-tools';
-import { Client } from 'pg';
 
 import execCreatedObstacle from './execObstacle/execCreated';
 import execExpiredObstacle from './execObstacle/execExpired';
@@ -11,29 +10,15 @@ import execExpiredTrafficSign from './execTrafficSign/execExpired';
 
 import execCreatedSurface from './execSurface/execCreated';
 import execCleanUp from './execSurface/execCleanup';
-import {
-  offline,
-  pghost,
-  pgport,
-  pgdatabase,
-  pguser,
-  pgpassword,
-  bucketName
-} from '@functions/config';
-import { getParameter } from '@libs/ssm-tools';
+import { bucketName } from '@functions/config';
 import { getFromS3 } from '@libs/s3-tools';
+import { getPostgresClient } from '@libs/pg-tools';
 
 const execDelta2SQL = async (event) => {
   const data = await getFromS3(bucketName, event.key);
   const delta = JSON.parse(data) as unknown;
 
-  const client = new Client({
-    host: pghost,
-    port: parseInt(pgport),
-    database: pgdatabase,
-    user: pguser,
-    password: offline ? pgpassword : await getParameter(pgpassword)
-  });
+  const client = await getPostgresClient();
   await client.connect();
 
   const municipality: string = delta.metadata.municipality;

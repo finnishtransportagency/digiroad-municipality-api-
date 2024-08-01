@@ -33,8 +33,6 @@ export default (feature: unknown): Feature => {
       }
     };
 
-  const coordinates = castedFeature.geometry.coordinates;
-
   return trafficSignFeatureSchema.cast({
     type: 'Feature',
     id: castedFeature.id,
@@ -57,7 +55,7 @@ export default (feature: unknown): Feature => {
     },
     geometry: {
       type: 'Point',
-      coordinates: [coordinates[0], coordinates[1]]
+      coordinates: castedFeature.geometry.coordinates
     }
   });
 };
