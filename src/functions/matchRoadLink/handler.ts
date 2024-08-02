@@ -107,7 +107,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
             MAX_OFFSET
           );
           if (!obstacleMatchResults) {
-            console.error('matchResult is undefined');
+            console.error('matchResult is undefined (Obstacle)');
             return;
           }
 

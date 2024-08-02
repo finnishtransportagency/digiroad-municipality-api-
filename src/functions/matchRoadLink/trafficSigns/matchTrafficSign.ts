@@ -14,20 +14,21 @@ export default function (
   let MAX_OFFSET = 5;
   if (trafficSignProperties.SUUNTIMA) {
     const result = matchBearing(roadLinks, feature, geomFactory);
-    if (!result || !result.closestLink || !result.closestPointOnLink) return undefined;
-    return getMValue(
-      result.feature,
-      result.closestLinkCoordinates,
-      result.closestLink,
-      result.minDistance,
-      result.closestPointOnLink,
-      result.featureCoordinates,
-      result.pointPairDistance,
-      result.geomFactory,
-      MAX_OFFSET,
-      result.minRoadAngle,
-      result.towardsDigitizing
-    );
+    if (result && result.closestLink && result.closestPointOnLink) {
+      return getMValue(
+        result.feature,
+        result.closestLinkCoordinates,
+        result.closestLink,
+        result.minDistance,
+        result.closestPointOnLink,
+        result.featureCoordinates,
+        result.pointPairDistance,
+        result.geomFactory,
+        MAX_OFFSET,
+        result.minRoadAngle,
+        result.towardsDigitizing
+      );
+    }
     MAX_OFFSET = 2;
   }
   if (trafficSignProperties.OSOITE) {
