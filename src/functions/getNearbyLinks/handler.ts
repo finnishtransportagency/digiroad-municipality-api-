@@ -53,9 +53,9 @@ const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
     })
     .filter((row) => row !== 'INVALID');
 
-  const now = new Date().toISOString().slice(0, 19);
-
-  const S3ObjectKey = `getNearbyLinks/${payload.municipality}/${now}.json`;
+  const S3ObjectKey = `getNearbyLinks/${payload.municipality}/${new Date()
+    .toISOString()
+    .slice(0, 19)}.json`;
   await uploadToS3(bucketName, S3ObjectKey, JSON.stringify(queryResultRows));
 
   return { key: S3ObjectKey };

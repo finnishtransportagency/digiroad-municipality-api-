@@ -128,7 +128,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
             geomFactory
           );
           if (!trafficSignMatchResults) {
-            console.error('matchResult is undefined');
+            console.error('matchResult is undefined (TrafficSign)');
             return;
           }
 

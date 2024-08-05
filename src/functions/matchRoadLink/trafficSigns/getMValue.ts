@@ -25,8 +25,8 @@ export default function (
     const startPoint = linkCoordinates[i];
     const endPoint = linkCoordinates[i + 1];
     const linkBearing = getLinkBearing(
-      [startPoint.x, startPoint.y],
-      [endPoint.x, endPoint.y]
+      [startPoint.x, startPoint.y, undefined],
+      [endPoint.x, endPoint.y, undefined]
     );
     const lineOnLink = geomFactory.createLineString([startPoint, endPoint]);
     pointPairDistance.initialize();
