@@ -1,26 +1,21 @@
 import { DrKuntaFeature, LinkObject } from '@functions/typing';
 import GeoJSONReader from 'jsts/org/locationtech/jts/io/GeoJSONReader';
-import Coordinate from 'jsts/org/locationtech/jts/geom/Coordinate';
+import { Coordinate } from 'jsts/org/locationtech/jts/geom';
 import BufferOP from 'jsts/org/locationtech/jts/operation/buffer/BufferOp';
 import OverlayOp from 'jsts/org/locationtech/jts/operation/overlay/OverlayOp';
+import { createLineString } from '@libs/spatial-tools';
 
-export default function (
-  roadLinks: Array<LinkObject>,
-  feature: DrKuntaFeature,
-  geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory
-) {
+export default function (roadLinks: Array<LinkObject>, feature: DrKuntaFeature) {
   const validLinks = [];
   const reader = new GeoJSONReader();
   const complexGeometry = reader.read(feature.geometry);
   const featureGeometry = BufferOP.bufferOp(complexGeometry, 0);
   for (const roadlink of roadLinks) {
-    const points = roadlink.points;
-    const coordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> = [];
-    for (let j = 0; j < points.length; j++) {
-      const point = points[j];
-      coordinates[j] = new Coordinate(point.x, point.y, point.z);
-    }
-    const lineString = geomFactory.createLineString(coordinates);
+    const coordinates: Array<Coordinate> = roadlink.points.map(
+      (point) => new Coordinate(point.x, point.y, point.z)
+    );
+
+    const lineString = createLineString(coordinates);
     const intersected = OverlayOp.intersection(featureGeometry, lineString);
     const intersectedLength = intersected.getLength();
     const roadlinkLength = lineString.getLength();

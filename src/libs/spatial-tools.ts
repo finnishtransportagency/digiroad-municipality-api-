@@ -1,4 +1,15 @@
 import { PointCoordinates } from '@customTypes/featureTypes';
+import { Coordinate, GeometryFactory } from 'jsts/org/locationtech/jts/geom';
+import { PrecisionModel } from 'jsts/org/locationtech/jts/geom';
+
+const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
+
+/**
+ * Creates jsts LineString from jsts Coordinates
+ * @param {Array<Coordinate>} coordinates - The coordinates of the LineString
+ */
+export const createLineString = (coordinates: Array<Coordinate>) =>
+  geomFactory.createLineString(coordinates);
 
 /**
  * Calculates the distance between two points

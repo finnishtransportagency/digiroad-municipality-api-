@@ -1,19 +1,13 @@
-import Coordinate from 'jsts/org/locationtech/jts/geom/Coordinate';
-import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
-import PointPairDistance from 'jsts/org/locationtech/jts/algorithm/distance/PointPairDistance';
-
+import { Coordinate } from 'jsts/org/locationtech/jts/geom';
 import {
-  DrKuntaFeature,
-  LinkObject,
-  LinkPoint,
-  TrafficSignProperties
-} from '@functions/typing';
+  PointPairDistance,
+  DistanceToPoint
+} from 'jsts/org/locationtech/jts/algorithm/distance_module';
 
-export default function (
-  roadLinks: Array<LinkObject>,
-  feature: DrKuntaFeature,
-  geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory
-) {
+import { DrKuntaFeature, LinkObject, TrafficSignProperties } from '@functions/typing';
+import { createLineString, getLinkBearing } from '@libs/spatial-tools';
+
+export default function (roadLinks: Array<LinkObject>, feature: DrKuntaFeature) {
   const trafficSignProperties = feature.properties as TrafficSignProperties;
   const featureCoordinates = new Coordinate(
     feature.geometry.coordinates[0] as number,
@@ -31,12 +25,8 @@ export default function (
   let minDistance = Number.MAX_VALUE;
   let minRoadAngle: number | undefined;
   let closestLink: LinkObject | undefined;
-  let closestLinkCoordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> = [];
-  let closestPointOnLink: jsts.org.locationtech.jts.geom.Coordinate | undefined;
-
-  function getAngle(start: LinkPoint, end: LinkPoint) {
-    return 180 + Math.atan2(start.x - end.x, start.y - end.y) * (180 / Math.PI);
-  }
+  let closestLinkCoordinates: Array<Coordinate> = [];
+  let closestPointOnLink: Coordinate | undefined;
 
   function angleDifference(p1: number, p2: number) {
     return 180 - Math.abs(Math.abs(p1 - p2) - 180);
@@ -48,7 +38,10 @@ export default function (
     for (let j = 0; j < roadlinkPoints.length - 1; j++) {
       const startPoint = roadlinkPoints[j];
       const endPoint = roadlinkPoints[j + 1];
-      const angle = getAngle(startPoint, endPoint);
+      const angle = getLinkBearing(
+        [startPoint.x, startPoint.y, startPoint.z],
+        [endPoint.x, endPoint.y, startPoint.z]
+      );
       const angleReverse = (angle + 180) % 360;
       let accepted = false;
       if (roadlink.directiontype === 0) {
@@ -64,10 +57,7 @@ export default function (
       if (accepted) {
         const startCoordinates = new Coordinate(startPoint.x, startPoint.y, startPoint.z);
         const endCoordinates = new Coordinate(endPoint.x, endPoint.y, endPoint.z);
-        const lineString = geomFactory.createLineString([
-          startCoordinates,
-          endCoordinates
-        ]);
+        const lineString = createLineString([startCoordinates, endCoordinates]);
         DistanceToPoint.computeDistance(
           lineString,
           featureCoordinates,
@@ -75,11 +65,10 @@ export default function (
         );
         const distance = pointPairDistance.getDistance();
         if (distance < minDistance && distance < 10) {
-          const coordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> = [];
-          for (let k = 0; k < roadlinkPoints.length; k++) {
-            const point = roadlinkPoints[k];
-            coordinates[k] = new Coordinate(point.x, point.y, point.z);
-          }
+          const coordinates: Array<Coordinate> = roadlinkPoints.map(
+            (point) => new Coordinate(point.x, point.y, point.z)
+          );
+
           minDistance = distance;
           closestLink = roadlink;
           closestLinkCoordinates = coordinates;
@@ -101,7 +90,6 @@ export default function (
       closestPointOnLink: closestPointOnLink,
       featureCoordinates: featureCoordinates,
       pointPairDistance: pointPairDistance,
-      geomFactory: geomFactory,
       towardsDigitizing: towardsDigitizing,
       minRoadAngle: minRoadAngle
     };

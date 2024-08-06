@@ -2,8 +2,6 @@ import { invokeLambda, middyfy } from '@libs/lambda-tools';
 import matchTrafficSign from './trafficSigns/matchTrafficSign';
 import matchObstacle from './obstacles/matchObstacle';
 import matchSurface from './surface/matchSurface';
-import GeometryFactory from 'jsts/org/locationtech/jts/geom/GeometryFactory';
-import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel';
 
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
 import {
@@ -47,7 +45,6 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     delta.Created = features;
     delta.Updated = []; */
   }
-  const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
   const getNearbyLinksPayload: GetNearbyLinksPayload = {
     features: features,
     municipality: updatePayload.metadata.municipality,
@@ -100,12 +97,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     if (roadLinks) {
       switch (feature.properties.TYPE) {
         case FeatureType.Obstacle: {
-          const obstacleMatchResults = matchObstacle(
-            roadLinks,
-            feature,
-            geomFactory,
-            MAX_OFFSET
-          );
+          const obstacleMatchResults = matchObstacle(roadLinks, feature, MAX_OFFSET);
           if (!obstacleMatchResults) {
             console.error('matchResult is undefined (Obstacle)');
             return;
@@ -122,11 +114,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
           break;
         }
         case FeatureType.TrafficSign: {
-          const trafficSignMatchResults = matchTrafficSign(
-            roadLinks,
-            feature,
-            geomFactory
-          );
+          const trafficSignMatchResults = matchTrafficSign(roadLinks, feature);
           if (!trafficSignMatchResults) {
             console.error('matchResult is undefined (TrafficSign)');
             return;
@@ -143,7 +131,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
           break;
         }
         case FeatureType.Surface: {
-          const surfaceMatchResults = matchSurface(roadLinks, feature, geomFactory);
+          const surfaceMatchResults = matchSurface(roadLinks, feature);
           console.log('surfaceMatchResults:\n', surfaceMatchResults);
           /* if (!surfaceMatchResults) {
             console.error('matchResult is undefined');

@@ -1,3 +1,5 @@
+import { Coordinate } from 'jsts/org/locationtech/jts/geom';
+
 export interface GeoJSON {
   type: string;
   name?: string;
@@ -68,7 +70,7 @@ export interface ObstacleProperties {
   DR_M_VALUE?: number;
   DR_OFFSET?: number;
   DR_REJECTED?: boolean;
-  DR_GEOMETRY?: jsts.org.locationtech.jts.geom.Coordinate;
+  DR_GEOMETRY?: Coordinate;
   OSOITE?: string;
 }
 
@@ -98,7 +100,7 @@ export interface TrafficSignProperties {
   DR_OFFSET?: number;
   OSOITE?: string;
   DR_REJECTED?: boolean;
-  DR_GEOMETRY?: jsts.org.locationtech.jts.geom.Coordinate;
+  DR_GEOMETRY?: Coordinate;
   TOWARDSDIGITIZING?: boolean;
 }
 
@@ -194,6 +196,6 @@ export interface matchResultObject {
   DR_M_VALUE: number;
   DR_OFFSET: number;
   DR_REJECTED: boolean;
-  DR_GEOMETRY: jsts.org.locationtech.jts.geom.Coordinate;
+  DR_GEOMETRY: Coordinate;
   TOWARDSDIGITIZING?: boolean;
 }

@@ -1,22 +1,25 @@
 import { LinkObject, matchResultObject } from '@functions/typing';
-import { getDistance3D } from '@libs/spatial-tools';
-import DistanceToPoint from 'jsts/org/locationtech/jts/algorithm/distance/DistanceToPoint';
+import { createLineString, getDistance3D } from '@libs/spatial-tools';
+import {
+  PointPairDistance,
+  DistanceToPoint
+} from 'jsts/org/locationtech/jts/algorithm/distance_module';
+import { Coordinate } from 'jsts/org/locationtech/jts/geom';
 
 export default function (
-  linkCoordinates: Array<jsts.org.locationtech.jts.geom.Coordinate>,
+  linkCoordinates: Array<Coordinate>,
   link: LinkObject,
   distanceToFeature: number,
-  closestPointOnLink: jsts.org.locationtech.jts.geom.Coordinate,
-  featureCoordinates: jsts.org.locationtech.jts.geom.Coordinate,
-  pointPairDistance: jsts.org.locationtech.jts.algorithm.distance.PointPairDistance,
-  geomFactory: jsts.org.locationtech.jts.geom.GeometryFactory,
+  closestPointOnLink: Coordinate,
+  featureCoordinates: Coordinate,
+  pointPairDistance: PointPairDistance,
   MAX_OFFSET: number
 ) {
   let mValue = 0;
   for (let i = 0; i < linkCoordinates.length - 1; i++) {
     const startPoint = linkCoordinates[i];
     const endPoint = linkCoordinates[i + 1];
-    const lineOnLink = geomFactory.createLineString([startPoint, endPoint]);
+    const lineOnLink = createLineString([startPoint, endPoint]);
     pointPairDistance.initialize();
     DistanceToPoint.computeDistance(lineOnLink, featureCoordinates, pointPairDistance);
 
