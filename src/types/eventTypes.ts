@@ -1,11 +1,11 @@
-type ApiResponseType = 'gml' | 'xml' | 'json';
+import { InferType } from 'yup';
+import { ValidFeature } from './featureTypes';
+import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
+import { gnlPayloadSchema } from '@schemas/getNearbyLinksSchema';
 
-const isApiResponseType = (
-  responseType: unknown
-): responseType is ApiResponseType => {
-  return (
-    responseType === 'gml' || responseType === 'xml' || responseType === 'json'
-  );
+type ApiResponseType = 'gml' | 'xml' | 'json';
+const isApiResponseType = (responseType: unknown): responseType is ApiResponseType => {
+  return responseType === 'gml' || responseType === 'xml' || responseType === 'json';
 };
 
 /**
@@ -36,7 +36,29 @@ export const isScheduleEvent = (event: unknown): event is ScheduleEvent => {
   return true;
 };
 
+/**
+ * Update payload saved to S3
+ */
+export type UpdatePayload = Pick<
+  InferType<typeof updatePayloadSchema>,
+  'metadata' | 'invalidInfrao'
+> & {
+  Created: Array<ValidFeature>;
+  Updated: Array<ValidFeature>;
+  Deleted: Array<ValidFeature>;
+};
+export const isUpdatePayload = (payload: unknown): payload is UpdatePayload => {
+  return updatePayloadSchema.isValidSync(payload);
+};
+
 // Keep in sync with isAssetTypeKey & isAssetTypeString
+/**
+ * {
+ *   obstacles?: 'infrao:Rakenne';
+ *   trafficSigns?: 'infrao:Liikennemerkki';
+ *   roadSurfaces?: 'infrao:KatualueenOsa';
+ * }
+ */
 interface AssetTypes {
   obstacles?: 'infrao:Rakenne';
   trafficSigns?: 'infrao:Liikennemerkki';
@@ -59,27 +81,59 @@ const isAssetTypes = (assetType: unknown): assetType is AssetTypes => {
   return true;
 };
 
+/**
+ * 'obstacles' | 'trafficSigns' | 'roadSurfaces'
+ */
 export type AssetTypeKey = keyof AssetTypes;
 // Keep in sync AssetTypes
-export const isAssetTypeKey = (
-  assetType: unknown
-): assetType is AssetTypeKey => {
+export const isAssetTypeKey = (assetType: unknown): assetType is AssetTypeKey => {
   if (typeof assetType !== 'string') return false;
 
   return ['obstacles', 'trafficSigns', 'roadSurfaces'].includes(assetType);
 };
 
+/**
+ * 'infrao:Rakenne' | 'infrao:Liikennemerkki' | 'infrao:KatualueenOsa'
+ */
 export type AssetTypeString =
   ScheduleEvent['assetTypes'][keyof ScheduleEvent['assetTypes']];
 // Keep in sync AssetTypes
-export const isAssetTypeString = (
-  assetType: unknown
-): assetType is AssetTypeString => {
+export const isAssetTypeString = (assetType: unknown): assetType is AssetTypeString => {
   if (typeof assetType !== 'string') return false;
 
-  return [
-    'infrao:Rakenne',
-    'infrao:Liikennemerkki',
-    'infrao:KatualueenOsa'
-  ].includes(assetType);
+  return ['infrao:Rakenne', 'infrao:Liikennemerkki', 'infrao:KatualueenOsa'].includes(
+    assetType
+  );
+};
+
+/**
+ * Lambda invocation event containing the S3 key of the payload
+ */
+export interface S3KeyObject {
+  key: string;
+}
+export const isS3KeyObject = (s3KeyObject: unknown): s3KeyObject is S3KeyObject => {
+  if (!s3KeyObject || typeof s3KeyObject !== 'object') {
+    return false;
+  }
+
+  const { key } = s3KeyObject as S3KeyObject;
+
+  if (typeof key !== 'string') {
+    return false;
+  }
+
+  return true;
+};
+
+export type GetNearbyLinksPayload = Omit<
+  InferType<typeof gnlPayloadSchema>,
+  'features'
+> & {
+  features: Array<ValidFeature>;
+};
+export const isGetNearbyLinksPayload = (
+  payload: unknown
+): payload is GetNearbyLinksPayload => {
+  return gnlPayloadSchema.isValidSync(payload);
 };

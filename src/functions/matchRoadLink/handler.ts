@@ -2,7 +2,6 @@ import { invokeLambda, middyfy } from '@libs/lambda-tools';
 import matchTrafficSign from './trafficSigns/matchTrafficSign';
 import matchObstacle from './obstacles/matchObstacle';
 import matchSurface from './surface/matchSurface';
-import combineSurfaces from './surface/combineSurfaces';
 import GeometryFactory from 'jsts/org/locationtech/jts/geom/GeometryFactory';
 import PrecisionModel from 'jsts/org/locationtech/jts/geom/PrecisionModel';
 
@@ -11,45 +10,53 @@ import {
   PayloadFeature,
   DrKuntaFeature,
   LinkObject,
-  S3KeyObject,
-  isS3KeyObject,
   FeatureType
 } from '@functions/typing';
-import { isDelta, isFeatureRoadlinkMap } from './types';
-import { stage } from '@functions/config';
-
-// Max offset permitted from middle of linestring
-const MAX_OFFSET = 2;
+import { isFeatureRoadlinkMap } from './types';
+import { bucketName, MAX_OFFSET } from '@functions/config';
+import {
+  GetNearbyLinksPayload,
+  isS3KeyObject,
+  isUpdatePayload,
+  S3KeyObject
+} from '@customTypes/eventTypes';
+import { ValidFeature } from '@customTypes/featureTypes';
+import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
 
 const now = new Date().toISOString().slice(0, 19);
 
 const matchRoadLinks = async (event: S3KeyObject) => {
-  const delta = JSON.parse(
-    await getFromS3(`dr-kunta-${stage}-bucket-placeholder`, event.key)
-  ) as unknown;
-  if (!isDelta(delta))
+  const s3Response = JSON.parse(await getFromS3(bucketName, event.key)) as unknown;
+  const updatePayload = updatePayloadSchema.cast(s3Response);
+  if (!isUpdatePayload(updatePayload))
     throw new Error(
-      `S3 object ${event.key} is not valid Delta object:\n`,
-      delta
+      `S3 object ${event.key} is not valid UpdatePayload object:\n${JSON.stringify(
+        updatePayload
+      ).slice(0, 1000)}`
     );
 
   let rejectsAmount = 0;
-  let features: Array<DrKuntaFeature> = delta.Created.concat(delta.Updated);
-  if (delta.metadata.assetType === 'roadSurfaces') {
+  const features: Array<ValidFeature> = updatePayload.Created.concat(
+    updatePayload.Updated
+  );
+  if (updatePayload.metadata.assetType === 'roadSurfaces') {
+    console.warn('Surface matching is not implemented yet');
+    return;
+    /* //combineSurfaces could maybe be implemented in the parsing phase in fetchAndParseData
     features = combineSurfaces(features) as unknown as Array<DrKuntaFeature>;
     delta.Created = features;
-    delta.Updated = [];
+    delta.Updated = []; */
   }
   const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
-  const getNearbyLinksPayload = {
+  const getNearbyLinksPayload: GetNearbyLinksPayload = {
     features: features,
-    municipality: delta.metadata.municipality,
-    assetType: delta.metadata.assetType
+    municipality: updatePayload.metadata.municipality,
+    assetType: updatePayload.metadata.assetType
   };
 
   await uploadToS3(
-    `dr-kunta-${stage}-bucket-placeholder`,
-    `getNearbyLinksRequestPayload/${delta.metadata.municipality}/${now}.json`,
+    bucketName,
+    `getNearbyLinksRequestPayload/${updatePayload.metadata.municipality}/${now}.json`,
     JSON.stringify(getNearbyLinksPayload)
   );
 
@@ -60,27 +67,25 @@ const matchRoadLinks = async (event: S3KeyObject) => {
         'RequestResponse',
         Buffer.from(
           JSON.stringify({
-            key: `getNearbyLinksRequestPayload/${delta.metadata.municipality}/${now}.json`
+            key: `getNearbyLinksRequestPayload/${updatePayload.metadata.municipality}/${now}.json`
           })
         )
       )
-    ).Payload
+    ).Payload || 'getNearbyLinks Payload was undefined'
   ).toString();
 
   const parsedResult = JSON.parse(invocationResult) as unknown;
   if (!isS3KeyObject(parsedResult)) {
     throw new Error(
-      `getNearbyLinks lambda invocation result is not valid S3KeyObject:\n`,
-      parsedResult
+      `getNearbyLinks lambda invocation result is not valid S3KeyObject:\n${JSON.stringify(
+        parsedResult
+      )}`
     );
   }
   const allRoadLinksS3Key = parsedResult.key;
 
   const allRoadLinks = JSON.parse(
-    await getFromS3(
-      `dr-kunta-${stage}-bucket-placeholder`,
-      allRoadLinksS3Key
-    )
+    await getFromS3(bucketName, allRoadLinksS3Key)
   ) as unknown;
   if (!Array.isArray(allRoadLinks) || !allRoadLinks.every(isFeatureRoadlinkMap))
     throw new Error(
@@ -90,8 +95,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   for (let p = 0; p < features.length; p++) {
     const feature = features[p];
     const roadLinks: Array<LinkObject> | undefined = allRoadLinks.find(
-      (i) =>
-        i.id === feature.properties.ID && i.type === feature.properties.TYPE
+      (i) => i.id === feature.properties.ID && i.type === feature.properties.TYPE
     )?.roadlinks;
     if (roadLinks) {
       switch (feature.properties.TYPE) {
@@ -139,13 +143,9 @@ const matchRoadLinks = async (event: S3KeyObject) => {
           break;
         }
         case FeatureType.Surface: {
-          const surfaceMatchResults = matchSurface(
-            roadLinks,
-            feature,
-            geomFactory
-          );
-
-          if (!surfaceMatchResults) {
+          const surfaceMatchResults = matchSurface(roadLinks, feature, geomFactory);
+          console.log('surfaceMatchResults:\n', surfaceMatchResults);
+          /* if (!surfaceMatchResults) {
             console.error('matchResult is undefined');
             return;
           }
@@ -158,7 +158,8 @@ const matchRoadLinks = async (event: S3KeyObject) => {
           feature.properties = {
             ...feature.properties,
             ...surfaceMatchResults
-          };
+          }; */
+          console.warn('Surface matching is not implemented yet');
           break;
         }
       }
@@ -168,55 +169,55 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     }
   }
   const execDelta2SQLBody: PayloadFeature = {
-    Created: delta.Created.filter(
+    Created: updatePayload.Created.filter(
       (feature: DrKuntaFeature) => !feature.properties.DR_REJECTED
     ),
-    Deleted: delta.Deleted,
-    Updated: delta.Updated.filter(
+    Deleted: updatePayload.Deleted,
+    Updated: updatePayload.Updated.filter(
       (feature: DrKuntaFeature) => !feature.properties.DR_REJECTED
     ),
     metadata: {
       OFFSET_LIMIT: MAX_OFFSET,
-      municipality: delta.metadata.municipality,
-      assetType: delta.metadata.assetType
+      municipality: updatePayload.metadata.municipality,
+      assetType: updatePayload.metadata.assetType
     }
   };
 
   const logsBody = {
     Rejected: {
-      Created: delta.Created.filter(
+      Created: updatePayload.Created.filter(
         (feature: DrKuntaFeature) => feature.properties.DR_REJECTED
       ),
-      Updated: delta.Updated.filter(
+      Updated: updatePayload.Updated.filter(
         (feature: DrKuntaFeature) => feature.properties.DR_REJECTED
       )
     },
     Accepted: {
-      Created: delta.Created.filter(
+      Created: updatePayload.Created.filter(
         (feature: DrKuntaFeature) => !feature.properties.DR_REJECTED
       ),
-      Deleted: delta.Deleted,
-      Updated: delta.Updated.filter(
+      Deleted: updatePayload.Deleted,
+      Updated: updatePayload.Updated.filter(
         (feature: DrKuntaFeature) => !feature.properties.DR_REJECTED
       )
     },
-    invalidInfrao: delta.invalidInfrao,
+    invalidInfrao: updatePayload.invalidInfrao,
     metadata: {
       OFFSET_LIMIT: MAX_OFFSET,
-      municipality: delta.metadata.municipality,
-      assetType: delta.metadata.assetType
+      municipality: updatePayload.metadata.municipality,
+      assetType: updatePayload.metadata.assetType
     }
   };
 
   await uploadToS3(
-    `dr-kunta-${stage}-bucket-placeholder`,
-    `matchRoadLink/${delta.metadata.municipality}/${now}.json`,
+    bucketName,
+    `matchRoadLink/${updatePayload.metadata.municipality}/${now}.json`,
     JSON.stringify(execDelta2SQLBody)
   );
 
   await uploadToS3(
-    `dr-kunta-${stage}-bucket-placeholder`,
-    `logs/${delta.metadata.municipality}/${now}.json`,
+    bucketName,
+    `logs/${updatePayload.metadata.municipality}/${now}.json`,
     JSON.stringify(logsBody)
   );
 
@@ -225,17 +226,17 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     'Event',
     Buffer.from(
       JSON.stringify({
-        key: `matchRoadLink/${delta.metadata.municipality}/${now}.json`
+        key: `matchRoadLink/${updatePayload.metadata.municipality}/${now}.json`
       })
     )
   );
 
   const reportRejectedDeltabody = {
-    assetType: delta.metadata.assetType,
+    assetType: updatePayload.metadata.assetType,
     rejectsAmount: rejectsAmount,
-    assetsAmount: delta.Created.length + delta.Updated.length,
-    deletesAmount: delta.Deleted.length,
-    invalidInfrao: delta.invalidInfrao,
+    assetsAmount: updatePayload.Created.length + updatePayload.Updated.length,
+    deletesAmount: updatePayload.Deleted.length,
+    invalidInfrao: updatePayload.invalidInfrao,
     now: now
   };
 
@@ -245,10 +246,10 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     Buffer.from(
       JSON.stringify({
         ReportType:
-          rejectsAmount > 0 || delta.invalidInfrao.sum > 0
+          rejectsAmount > 0 || updatePayload.invalidInfrao.sum > 0
             ? 'matchedWithFailures'
             : 'matchedSuccessfully',
-        Municipality: delta.metadata.municipality,
+        Municipality: updatePayload.metadata.municipality,
         Body: reportRejectedDeltabody
       })
     )

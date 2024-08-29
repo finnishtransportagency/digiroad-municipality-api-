@@ -1,4 +1,7 @@
 import {
+  drsecuritygroupid,
+  drsubnetid1,
+  drsubnetid2,
   pgdatabase,
   pghost,
   pgpassword,
@@ -12,8 +15,8 @@ export default {
   maximumRetryAttempts: 0,
   timeout: 60,
   vpc: {
-    securityGroupIds: ['${self:custom.drSecurityGroupId}'],
-    subnetIds: ['${self:custom.drSubnetId1}', '${self:custom.drSubnetId2}']
+    securityGroupIds: [drsecuritygroupid],
+    subnetIds: [drsubnetid1, drsubnetid2]
   },
   environment: {
     PGHOST: pghost,
@@ -21,5 +24,6 @@ export default {
     PGPASSWORD_SSM_KEY: pgpassword,
     PGPORT: pgport,
     PGDATABASE: pgdatabase
-  }
+  },
+  role: 'DBLambdaRole'
 };

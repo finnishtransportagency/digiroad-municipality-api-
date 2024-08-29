@@ -1,9 +1,5 @@
 import { middyfy } from '@libs/lambda-tools';
-import {
-  SSM,
-  GetParameterCommand,
-  DeleteParameterCommand
-} from '@aws-sdk/client-ssm';
+import { SSM, GetParameterCommand, DeleteParameterCommand } from '@aws-sdk/client-ssm';
 import {
   SchedulerClient,
   GetScheduleCommand,

@@ -25,12 +25,7 @@ export default async function execCreatedTrafficSign(
   const checkExistingAssetResult = await client.query(checkExistingAssetQuery);
 
   if (checkExistingAssetResult.rowCount > 0) {
-    await execUpdatedTrafficSign(
-      feature,
-      municipality_code,
-      dbmodifier,
-      client
-    );
+    await execUpdatedTrafficSign(feature, municipality_code, dbmodifier, client);
     return;
   }
 
@@ -58,11 +53,7 @@ export default async function execCreatedTrafficSign(
         INSERT INTO lrm_position (id, side_code,start_measure, link_id)
         VALUES (nextval('LRM_POSITION_PRIMARY_KEY_SEQ'), $1, $2, $3)
         `,
-    values: [
-      sideCode,
-      trafficSignProperties.DR_M_VALUE,
-      trafficSignProperties.DR_LINK_ID
-    ]
+    values: [sideCode, trafficSignProperties.DR_M_VALUE, trafficSignProperties.DR_LINK_ID]
   };
   await client.query(lrmPositionQuery);
 
@@ -86,12 +77,7 @@ export default async function execCreatedTrafficSign(
       INSERT INTO text_property_value (id, asset_id, property_id, value_fi, created_date, created_by)
       VALUES (nextval('PRIMARY_KEY_SEQ'),$2, (SELECT id FROM _property), $3 ,CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', $4)
     `,
-    values: [
-      'trafficSigns_value',
-      assetID,
-      trafficSignProperties.ARVO,
-      dbmodifier
-    ]
+    values: ['trafficSigns_value', assetID, trafficSignProperties.ARVO, dbmodifier]
   };
 
   await client.query(valueQuery);
@@ -114,15 +100,9 @@ export default async function execCreatedTrafficSign(
     await client.query(query);
   }
 
-  await numberQuery(
-    'terrain_coordinates_x',
-    feature.geometry.coordinates[0] as number
-  );
+  await numberQuery('terrain_coordinates_x', feature.geometry.coordinates[0] as number);
 
-  await numberQuery(
-    'terrain_coordinates_y',
-    feature.geometry.coordinates[1] as number
-  );
+  await numberQuery('terrain_coordinates_y', feature.geometry.coordinates[1] as number);
 
   const typeQuery = {
     text: `
@@ -133,19 +113,14 @@ export default async function execCreatedTrafficSign(
       ), _enumerated_value AS (
         SELECT enumerated_value.id
         FROM enumerated_value, _property
-      WHERE property_id = _property.id AND name_fi ~ ($2)
+      WHERE property_id = _property.id AND name_fi = ($2)
       LIMIT 1
       )
       
     INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
         VALUES ($3, (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', $4)
     `,
-    values: [
-      'trafficSigns_type',
-      trafficSignProperties.LM_TYYPPI,
-      assetID,
-      dbmodifier
-    ]
+    values: ['trafficSigns_type', trafficSignProperties.LM_TYYPPI, assetID, dbmodifier]
   };
   await client.query(typeQuery);
 

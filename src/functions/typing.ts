@@ -1,23 +1,3 @@
-export interface S3KeyObject {
-  key: string;
-}
-
-export const isS3KeyObject = (
-  s3KeyObject: unknown
-): s3KeyObject is S3KeyObject => {
-  if (typeof s3KeyObject !== 'object' || s3KeyObject === null) {
-    return false;
-  }
-
-  const { key } = s3KeyObject as S3KeyObject;
-
-  if (typeof key !== 'string') {
-    return false;
-  }
-
-  return true;
-};
-
 export interface GeoJSON {
   type: string;
   name?: string;
@@ -137,7 +117,7 @@ export interface PayloadFeature {
   metadata?: {
     OFFSET_LIMIT?: number;
     municipality: string;
-    assetType?: string;
+    assetType: string;
   };
   invalidInfrao?: {
     sum: number;

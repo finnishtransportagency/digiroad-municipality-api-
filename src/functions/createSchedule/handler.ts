@@ -2,15 +2,8 @@ import { middyfy } from '@libs/lambda-tools';
 import validator from '@middy/validator';
 import httpErrorHandler from '@middy/http-error-handler';
 import { transpileSchema } from '@middy/validator/transpile';
-import {
-  SSM,
-  PutParameterCommand,
-  DeleteParameterCommand
-} from '@aws-sdk/client-ssm';
-import {
-  SchedulerClient,
-  CreateScheduleCommand
-} from '@aws-sdk/client-scheduler';
+import { SSM, PutParameterCommand, DeleteParameterCommand } from '@aws-sdk/client-ssm';
+import { SchedulerClient, CreateScheduleCommand } from '@aws-sdk/client-scheduler';
 import { awsaccountid, stage } from '@functions/config';
 
 const inputSchema = {
@@ -65,9 +58,7 @@ const createSchedule = async (event) => {
     } else if (schedule.dayOfMonth && schedule.time) {
       time = `cron(0 ${schedule.time} ${schedule.dayOfMonth} * ? *)`;
     } else {
-      console.error(
-        'Invalid schedule, time and dayOfWeek or dayOfMonth required'
-      );
+      console.error('Invalid schedule, time and dayOfWeek or dayOfMonth required');
     }
     return time;
   };
@@ -119,9 +110,7 @@ const createSchedule = async (event) => {
     const deleteParameterInput = {
       Name: `/DRKunta/${stage}/${event.body.municipality}`
     };
-    const deleteParameterCommand = new DeleteParameterCommand(
-      deleteParameterInput
-    );
+    const deleteParameterCommand = new DeleteParameterCommand(deleteParameterInput);
     await ssm.send(deleteParameterCommand);
     console.error(e);
     return {

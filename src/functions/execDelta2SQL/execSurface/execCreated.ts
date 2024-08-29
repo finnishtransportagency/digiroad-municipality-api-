@@ -7,8 +7,7 @@ export default async function execCreatedSurface(
   dbmodifier: string,
   client: Client
 ) {
-  const surfaceProperties: SurfaceProperties =
-    feature.properties as SurfaceProperties;
+  const surfaceProperties: SurfaceProperties = feature.properties as SurfaceProperties;
   const assetTypeID = 110;
   for (const roadLink of surfaceProperties.DR_VALIDLINKS) {
     const assetQuery = {

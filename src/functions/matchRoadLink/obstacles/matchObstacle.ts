@@ -12,10 +12,9 @@ export default function (
 ) {
   const pointPairDistance = new PointPairDistance();
   let minDistance = Number.MAX_VALUE;
-  let closestLink: LinkObject;
-  let closestLinkCoordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> =
-    [];
-  let closestPointOnLink: jsts.org.locationtech.jts.geom.Coordinate;
+  let closestLink: LinkObject | undefined;
+  let closestLinkCoordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> = [];
+  let closestPointOnLink: jsts.org.locationtech.jts.geom.Coordinate | undefined;
 
   const featureCoordinates = new Coordinate(
     feature.geometry.coordinates[0] as number,
@@ -31,11 +30,7 @@ export default function (
       coordinates[j] = new Coordinate(point.x, point.y, point.z);
     }
     const lineString = geomFactory.createLineString(coordinates);
-    DistanceToPoint.computeDistance(
-      lineString,
-      featureCoordinates,
-      pointPairDistance
-    );
+    DistanceToPoint.computeDistance(lineString, featureCoordinates, pointPairDistance);
     const distance = pointPairDistance.getDistance();
     if (distance < minDistance) {
       minDistance = distance;
@@ -44,6 +39,7 @@ export default function (
       closestPointOnLink = pointPairDistance.getCoordinate(0);
     }
   }
+  if (!closestLink || !closestPointOnLink) return undefined;
   pointPairDistance.initialize();
   return getMValue(
     closestLinkCoordinates,

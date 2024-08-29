@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import type { AWS } from '@serverless/typescript';
+import type { Serverless } from 'serverless/aws'
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -9,8 +9,6 @@ import {
   reportRejectedDelta,
   getNearbyLinks,
   execDelta2SQL,
-  parseXML,
-  fetchMunicipalityData,
   createSchedule,
   listSchedules,
   deleteSchedule,
@@ -38,7 +36,7 @@ import {
   email
 } from '@functions/config';
 
-const serverlessConfiguration: AWS = {
+const serverlessConfiguration: Serverless = {
   service: 'dr-kunta',
   frameworkVersion: '3',
   plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-s3-local'],
@@ -53,16 +51,16 @@ const serverlessConfiguration: AWS = {
       platform: 'node',
       concurrency: 10
     },
-    drSubnetId1: `\${ssm:${drsubnetid1}}`,
-    drSubnetId2: `\${ssm:${drsubnetid2}}`,
-    subnetId1: `\${ssm:${subnetid1}}`,
-    subnetId2: `\${ssm:${subnetid2}}`,
-    securityGroupId: `\${ssm:${securitygroupid}}`,
-    vpcId: `\${ssm:${vpcid}}`,
-    pgPasswordSsmKey: `\${ssm:${pgpassword}}`,
-    smtpUsernameSsmKey: `\${ssm:${smtpusername}}`,
-    smtpPasswordSsmKey: `\${ssm:${smtppassword}}`,
-    drSecurityGroupId: `\${ssm:${drsecuritygroupid}}`
+    drSubnetId1: offline ? '' : `\${ssm:${drsubnetid1}}`,
+    drSubnetId2: offline ? '' : `\${ssm:${drsubnetid2}}`,
+    subnetId1: offline ? '' : `\${ssm:${subnetid1}}`,
+    subnetId2: offline ? '' : `\${ssm:${subnetid2}}`,
+    securityGroupId: offline ? '' : `\${ssm:${securitygroupid}}`,
+    vpcId: offline ? '' : `\${ssm:${vpcid}}`,
+    pgPasswordSsmKey: offline ? '' : `\${ssm:${pgpassword}}`,
+    smtpUsernameSsmKey: offline ? '' : `\${ssm:${smtpusername}}`,
+    smtpPasswordSsmKey: offline ? '' : `\${ssm:${smtppassword}}`,
+    drSecurityGroupId: offline ? '' : `\${ssm:${drsecuritygroupid}}`
   },
   provider: {
     name: 'aws',
@@ -103,21 +101,21 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       STAGE_NAME: stage,
       OPERATOR_EMAIL: email,
-      DR_SECURITY_GROUP_ID: '${self:custom.drSecurityGroupId}',
+      DR_SECURITY_GROUP_ID: offline ? '' : `\${ssm:${drsecuritygroupid}}`,
       DR_SUBNET_ID_1: '${self:custom.drSubnetId1}',
       DR_SUBNET_ID_2: '${self:custom.drSubnetId2}',
       AWS_ACCOUNT_ID: awsaccountid,
-      PGHOST: `\${ssm:${pghost}}`,
-      PGPORT: `\${ssm:${pgport}}`,
-      PGDATABASE: `\${ssm:${pgdatabase}}`,
-      PGUSER: `\${ssm:${pguser}}`,
+      PGHOST: offline ? '' : `\${ssm:${pghost}}`,
+      PGPORT: offline ? '' : `\${ssm:${pgport}}`,
+      PGDATABASE: offline ? '' : `\${ssm:${pgdatabase}}`,
+      PGUSER: offline ? '' : `\${ssm:${pguser}}`,
       PGPASSWORD_SSM_KEY: '${self:custom.pgPasswordSsmKey}',
       SMTP_USERNAME_SSM_KEY: '${self:custom.smtpUsernameSsmKey}',
       SMTP_PASSWORD_SSM_KEY: '${self:custom.smtpPasswordSsmKey}'
     },
     region: 'eu-west-1',
     ...((stage === 'test' || stage === 'prod') && {
-      endpointType: 'PRIVATE',
+      endpointType: 'private',
       vpcEndpointIds: [{ Ref: 'drKuntaEndpoint' }],
       vpc: {
         securityGroupIds: ['${self:custom.securityGroupId}'],
@@ -132,13 +130,11 @@ const serverlessConfiguration: AWS = {
   // import the function via paths
   functions: {
     fetchAndParseData,
-    parseXML,
     calculateDelta,
     matchRoadLink,
     reportRejectedDelta,
     getNearbyLinks,
     execDelta2SQL,
-    fetchMunicipalityData,
     createSchedule,
     listSchedules,
     deleteSchedule
@@ -206,7 +202,7 @@ const serverlessConfiguration: AWS = {
       drKuntaBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
-          BucketName: `dr-kunta-${stage}-bucket-placeholder`, // poista placeholder
+          BucketName: `dr-kunta-${stage}-bucket`,
           LifecycleConfiguration: {
             Rules: [
               {

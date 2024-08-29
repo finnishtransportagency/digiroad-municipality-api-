@@ -1,180 +1,187 @@
 import { invokeLambda, middyfy } from '@libs/lambda-tools';
-import { DrKuntaFeature, PayloadFeature } from '@functions/typing';
-import {
-  obstaclesSchema,
-  trafficSignsSchema,
-  roadSurfacesSchema
-} from './validation/validationSchema';
 import { isEqual } from 'lodash';
-import {
-  deleteFromS3,
-  getFromS3,
-  listS3Objects,
-  uploadToS3
-} from '@libs/s3-tools';
+import { deleteFromS3, getFromS3, listS3Objects, uploadToS3 } from '@libs/s3-tools';
 import { S3Event } from 'aws-lambda';
-import { stage } from '@functions/config';
+import { bucketName } from '@functions/config';
+import { AssetTypeKey, UpdatePayload, isAssetTypeKey } from '@customTypes/eventTypes';
+import {
+  geoJsonSchema,
+  obstacleFeatureSchema,
+  roadSurfaceFeatureSchema,
+  trafficSignFeatureSchema
+} from '@schemas/geoJsonSchema';
+import { FeatureCollection, ValidFeature } from '@customTypes/featureTypes';
 
-const getAndFormatS3Object = async (
-  bucketName: string,
-  fileName: string
-): Promise<unknown> => {
-  const data = await getFromS3(bucketName, fileName);
-  return JSON.parse(data) as unknown;
-};
+enum FeatureObjectType {
+  UPDATE = 0,
+  REFERENCE = 1
+}
+
+interface FeatureCollectionResult {
+  error: string | null;
+  object: FeatureCollection | null;
+}
 
 const calculateDelta = async (event: S3Event) => {
-  const key: string = decodeURIComponent(event.Records[0].s3.object.key);
+  /**
+   * @example geojson/espoo/obstacles/2024-07-11T13:55:21.json
+   */
+  const updateObjectKey: string = event.Records[0].s3.object.key;
+  const municipality: string = updateObjectKey.split('/')[1];
+  const assetType: string = updateObjectKey.split('/')[2];
+  if (!isAssetTypeKey(assetType)) throw new Error('Invalid assetType');
 
-  const municipality: string = key.split('/')[1];
-  const assetType: string = key.split('/')[2];
-
-  try {
-    var keys = await listS3Objects(
-      `dr-kunta-${stage}-bucket-placholder`,
-      `geojson/${municipality}/${assetType}/`
+  const updateCollectionResult: FeatureCollectionResult = await getFeatureCollection(
+    municipality,
+    assetType,
+    FeatureObjectType.UPDATE
+  );
+  if (!updateCollectionResult.object) {
+    await reportUpdateObjectError(
+      municipality,
+      updateCollectionResult.error || 'Unknown error',
+      updateObjectKey
     );
-    const sortedKeyList = keys.Contents.sort((k) => -k.LastModified.getTime());
-    var updateKey = sortedKeyList[0].Key;
-    var refrenceKey = sortedKeyList.length > 1 ? sortedKeyList[1].Key : null; //null for first upload where a refrence object does not exist
-  } catch (e: unknown) {
-    if (!(e instanceof Error)) throw e;
-    throw new Error(`Could not list object keys from S3: ${e.message}`);
+    throw new Error(`Error while retrieving update object: ${updateObjectKey}`);
   }
+  const updateObject: FeatureCollection = updateCollectionResult.object;
+  const referenceObject: FeatureCollection | null = (
+    await getFeatureCollection(municipality, assetType, FeatureObjectType.REFERENCE)
+  ).object;
 
-  let schema;
-  if (assetType === 'obstacles') {
-    schema = obstaclesSchema;
-  }
-  if (assetType === 'trafficSigns') {
-    schema = trafficSignsSchema;
-  }
-  if (assetType === 'roadSurfaces') {
-    schema = roadSurfacesSchema;
-  }
-  if (!schema) {
-    throw new Error('Unknown assetType');
-  }
+  const updateFeatures: Array<ValidFeature> = updateObject.features.filter((f) =>
+    validateFeatureAssetType(f, assetType)
+  );
+  const referenceFeatures: Array<ValidFeature> = referenceObject
+    ? referenceObject.features.filter((f) => validateFeatureAssetType(f, assetType))
+    : [];
+  const referencesExist: boolean = referenceFeatures.length > 0;
 
-  try {
-    var updateObject = await getAndFormatS3Object(
-      `dr-kunta-${stage}-bucket-placeholder`,
-      updateKey
-    );
-    const valid = await schema.validate(updateObject);
-    if (!valid) {
-      throw new Error('Invalid schema');
-    }
-    updateObject = schema.cast(updateObject);
-  } catch (e: unknown) {
-    if (!(e instanceof Error)) throw e;
-    await invokeLambda(
-      'reportRejectedDelta',
-      'Event',
-      Buffer.from(
-        JSON.stringify({
-          ReportType: 'invalidData',
-          Municipality: municipality,
-          Body: { Message: e.message }
-        })
-      )
-    );
-    await deleteFromS3(`dr-kunta-${stage}-bucket-placeholder`, updateKey);
-    throw new Error(`Object deleted because of invalid data: ${e.message}`);
-  }
-
-  let referenceObject =
-    refrenceKey === null
-      ? { type: 'FeatureCollection', features: [] }
-      : await getAndFormatS3Object(
-          `dr-kunta-${stage}-bucket-placeholder`,
-          refrenceKey
-        );
-
-  referenceObject = schema.cast(referenceObject);
-
-  const updateFeatures: Array<DrKuntaFeature> = updateObject.features;
-  const referenceFeatures: Array<DrKuntaFeature> = referenceObject.features;
-
-  let created: Array<DrKuntaFeature> = [];
-  const updated: Array<DrKuntaFeature> = [];
-  let deleted: Array<DrKuntaFeature> = [];
-
-  // returns true if Features differ
-  function compareFeatures(obj1: DrKuntaFeature, obj2: DrKuntaFeature) {
-    return !isEqual(obj1, obj2);
-  }
-  if (assetType === 'obstacles' || assetType === 'trafficSigns') {
-    for (let i = 0; i < updateFeatures.length; i++) {
-      let found = false;
-      for (let j = 0; j < referenceFeatures.length; j++) {
-        if (
-          updateFeatures[i].properties.ID ===
-            referenceFeatures[j].properties.ID &&
-          updateFeatures[i].properties.TYPE ===
-            referenceFeatures[j].properties.TYPE
-        ) {
-          if (compareFeatures(updateFeatures[i], referenceFeatures[j])) {
-            updated.push(updateFeatures[i]);
-          }
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        created.push(updateFeatures[i]);
-      }
-    }
-    for (let j = 0; j < referenceFeatures.length; j++) {
-      let found = false;
-      for (let i = 0; i < updateFeatures.length; i++) {
-        if (
-          updateFeatures[i].properties.ID ===
-            referenceFeatures[j].properties.ID &&
-          updateFeatures[i].properties.TYPE ===
-            referenceFeatures[j].properties.TYPE
-        ) {
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        deleted.push(referenceFeatures[j]);
-      }
-    }
-  }
-  if (assetType === 'roadSurfaces') {
-    if (!isEqual(updateFeatures, referenceFeatures)) {
-      created = updateFeatures;
-      deleted = referenceFeatures;
-    }
-  }
-  const payLoad: PayloadFeature = {
-    Created: created,
-    Deleted: deleted,
-    Updated: updated,
+  const updatePayload: UpdatePayload = {
+    Created: referencesExist ? [] : updateFeatures,
+    Updated: [],
+    Deleted: [],
     metadata: {
-      municipality: municipality,
-      assetType: assetType
+      municipality,
+      assetType
     },
     invalidInfrao: updateObject.invalidInfrao
   };
+  if (referencesExist)
+    pushUpdatesToPayload(updatePayload, updateFeatures, referenceFeatures);
 
-  const now = new Date().toISOString().slice(0, 19);
-
+  const fileName = updateObjectKey.split('/')[3].split('.')[0];
   await uploadToS3(
-    `dr-kunta-${stage}-bucket-placeholder`,
-    `calculateDelta/${municipality}/${now}.json`,
-    JSON.stringify(payLoad)
+    bucketName,
+    `calculateDelta/${municipality}/${fileName}.json`,
+    JSON.stringify(updatePayload)
   );
-
-  await invokeLambda(
+  // No need to await for matchRoadLink
+  void invokeLambda(
     'matchRoadLink',
     'Event',
     Buffer.from(
-      JSON.stringify({ key: `calculateDelta/${municipality}/${now}.json` })
+      JSON.stringify({ key: `calculateDelta/${municipality}/${fileName}.json` })
     )
   );
+};
+
+const getFeatureCollection = async (
+  municipality: string,
+  assetType: AssetTypeKey,
+  index: FeatureObjectType
+): Promise<FeatureCollectionResult> => {
+  try {
+    const { Contents } = await listS3Objects(
+      bucketName,
+      `geojson/${municipality}/${assetType}/`
+    );
+
+    if (!Contents || Contents.length < index + 1)
+      return {
+        error: `Less than ${
+          index + 1
+        } object(s) found in geojson/${municipality}/${assetType}/`,
+        object: null
+      };
+    const foundObject = Contents.sort((object) =>
+      object && object.LastModified ? -object.LastModified.getTime() : 0
+    )[index];
+
+    if (!foundObject || !foundObject.Key)
+      return { error: `No object found in index: ${index}`, object: null };
+
+    return {
+      error: null,
+      object: geoJsonSchema.cast(JSON.parse(await getFromS3(bucketName, foundObject.Key)))
+    };
+  } catch (e: unknown) {
+    if (!(e instanceof Error)) throw e;
+    console.error(`Could not get FeatureCollection: ${e.message}`);
+    return { error: e.message, object: null };
+  }
+};
+
+const reportUpdateObjectError = async (
+  municipality: string,
+  error: string,
+  updateObjectKey: string
+) => {
+  await invokeLambda(
+    'reportRejectedDelta',
+    'Event',
+    Buffer.from(
+      JSON.stringify({
+        ReportType: 'invalidData',
+        Municipality: municipality,
+        Body: { Message: error }
+      })
+    )
+  );
+  await deleteFromS3(bucketName, updateObjectKey);
+  console.error(`${updateObjectKey} deleted because of invalid data: ${error}`);
+};
+
+const validateFeatureAssetType = (
+  feature: ValidFeature,
+  assetType: AssetTypeKey
+): boolean => {
+  switch (assetType) {
+    case 'obstacles':
+      return obstacleFeatureSchema.isValidSync(feature);
+    case 'trafficSigns':
+      return trafficSignFeatureSchema.isValidSync(feature);
+    case 'roadSurfaces':
+      return roadSurfaceFeatureSchema.isValidSync(feature);
+    default:
+      return false;
+  }
+};
+
+const pushUpdatesToPayload = (
+  payloadObject: UpdatePayload,
+  updateFeatures: Array<ValidFeature>,
+  referenceFeatures: Array<ValidFeature>
+) => {
+  updateFeatures.forEach((updateFeature) => {
+    const referenceFeature: ValidFeature | undefined = referenceFeatures.find(
+      (f) =>
+        f.properties.ID === updateFeature.properties.ID &&
+        f.properties.TYPE === updateFeature.properties.TYPE
+    );
+
+    if (referenceFeature) {
+      if (!isEqual(updateFeature, referenceFeature))
+        payloadObject.Updated.push(updateFeature);
+    } else {
+      payloadObject.Created.push(updateFeature);
+    }
+  });
+
+  referenceFeatures.forEach((referenceFeature) => {
+    if (!updateFeatures.find((f) => isEqual(f, referenceFeature)))
+      payloadObject.Deleted.push(referenceFeature);
+  });
 };
 
 export const main = middyfy(calculateDelta);

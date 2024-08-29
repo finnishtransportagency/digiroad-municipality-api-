@@ -1,5 +1,4 @@
 import { middyfy } from '@libs/lambda-tools';
-import { Client } from 'pg';
 
 import execCreatedObstacle from './execObstacle/execCreated';
 import execExpiredObstacle from './execObstacle/execExpired';
@@ -11,32 +10,15 @@ import execExpiredTrafficSign from './execTrafficSign/execExpired';
 
 import execCreatedSurface from './execSurface/execCreated';
 import execCleanUp from './execSurface/execCleanup';
-import {
-  offline,
-  pghost,
-  pgport,
-  pgdatabase,
-  pguser,
-  pgpassword,
-  stage
-} from '@functions/config';
-import { getParameter } from '@libs/ssm-tools';
+import { bucketName } from '@functions/config';
 import { getFromS3 } from '@libs/s3-tools';
+import { getPostgresClient } from '@libs/pg-tools';
 
 const execDelta2SQL = async (event) => {
-  const data = await getFromS3(
-    `dr-kunta-${stage}-bucket-placeholder`,
-    event.key
-  );
+  const data = await getFromS3(bucketName, event.key);
   const delta = JSON.parse(data) as unknown;
 
-  const client = new Client({
-    host: pghost,
-    port: parseInt(pgport),
-    database: pgdatabase,
-    user: pguser,
-    password: offline ? pgpassword : await getParameter(pgpassword)
-  });
+  const client = await getPostgresClient();
   await client.connect();
 
   const municipality: string = delta.metadata.municipality;
@@ -60,66 +42,31 @@ const execDelta2SQL = async (event) => {
     switch (delta.metadata.assetType) {
       case 'obstacles':
         for (const feature of delta.Created) {
-          await execCreatedObstacle(
-            feature,
-            municipality_code,
-            dbmodifier,
-            client
-          );
+          await execCreatedObstacle(feature, municipality_code, dbmodifier, client);
         }
         for (const feature of delta.Deleted) {
-          await execExpiredObstacle(
-            feature,
-            municipality_code,
-            dbmodifier,
-            client
-          );
+          await execExpiredObstacle(feature, municipality_code, dbmodifier, client);
         }
         for (const feature of delta.Updated) {
-          await execUpdatedObstacle(
-            feature,
-            municipality_code,
-            dbmodifier,
-            client
-          );
+          await execUpdatedObstacle(feature, municipality_code, dbmodifier, client);
         }
         break;
       case 'trafficSigns':
         for (const feature of delta.Created) {
-          await execCreatedTrafficSign(
-            feature,
-            municipality_code,
-            dbmodifier,
-            client
-          );
+          await execCreatedTrafficSign(feature, municipality_code, dbmodifier, client);
         }
         for (const feature of delta.Deleted) {
-          await execExpiredTrafficSign(
-            feature,
-            municipality_code,
-            dbmodifier,
-            client
-          );
+          await execExpiredTrafficSign(feature, municipality_code, dbmodifier, client);
         }
         for (const feature of delta.Updated) {
-          await execUpdatedTrafficSign(
-            feature,
-            municipality_code,
-            dbmodifier,
-            client
-          );
+          await execUpdatedTrafficSign(feature, municipality_code, dbmodifier, client);
         }
         break;
       case 'roadSurfaces':
         if (delta.Created.length > 0 || delta.Deleted.length > 0) {
           await execCleanUp(municipality_code, dbmodifier, client);
           for (const feature of delta.Created) {
-            await execCreatedSurface(
-              feature,
-              municipality_code,
-              dbmodifier,
-              client
-            );
+            await execCreatedSurface(feature, municipality_code, dbmodifier, client);
           }
         }
         break;

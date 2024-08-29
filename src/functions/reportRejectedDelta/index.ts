@@ -8,5 +8,6 @@ export default {
   environment: {
     SMTP_USERNAME_SSM_KEY: smtpusername,
     SMTP_PASSWORD_SSM_KEY: smtppassword
-  }
+  },
+  role: 'reportRejectedDeltaRole'
 };

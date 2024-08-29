@@ -8,8 +8,7 @@ export default async function execCreatedObstacle(
   dbmodifier: string,
   client: Client
 ) {
-  const obstacleProperties: ObstacleProperties =
-    feature.properties as ObstacleProperties;
+  const obstacleProperties: ObstacleProperties = feature.properties as ObstacleProperties;
 
   const assetTypeID = 220;
 
@@ -35,13 +34,7 @@ export default async function execCreatedObstacle(
         INSERT INTO asset (id, created_date, geometry, created_by, asset_type_id, municipality_code, external_id) 
         VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', ST_GeomFromText(($1),3067), $2, $3, $4, $5);
         `,
-    values: [
-      point,
-      dbmodifier,
-      assetTypeID,
-      municipality_code,
-      obstacleProperties.ID
-    ]
+    values: [point, dbmodifier, assetTypeID, municipality_code, obstacleProperties.ID]
   };
   await client.query(assetQuery);
 

@@ -2953,10 +2953,7 @@ export const createTrafficSignText = (trafficSignCode: string): string =>
  * @example ['A1.1 Mutka oikealle', 'A1.2 Mutka vasemmalle', ...]
  */
 export const allowedTrafficSigns = Object.keys(trafficSignRules)
-  .filter(
-    (trafficSignCode) =>
-      trafficSignRules[trafficSignCode].type === 'TRAFFICSIGN'
-  )
+  .filter((trafficSignCode) => trafficSignRules[trafficSignCode].type === 'TRAFFICSIGN')
   .map(createTrafficSignText);
 
 /**
@@ -2965,8 +2962,7 @@ export const allowedTrafficSigns = Object.keys(trafficSignRules)
  */
 export const allowedAdditionalPanels = Object.keys(trafficSignRules)
   .filter(
-    (trafficSignCode) =>
-      trafficSignRules[trafficSignCode].type === 'ADDITIONALPANEL'
+    (trafficSignCode) => trafficSignRules[trafficSignCode].type === 'ADDITIONALPANEL'
   )
   .map(createTrafficSignText);
 

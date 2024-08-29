@@ -48,7 +48,7 @@ const reportRejectedDelta = async (event: ReportRejectedDeltaEvent) => {
 
   const recipients = email.split(',');
   event.Body.stage = stage;
-  event.Body.link = `https://s3.console.aws.amazon.com/s3/object/dr-kunta-${stage}-bucket-placeholder?region=eu-west-1&prefix=logs/${event.Municipality}/${event.Body.now}.json`;
+  event.Body.link = `https://s3.console.aws.amazon.com/s3/object/dr-kunta-${stage}-bucket?region=eu-west-1&prefix=logs/${event.Municipality}/${event.Body.now}.json`;
   const municipalityEmail = await ejs.renderFile(
     path.resolve(__dirname, './templates/' + templateName),
     event

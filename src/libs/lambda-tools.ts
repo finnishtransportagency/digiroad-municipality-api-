@@ -1,8 +1,4 @@
-import {
-  InvokeCommand,
-  InvokeCommandOutput,
-  Lambda
-} from '@aws-sdk/client-lambda';
+import { InvokeCommand, InvokeCommandOutput, Lambda } from '@aws-sdk/client-lambda';
 import { offline, stage } from '@functions/config';
 import middy from '@middy/core';
 import middyJsonBodyParser from '@middy/http-json-body-parser';

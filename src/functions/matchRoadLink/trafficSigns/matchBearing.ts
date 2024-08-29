@@ -29,11 +29,10 @@ export default function (
   const MAX_ANGLE_OFFSET = 25;
   const pointPairDistance = new PointPairDistance();
   let minDistance = Number.MAX_VALUE;
-  let minRoadAngle: number;
-  let closestLink: LinkObject;
-  let closestLinkCoordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> =
-    [];
-  let closestPointOnLink: jsts.org.locationtech.jts.geom.Coordinate;
+  let minRoadAngle: number | undefined;
+  let closestLink: LinkObject | undefined;
+  let closestLinkCoordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> = [];
+  let closestPointOnLink: jsts.org.locationtech.jts.geom.Coordinate | undefined;
 
   function getAngle(start: LinkPoint, end: LinkPoint) {
     return 180 + Math.atan2(start.x - end.x, start.y - end.y) * (180 / Math.PI);
@@ -63,16 +62,8 @@ export default function (
             (roadlink.directiontype === 2 && !towardsDigitizing));
       }
       if (accepted) {
-        const startCoordinates = new Coordinate(
-          startPoint.x,
-          startPoint.y,
-          startPoint.z
-        );
-        const endCoordinates = new Coordinate(
-          endPoint.x,
-          endPoint.y,
-          endPoint.z
-        );
+        const startCoordinates = new Coordinate(startPoint.x, startPoint.y, startPoint.z);
+        const endCoordinates = new Coordinate(endPoint.x, endPoint.y, endPoint.z);
         const lineString = geomFactory.createLineString([
           startCoordinates,
           endCoordinates
@@ -84,8 +75,7 @@ export default function (
         );
         const distance = pointPairDistance.getDistance();
         if (distance < minDistance && distance < 10) {
-          const coordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> =
-            [];
+          const coordinates: Array<jsts.org.locationtech.jts.geom.Coordinate> = [];
           for (let k = 0; k < roadlinkPoints.length; k++) {
             const point = roadlinkPoints[k];
             coordinates[k] = new Coordinate(point.x, point.y, point.z);
@@ -102,7 +92,7 @@ export default function (
   pointPairDistance.initialize();
   trafficSignProperties.SUUNTIMA = adjustedBearing;
   if (minDistance < 5) {
-    trafficSignProperties.SUUNTIMA = Math.floor(minRoadAngle);
+    trafficSignProperties.SUUNTIMA = Math.floor(minRoadAngle || 0);
     return {
       feature: feature,
       closestLinkCoordinates: closestLinkCoordinates,

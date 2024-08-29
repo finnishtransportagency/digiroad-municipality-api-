@@ -1,16 +1,20 @@
-import { InferType, array, mixed, number, object, string } from 'yup';
-import {
-  allowedAdditionalPanels,
-  allowedTrafficSigns
-} from '@schemas/trafficSignTypes';
+import { array, number, object, string } from 'yup';
+import { allowedAdditionalPanels, allowedTrafficSigns } from '@schemas/trafficSignTypes';
 import { areaGeometrySchema, pointGeometrySchema } from './geometrySchema';
+
+enum GeoJsonFeatureType {
+  Obstacle = 'OBSTACLE',
+  AdditionalPanel = 'ADDITIONALPANEL',
+  TrafficSign = 'TRAFFICSIGN',
+  Surface = 'SURFACE'
+}
 
 // v--------------- PROPERTIES ---------------v //
 /**
  * @field EST_TYYPPI: 1 = Suljettu yhteys, 2 = Avattava puomi
  */
 const obstaclePropertiesSchema = object({
-  TYPE: mixed().oneOf(['OBSTACLE']).required(),
+  TYPE: string().oneOf([GeoJsonFeatureType.Obstacle]).required(),
   ID: string().required(),
   EST_TYYPPI: number().required().oneOf([1, 2])
 });
@@ -21,7 +25,7 @@ const obstaclePropertiesSchema = object({
  * @field VARI: 1 = Sininen, 2 = Keltainen
  */
 const additionalPanelPropertiesSchema = object({
-  TYPE: mixed().oneOf(['ADDITIONALPANEL']).required(),
+  TYPE: string().oneOf([GeoJsonFeatureType.AdditionalPanel]).required(),
   ID: string().required(),
   SUUNTIMA: number().required().max(360).min(0),
   LM_TYYPPI: string().required().oneOf(allowedAdditionalPanels),
@@ -39,7 +43,7 @@ const additionalPanelPropertiesSchema = object({
  * @field KOKO: 1 = Pienikokoinen merkki, 2 = Normaalikokoinen merkki (oletus), 3 = Suurikokoinen merkki
  */
 const trafficSignPropertiesSchema = object({
-  TYPE: mixed().oneOf(['TRAFFICSIGN']).required(),
+  TYPE: string().oneOf([GeoJsonFeatureType.TrafficSign]).required(),
   ID: string().required(),
   SUUNTIMA: number().required().max(360).min(0),
   LM_TYYPPI: string().required().oneOf(allowedTrafficSigns),
@@ -57,83 +61,67 @@ const trafficSignPropertiesSchema = object({
       then: (schema) => schema.notRequired(),
       otherwise: (schema) => schema.required().max(5)
     })
-});
+}).required();
 
 // TODO implement all fields
 const surfacePropertiesSchema = object({
-  TYPE: mixed().oneOf(['SURFACE']).required()
+  TYPE: string().oneOf([GeoJsonFeatureType.Surface]).required()
 });
 // ^------------------------------------------^ //
 
 // v---------------- FEATURES ----------------v //
 const obstacleFeatureSchema = object({
-  type: mixed().oneOf(['Feature']).required(),
+  type: string().oneOf(['Feature']).required(),
   id: string().required(),
   properties: obstaclePropertiesSchema,
   geometry: pointGeometrySchema.required()
 });
 
 const trafficSignFeatureSchema = object({
-  type: mixed().oneOf(['Feature']).required(),
+  type: string().oneOf(['Feature']).required(),
   id: string().required(),
   properties: trafficSignPropertiesSchema,
   geometry: pointGeometrySchema.required()
 });
 
 const additionalPanelFeatureSchema = object({
-  type: mixed().oneOf(['Feature']).required(),
+  type: string().oneOf(['Feature']).required(),
   id: string().required(),
   properties: additionalPanelPropertiesSchema,
   geometry: pointGeometrySchema.required()
 });
 
 const roadSurfaceFeatureSchema = object({
-  type: mixed().oneOf(['Feature']).required(),
+  type: string().oneOf(['Feature']).required(),
   id: string().required(),
   properties: surfacePropertiesSchema,
   geometry: areaGeometrySchema.required()
 });
 // ^------------------------------------------^ //
 
-type ValidFeature =
-  | InferType<typeof obstacleFeatureSchema>
-  | InferType<typeof trafficSignFeatureSchema>
-  | InferType<typeof additionalPanelFeatureSchema>;
-// TODO enable after implementing surfacePropertiesSchema & areaGeometrySchema
-//| InferType<typeof roadSurfaceFeatureSchema>;
-
-interface InvalidFeature {
-  type: 'Invalid';
-  id: number;
-  properties: {
-    reason: string;
-    feature: string;
-  };
-}
-
-type Feature = ValidFeature | InvalidFeature;
-
-interface FeatureCollection {
-  type: 'FeatureCollection';
-  name: string;
-  crs: {
-    type: 'name';
-    properties: {
-      name: 'urn:ogc:def:crs:EPSG::3067';
-    };
-  };
-  features: Array<Feature>;
-  invalidInfrao: {
-    sum: number;
-    IDs: Array<number>;
-  };
-}
+/**
+ * Shallow check for the most important fields.
+ * Contents of the features array are not checked!!!
+ */
+const geoJsonSchema = object({
+  type: string().oneOf(['FeatureCollection']).required(),
+  name: string().required(),
+  crs: object({
+    type: string().oneOf(['name']).required(),
+    properties: object({
+      name: string().oneOf(['urn:ogc:def:crs:EPSG::3067']).required()
+    }).required()
+  }).required(),
+  features: array().required(), // Content in not checked
+  invalidInfrao: object({
+    sum: number().required(),
+    IDs: array().default([]).of(number().required()).min(0).required()
+  }).required()
+}).required();
 
 export {
-  ValidFeature,
-  InvalidFeature,
-  Feature,
-  FeatureCollection,
+  GeoJsonFeatureType,
+  geoJsonSchema,
   obstacleFeatureSchema,
   trafficSignFeatureSchema,
   additionalPanelFeatureSchema,
