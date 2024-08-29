@@ -12,6 +12,7 @@ export default async function execExpiredTrafficSign(
 
   const assetTypeID = 300;
 
+  /** Expires asset by setting the valid_to value as current moment */
   const assetQuery = {
     text: `
         UPDATE asset

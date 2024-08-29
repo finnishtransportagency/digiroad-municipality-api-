@@ -13,6 +13,7 @@ export default async function execCreatedTrafficSign(
 
   const assetTypeID = 300;
 
+  /** Selects existing asset checking if the id is same */
   const checkExistingAssetQuery = {
     text: `
       SELECT id
@@ -30,6 +31,10 @@ export default async function execCreatedTrafficSign(
   }
 
   const point = `Point(${trafficSignProperties.DR_GEOMETRY.x} ${trafficSignProperties.DR_GEOMETRY.y} 0 0 )`;
+  /**
+   * Inserts into table asset values: unique id from primary_key_seq sequence, current time, geometry from wkt,
+   * bearing, asset type, municipality code and external id for future comparisons. Returns inserted id for next query.
+   */
   const assetQuery = {
     text: `
         INSERT INTO asset (id, created_date, geometry, created_by, bearing, asset_type_id, municipality_code, external_id) 
@@ -48,6 +53,7 @@ export default async function execCreatedTrafficSign(
   const result = await client.query(assetQuery);
   const assetID = result.rows[0].id;
   const sideCode = trafficSignProperties.TOWARDSDIGITIZING ? 2 : 3;
+  /** Inserts into lrm_position values: unique id from the corresponding sequence, side code, m value and link id */
   const lrmPositionQuery = {
     text: `
         INSERT INTO lrm_position (id, side_code,start_measure, link_id)
@@ -57,6 +63,7 @@ export default async function execCreatedTrafficSign(
   };
   await client.query(lrmPositionQuery);
 
+  /** Inserts into asset_link the corresponding asset and lrm_position ids */
   const assetLinkQuery = {
     text: `
         INSERT INTO asset_link (asset_id, position_id)
@@ -66,6 +73,7 @@ export default async function execCreatedTrafficSign(
   };
   await client.query(assetLinkQuery);
 
+  /** Inserts value of traffic sign into text_property_value */
   const valueQuery = {
     text: `
       WITH _property AS (
@@ -82,6 +90,10 @@ export default async function execCreatedTrafficSign(
 
   await client.query(valueQuery);
 
+  /** 
+   * Selects property corresponding to @param publicId . 
+   * Inserts into number_property_value value from @param value . 
+   */
   async function numberQuery(publicId: string, value: number) {
     const query = {
       text: `
@@ -104,6 +116,10 @@ export default async function execCreatedTrafficSign(
 
   await numberQuery('terrain_coordinates_y', feature.geometry.coordinates[1] as number);
 
+  /** 
+   * Selects the traffic sign property id and enumerated value id corresponding to the type of 
+   * traffic sign. Inserts into single_choice_value these values for asset being created.
+   */
   const typeQuery = {
     text: `
     WITH _property AS (
@@ -124,6 +140,10 @@ export default async function execCreatedTrafficSign(
   };
   await client.query(typeQuery);
 
+  /** 
+   * Selects property id corresponding to @param publicId . 
+   * Inserts into text_property_value value @param value 
+   */
   async function textQuery(publicId: string, value: string) {
     if (!value) return;
     const query = {
@@ -147,6 +167,11 @@ export default async function execCreatedTrafficSign(
 
   await textQuery('trafficSigns_info', trafficSignProperties.LISATIETO);
 
+  /**
+   * Selects property id corresponding to @param publicId and enumerated value id corresponding to @param value.
+   * Inserts into single_choice_value the chosen value for asset being processed.
+   */
+  
   async function singleChoiseQuery(publicId: string, value: number) {
     const enumeratedValue = value ? value : 99;
 
@@ -179,6 +204,10 @@ export default async function execCreatedTrafficSign(
 
   for (const i in trafficSignProperties.LISAKILVET) {
     const panel = trafficSignProperties.LISAKILVET[i];
+    /**
+     * Selects property ids for additional panels and trafficsign types as well as enumerated value values
+     * for trafficsign types. Inserts values into additional_panel for asset being processed.
+     */
     const additionalPanelQuery = {
       text: `
     WITH ap_property AS (

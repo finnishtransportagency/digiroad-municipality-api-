@@ -43,6 +43,13 @@ export const executeSingleQuery = async (query: PostgresQuery) => {
 /**
  * TODO: Verify query & write description
  *
+ * Fetches roadlinks with admin class not 1 (checks for overwrites in administrative_class table) from municipality in question
+ * and selects those that are within 5 meters of the feature.
+ *
+ * The point is deemed as acceptable if the type is not TRAFFICSIGN, the LM_TYYPPI is in the list of acceptable on kapy or if the road link is not functional class 8.
+ *
+ * @param municipality the municipality being fetched from
+ * @param features the features fetched from the api
  * @example result row:
  * // {
  * //  id: '392852548',

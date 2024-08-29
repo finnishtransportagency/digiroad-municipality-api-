@@ -13,6 +13,7 @@ export default async function execUpdatedTrafficSign(
 
   const assetTypeID = 300;
 
+  /** Expires asset by setting valid_to as current time returning data if anything was expired.  */
   const expireQuery = {
     text: `
         UPDATE asset
@@ -31,6 +32,7 @@ export default async function execUpdatedTrafficSign(
   }
 
   const point = `Point(${trafficSignProperties.DR_GEOMETRY.x} ${trafficSignProperties.DR_GEOMETRY.y} 0 0 )`;
+  /** "Updates" asset by creating new asset with same external_id and setting created dates as the same as with the old asset */
   const assetQuery = {
     text: `
         INSERT INTO asset (id, modified_date, geometry, modified_by, bearing, asset_type_id, municipality_code, external_id, created_by, created_date) 
@@ -51,6 +53,7 @@ export default async function execUpdatedTrafficSign(
   const assetResult = await client.query(assetQuery);
   const assetID = assetResult.rows[0].id;
   const sideCode = trafficSignProperties.TOWARDSDIGITIZING ? 2 : 3;
+  /** Inserts into lrm_position values: unique id from the corresponding sequence, side code, m value and link id */
   const lrmPositionQuery = {
     text: `
         INSERT INTO lrm_position (id, side_code,start_measure, link_id)
@@ -60,6 +63,7 @@ export default async function execUpdatedTrafficSign(
   };
   await client.query(lrmPositionQuery);
 
+  /** Inserts into asset_link the corresponding asset and lrm_position ids */
   const assetLinkQuery = {
     text: `
         INSERT INTO asset_link (asset_id, position_id)

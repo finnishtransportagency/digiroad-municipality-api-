@@ -11,6 +11,7 @@ export default async function execExpiredObstacle(
 
   const assetTypeID = 220;
 
+  /** Expires asset by setting the valid_to value as current moment */
   const assetQuery = {
     text: `
         UPDATE asset

@@ -12,6 +12,7 @@ export default async function execUpdatedObstacle(
 
   const assetTypeID = 220;
 
+  /** Expires asset by setting valid_to as current time returning data if anything was expired.  */
   const expireQuery = {
     text: `
         UPDATE asset
@@ -29,6 +30,8 @@ export default async function execUpdatedObstacle(
     return;
   }
   const point = `Point(${obstacleProperties.DR_GEOMETRY.x} ${obstacleProperties.DR_GEOMETRY.y} 0 0 )`;
+
+  /** "Updates" asset by creating new asset with same external_id and setting created dates as the same as with the old asset */
   const insertQuery = {
     text: `
         INSERT INTO asset (id, modified_date, geometry, modified_by, asset_type_id, municipality_code, external_id, created_by, created_date) 
@@ -46,6 +49,7 @@ export default async function execUpdatedObstacle(
   };
   await client.query(insertQuery);
 
+  /** Inserts into lrm_position values: unique id from the corresponding sequence, m value and link id */
   const lrmPositionQuery = {
     text: `
         INSERT INTO lrm_position (id, start_measure, link_id)
@@ -55,6 +59,7 @@ export default async function execUpdatedObstacle(
   };
   await client.query(lrmPositionQuery);
 
+  /** Inserts into asset_link the corresponding asset and lrm_position ids */
   const assetLinkQuery = {
     text: `
         INSERT INTO asset_link (asset_id, position_id)
@@ -63,6 +68,9 @@ export default async function execUpdatedObstacle(
     values: []
   };
   await client.query(assetLinkQuery);
+  /**
+   * TODO: change for new obstacle types
+   */
   const singleChoiceValueQuery = {
     text: `
         WITH _property AS (

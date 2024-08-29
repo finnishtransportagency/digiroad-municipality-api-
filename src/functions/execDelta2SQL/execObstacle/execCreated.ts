@@ -11,7 +11,8 @@ export default async function execCreatedObstacle(
   const obstacleProperties: ObstacleProperties = feature.properties as ObstacleProperties;
 
   const assetTypeID = 220;
-
+  
+  /** Selects existing asset checking if the id is same */
   const checkExistingAssetQuery = {
     text: `
       SELECT id
@@ -29,6 +30,10 @@ export default async function execCreatedObstacle(
   }
 
   const point = `Point(${obstacleProperties.DR_GEOMETRY.x} ${obstacleProperties.DR_GEOMETRY.y} 0 0 )`;
+  /**
+   * Inserts into table asset values: unique id from primary_key_seq sequence, current time,
+   * geometry from wkt, asset type, municipality code and external id for future comparisons
+   */
   const assetQuery = {
     text: `
         INSERT INTO asset (id, created_date, geometry, created_by, asset_type_id, municipality_code, external_id) 
@@ -38,6 +43,7 @@ export default async function execCreatedObstacle(
   };
   await client.query(assetQuery);
 
+  /** Inserts into lrm_position values: unique id from the corresponding sequence, m value and link id */
   const lrmPositionQuery = {
     text: `
         INSERT INTO lrm_position (id, start_measure, link_id)
@@ -47,6 +53,7 @@ export default async function execCreatedObstacle(
   };
   await client.query(lrmPositionQuery);
 
+  /** Inserts into asset_link the corresponding asset and lrm_position ids */
   const assetLinkQuery = {
     text: `
         INSERT INTO asset_link (asset_id, position_id)
@@ -56,6 +63,9 @@ export default async function execCreatedObstacle(
   };
   await client.query(assetLinkQuery);
 
+  /**
+   * TODO: change for new obstacle types
+   */
   const singleChoiceValueQuery = {
     text: `
         WITH _property AS (
