@@ -77,13 +77,30 @@ export const getPointQuery = (
     WHERE LOWER(name_fi) = LOWER($1)
     ), 
     acceptable_roadlinks AS (
-      SELECT linkid, shape, directiontype, functional_class, roadname_fi
+      SELECT linkid, shape,
+      CASE
+        WHEN linkid IN (
+          SELECT
+            link_id
+          FROM
+            traffic_direction)
+            THEN (
+              SELECT
+                traffic_direction
+              FROM
+                traffic_direction,
+                kgv_roadlink
+              WHERE
+                link_id = linkid)
+        ELSE directiontype
+      END AS directiontype,
+      functional_class, roadname_fi
       FROM kgv_roadlink, municipality_, functional_class
       WHERE kgv_roadlink.municipalitycode = municipality_.id AND kgv_roadlink.linkid = functional_class.link_id AND not EXISTS(
       SELECT 1
       FROM administrative_class 
       WHERE administrative_class.link_id = kgv_roadlink.linkid AND administrative_class.administrative_class = 1
-      ) AND (kgv_roadlink.adminclass != 1 OR kgv_roadlink.adminclass IS NULL)
+      ) AND (kgv_roadlink.adminclass != 1 OR kgv_roadlink.adminclass IS NULL) AND expired_date is null
     )
     
     SELECT (value#>'{properties}'->>'ID')::TEXT AS ID, (value#>'{properties}'->>'TYPE')::TEXT AS TYPE,json_agg((st_astext(shape),linkid,directiontype, roadname_fi)) AS roadlinks
