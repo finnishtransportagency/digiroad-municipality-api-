@@ -17,7 +17,9 @@
     "traffic-signs": "sls invoke local --function fetchMunicipalityData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"xml\", \"municipality\": \"espoo\", \"assetTypes\": { \"trafficSigns\": \"infrao:Liikennemerkki\" }}'",
     "road-surfaces": "sls invoke local --function fetchMunicipalityData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"xml\", \"municipality\": \"espoo\", \"assetTypes\": { \"roadSurfaces\": \"infrao:KatualueenOsa\" }}'",
     "test-clear-traffic-signs": "node testFiles/uploadTestFile.js ./testFiles/empty.json dr-kunta-dev-bucket geojson/espoo/trafficSigns/ .json",
-    "test-new": "npm run test-clear-traffic-signs && sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"json\", \"municipality\": \"espoo\", \"assetTypes\": { \"trafficSigns\": \"infrao:Liikennemerkki\" }}'"
+    "test-clear-obstacles": "node testFiles/uploadTestFile.js ./testFiles/empty.json dr-kunta-dev-bucket geojson/espoo/obstacles/ .json",
+    "test-new-obstacles": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"json\", \"municipality\": \"espoo\", \"assetTypes\": { \"obstacles\": \"infrao:Rakenne\" }}'",
+    "test-new-traffic-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"json\", \"municipality\": \"espoo\", \"assetTypes\": { \"trafficSigns\": \"infrao:Liikennemerkki\" }}'"
   },
   "engines": {
     "node": ">=18.15.0"
