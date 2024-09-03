@@ -51,7 +51,7 @@ export const isDelta = (delta: unknown): delta is Delta => {
   return true;
 };
 
-interface FeatureRoadlinkMap {
+export interface FeatureRoadlinkMap {
   id: string;
   type: string;
   roadlinks: Array<LinkObject>;

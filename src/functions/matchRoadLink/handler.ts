@@ -9,7 +9,6 @@ import {
   LinkObject,
   FeatureType
 } from '@functions/typing';
-import { isFeatureRoadlinkMap } from './types';
 import { bucketName, MAX_OFFSET } from '@functions/config';
 import {
   GetNearbyLinksPayload,
@@ -19,6 +18,8 @@ import {
 } from '@customTypes/eventTypes';
 import { ValidFeature } from '@customTypes/featureTypes';
 import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
+import { featureNearbyLinksSchema } from '@schemas/featureNearbyLinksSchema';
+import matchFeature from './matchFeature';
 
 const now = new Date().toISOString().slice(0, 19);
 
@@ -75,10 +76,19 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   const allRoadLinks = JSON.parse(
     await getFromS3(bucketName, allRoadLinksS3Key)
   ) as unknown;
-  if (!Array.isArray(allRoadLinks) || !allRoadLinks.every(isFeatureRoadlinkMap))
+  if (!Array.isArray(allRoadLinks))
     throw new Error(
       `S3 object ${allRoadLinksS3Key} is not valid Array<FeatureRoadlinkMap>`
     );
+  const nearbyLinksList = allRoadLinks.map((link) => featureNearbyLinksSchema.cast(link));
+
+  const matchedFeatures = features.map((feature) => {
+    const nearbyLinks = nearbyLinksList.find(
+      (link) => link.id === feature.properties.ID && link.type === feature.properties.TYPE
+    );
+    if (!nearbyLinks) return 'TODOOOOOOOOOOOOO';
+    return matchFeature(feature, nearbyLinks.roadlinks);
+  });
 
   for (let p = 0; p < features.length; p++) {
     const feature = features[p];
