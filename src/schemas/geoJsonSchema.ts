@@ -1,5 +1,10 @@
 import { array, number, object, string } from 'yup';
-import { allowedAdditionalPanels, allowedTrafficSigns } from '@schemas/trafficSignTypes';
+import {
+  allowedAdditionalPanels,
+  allowedSpeedLimits,
+  allowedTrafficSigns,
+  trafficSignRules
+} from '@schemas/trafficSignTypes';
 import { pointGeometrySchema } from './geometrySchema';
 
 enum GeoJsonFeatureType {
@@ -18,6 +23,20 @@ const obstaclePropertiesSchema = object({
   EST_TYYPPI: number().required().oneOf([1, 2])
 });
 
+const trafficSignValueSchema = number().when('LM_TYYPPI', ([LM_TYYPPI], schema) => {
+  if (typeof LM_TYYPPI !== 'string') return schema.notRequired();
+  const typeRules = trafficSignRules[LM_TYYPPI.split(' ')[0]];
+  switch (typeRules.unit) {
+    case 'km/h':
+      return schema.oneOf(allowedSpeedLimits).required();
+    case null:
+      return schema.notRequired();
+    default:
+      if (!typeRules.minValue || !typeRules.maxValue) return schema.notRequired();
+      return schema.min(typeRules.minValue).max(typeRules.maxValue).required();
+  }
+});
+
 /**
  * @field KOKO: 1 = Pienikokoinen merkki, 2 = Normaalikokoinen merkki (oletus), 3 = Suurikokoinen merkki
  * @field KALVON_TYYPPI: 1 = R1-luokan kalvo, 2 = R2-luokan kalvo, 3 = R3-luokan kalvo
@@ -28,8 +47,7 @@ const additionalPanelPropertiesSchema = object({
   ID: string().required(),
   SUUNTIMA: number().required().max(360).min(0),
   LM_TYYPPI: string().required().oneOf(allowedAdditionalPanels),
-  // TODO: specify the range of ARVO when max and/or min values are known (trafficSignRules)
-  ARVO: number().notRequired(),
+  ARVO: trafficSignValueSchema,
   TEKSTI: string().notRequired(),
   KOKO: number().oneOf([1, 2, 3]).notRequired(),
   KALVON_TYYPPI: number().oneOf([1, 2, 3]).notRequired(),
@@ -46,8 +64,7 @@ const trafficSignPropertiesSchema = object({
   ID: string().required(),
   SUUNTIMA: number().required().max(360).min(0),
   LM_TYYPPI: string().required().oneOf(allowedTrafficSigns),
-  // TODO: specify the range of ARVO when max and/or min values are known (trafficSignRules)
-  ARVO: number().notRequired(),
+  ARVO: trafficSignValueSchema,
   TEKSTI: string().max(128).notRequired(),
   LISATIETO: string().notRequired(),
   RAKENNE: number().oneOf([1, 2, 3, 4, 5, 6]).notRequired(),

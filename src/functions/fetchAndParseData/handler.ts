@@ -25,7 +25,7 @@ import axios from 'axios';
 import parseFeature from './parseFeature';
 import matchAdditionalPanels from './matchAdditionalPanels';
 import { SignMap } from '@customTypes/mapTypes';
-import helsinkiSignMapParser from './parseFeature/helsinkiSignMapParser';
+import helsinkiSignMapParser from './parseFeature/helsinki/helsinkiSignMapParser';
 
 const fetchAndParseData = async (event: unknown) => {
   if (!isScheduleEvent(event)) {

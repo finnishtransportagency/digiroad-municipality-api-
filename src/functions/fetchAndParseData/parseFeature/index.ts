@@ -3,7 +3,7 @@ import { Feature } from '@customTypes/featureTypes';
 import obstacleParser from './obstacleParser';
 import trafficSignParser from './trafficSignParser';
 import { SignMap } from '@customTypes/mapTypes';
-import helsinkiSignParser from './helsinkiSignParser';
+import helsinkiSignParser from './helsinki/helsinkiSignParser';
 
 export default (
   assetType: AssetTypeString,
@@ -29,7 +29,7 @@ export default (
   } catch (e: unknown) {
     if (!(e instanceof Error)) throw e;
     console.error('Error in parseFeature:', e.message);
-    //console.info('Invalid feature:', feature);
+    console.info('Invalid feature:', feature);
     return {
       type: 'Invalid',
       id: '-1',

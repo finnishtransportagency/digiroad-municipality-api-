@@ -9,6 +9,8 @@ interface TrafficSignRules {
   };
 }
 
+export const allowedSpeedLimits = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120];
+
 export const trafficSignRules: TrafficSignRules = {
   'A1.1': {
     text: 'Mutka oikealle',
@@ -796,11 +798,11 @@ export const trafficSignRules: TrafficSignRules = {
   },
   C47: {
     text: 'Moottorikäyttöisten ajoneuvojen vähimmäisetäisyys',
-    maxValue: 1000,
+    maxValue: 500,
     unit: 'm',
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
-    minValue: null
+    minValue: 10
   },
   C48: {
     text: 'Nastarenkailla varustetulla moottorikäyttöisellä ajoneuvolla ajo kielletty',
@@ -2472,7 +2474,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
-    minValue: null
+    minValue: 2
   },
   'I10.1': {
     text: 'Liikennemerkkipylvään tehostamismerkki (sinivalkoinen)',
@@ -2584,7 +2586,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'km',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: null
+    minValue: 0
   },
   'H2.3': {
     text: 'Kohde edessä ja etäisyys',
@@ -2592,7 +2594,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'km',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: null
+    minValue: 0
   },
   H3: {
     text: 'Vaikutusalueen pituus',
@@ -2600,7 +2602,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'km',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: null
+    minValue: 0
   },
   H4: {
     text: 'Etäisyys kohteeseen',
@@ -2608,7 +2610,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: null
+    minValue: 0
   },
   H5: {
     text: 'Etäisyys pakolliseen pysäyttämiseen',
@@ -2616,7 +2618,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: null
+    minValue: 0
   },
   H6: {
     text: 'Vapaa leveys',
@@ -2624,7 +2626,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: null
+    minValue: 0
   },
   H7: {
     text: 'Vapaa korkeus',
@@ -2632,7 +2634,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: null
+    minValue: 0
   },
   H8: {
     text: 'Sähköjohdon korkeus',
@@ -2640,7 +2642,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: null
+    minValue: 0
   },
   'H9.1': {
     text: 'Vaikutusalue molempiin suuntiin oikealle ja vasemmalle',
@@ -2776,7 +2778,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'g/km',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: null
+    minValue: 0
   },
   'H13.1': {
     text: 'Pysäköintitapa reunakiven päälle',
@@ -2848,7 +2850,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'min',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: null
+    minValue: 0
   },
   'H19.1': {
     text: 'Pysäköintiajan alkamisen osoittamisvelvollisuus (keltainen pohja)',
@@ -2856,7 +2858,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'min',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: null
+    minValue: 0
   },
   'H19.2': {
     text: 'Pysäköintiajan alkamisen osoittamisvelvollisuus (sininen pohja)',
@@ -2864,7 +2866,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'min',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: null
+    minValue: 0
   },
   H20: {
     text: 'Maksullinen pysäköinti',

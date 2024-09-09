@@ -1,7 +1,7 @@
 import { Feature } from '@customTypes/featureTypes';
 import { GeoJsonFeatureType, trafficSignFeatureSchema } from '@schemas/geoJsonSchema';
 import { infraoTrafficSignSchema } from '@schemas/muniResponseSchema';
-import { createTrafficSignText, trafficSignRules } from '@schemas/trafficSignTypes';
+import { createTrafficSignText } from '@schemas/trafficSignTypes';
 
 export default (feature: unknown): Feature => {
   const castedFeature = infraoTrafficSignSchema.cast(feature);
@@ -33,6 +33,8 @@ export default (feature: unknown): Feature => {
       }
     };
 
+  const value = parseInt(properties.teksti ?? '');
+
   return trafficSignFeatureSchema.cast({
     type: 'Feature',
     id: castedFeature.id,
@@ -44,10 +46,7 @@ export default (feature: unknown): Feature => {
       ID: String(id),
       SUUNTIMA: properties.suunta ? properties.suunta * (180 / Math.PI) : 0,
       LM_TYYPPI: createTrafficSignText(trafficSignCode),
-      // TODO: Set ARVO only on corresponding traffic signs. e.g. speed limit signs (check trafficSignRules)
-      ARVO: Object.keys(trafficSignRules).includes(properties.liikennemerkkityyppi2020)
-        ? Number(properties.teksti)
-        : null,
+      ARVO: isNaN(value) ? undefined : value,
       TEKSTI: properties.teksti ? properties.teksti.substring(0, 128) : properties.teksti,
       ...(!(trafficSignCode[0] === 'H') && {
         LISAKILVET: []
