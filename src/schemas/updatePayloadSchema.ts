@@ -10,7 +10,7 @@ const updatePayloadSchema = object({
   Deleted: arrayOfValidFeature('metadata.assetType').required(),
   metadata: object({
     municipality: string().required(),
-    assetType: string().oneOf(['obstacles', 'trafficSigns', 'roadSurfaces']).required()
+    assetType: string().oneOf(['obstacles', 'trafficSigns']).required()
   }).required(),
   invalidInfrao: object({
     sum: number().required(),

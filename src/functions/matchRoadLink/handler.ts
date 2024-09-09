@@ -1,7 +1,6 @@
 import { invokeLambda, middyfy } from '@libs/lambda-tools';
 import matchTrafficSign from './trafficSigns/matchTrafficSign';
 import matchObstacle from './obstacles/matchObstacle';
-import matchSurface from './surface/matchSurface';
 
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
 import {
@@ -37,14 +36,6 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   const features: Array<ValidFeature> = updatePayload.Created.concat(
     updatePayload.Updated
   );
-  if (updatePayload.metadata.assetType === 'roadSurfaces') {
-    console.warn('Surface matching is not implemented yet');
-    return;
-    /* //combineSurfaces could maybe be implemented in the parsing phase in fetchAndParseData
-    features = combineSurfaces(features) as unknown as Array<DrKuntaFeature>;
-    delta.Created = features;
-    delta.Updated = []; */
-  }
   const getNearbyLinksPayload: GetNearbyLinksPayload = {
     features: features,
     municipality: updatePayload.metadata.municipality,
@@ -128,26 +119,6 @@ const matchRoadLinks = async (event: S3KeyObject) => {
             ...feature.properties,
             ...trafficSignMatchResults
           };
-          break;
-        }
-        case FeatureType.Surface: {
-          const surfaceMatchResults = matchSurface(roadLinks, feature);
-          console.log('surfaceMatchResults:\n', surfaceMatchResults);
-          /* if (!surfaceMatchResults) {
-            console.error('matchResult is undefined');
-            return;
-          }
-
-          if (surfaceMatchResults.DR_REJECTED) {
-            rejectsAmount++;
-          }
-
-          delete feature['geometry'];
-          feature.properties = {
-            ...feature.properties,
-            ...surfaceMatchResults
-          }; */
-          console.warn('Surface matching is not implemented yet');
           break;
         }
       }

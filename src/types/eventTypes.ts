@@ -61,26 +61,23 @@ export const isUpdatePayload = (payload: unknown): payload is UpdatePayload => {
  * {
  *   obstacles?: 'infrao:Rakenne';
  *   trafficSigns?: 'infrao:Liikennemerkki';
- *   roadSurfaces?: 'infrao:KatualueenOsa';
  * }
  */
 interface AssetTypes {
   obstacles?: 'infrao:Rakenne';
   trafficSigns?: 'infrao:Liikennemerkki' | 'traffic-sign-reals';
-  roadSurfaces?: 'infrao:KatualueenOsa';
 }
 const isAssetTypes = (assetType: unknown): assetType is AssetTypes => {
   if (!assetType || typeof assetType !== 'object') return false;
 
-  const { obstacles, trafficSigns, roadSurfaces } = assetType as AssetTypes;
+  const { obstacles, trafficSigns } = assetType as AssetTypes;
 
   if (
-    (!obstacles && !trafficSigns && !roadSurfaces) ||
+    (!obstacles && !trafficSigns) ||
     (obstacles && obstacles !== 'infrao:Rakenne') ||
     (trafficSigns &&
       trafficSigns !== 'infrao:Liikennemerkki' &&
-      trafficSigns !== 'traffic-sign-reals') ||
-    (roadSurfaces && roadSurfaces !== 'infrao:KatualueenOsa')
+      trafficSigns !== 'traffic-sign-reals')
   ) {
     return false;
   }
@@ -89,14 +86,14 @@ const isAssetTypes = (assetType: unknown): assetType is AssetTypes => {
 };
 
 /**
- * 'obstacles' | 'trafficSigns' | 'roadSurfaces'
+ * 'obstacles' | 'trafficSigns'
  */
 export type AssetTypeKey = keyof AssetTypes;
 // Keep in sync AssetTypes
 export const isAssetTypeKey = (assetType: unknown): assetType is AssetTypeKey => {
   if (typeof assetType !== 'string') return false;
 
-  return ['obstacles', 'trafficSigns', 'roadSurfaces'].includes(assetType);
+  return ['obstacles', 'trafficSigns'].includes(assetType);
 };
 
 /**

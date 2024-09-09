@@ -9,7 +9,4 @@ const pointGeometrySchema = object({
   ]).required()
 }).required();
 
-// TODO: Implement areaGeometrySchema
-const areaGeometrySchema = object({}).required();
-
-export { pointGeometrySchema, areaGeometrySchema };
+export { pointGeometrySchema };

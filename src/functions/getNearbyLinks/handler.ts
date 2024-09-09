@@ -4,7 +4,7 @@ import { bucketName } from '@functions/config';
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
 import { isGetNearbyLinksPayload, S3KeyObject } from '@customTypes/eventTypes';
 import { gnlPayloadSchema } from '@schemas/getNearbyLinksSchema';
-import { getPointQuery, getAreaQuery, executeSingleQuery } from '@libs/pg-tools';
+import { getPointQuery, executeSingleQuery } from '@libs/pg-tools';
 import { pointQueryResultSchema } from '@schemas/sqlResultSchemas';
 
 const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
@@ -20,12 +20,9 @@ const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
       )}`
     );
 
-  const query =
-    payload.assetType === 'roadSurfaces'
-      ? getAreaQuery(payload.municipality, payload.features)
-      : getPointQuery(payload.municipality, payload.features);
-
-  const queryResultRows = (await executeSingleQuery(query)).rows
+  const queryResultRows = (
+    await executeSingleQuery(getPointQuery(payload.municipality, payload.features))
+  ).rows
     .map((row) => {
       try {
         const parsedRow = pointQueryResultSchema.cast(row);
@@ -33,12 +30,6 @@ const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
           ...parsedRow,
           roadlinks: parsedRow.roadlinks.map((roadlink) => {
             return {
-              // TODO: Area roadlinks are not supported yet. Check history for the code snippet below
-              /**
-               * if (payload.assetType === 'roadSurfaces') {
-               *  roadlink.geometrylength = roadlink.f3;
-               * }
-               */
               linkId: roadlink.f2,
               points: (Geometry.parse(`SRID=3067;${roadlink.f1}`) as LineString).points,
               directiontype: roadlink.f3,

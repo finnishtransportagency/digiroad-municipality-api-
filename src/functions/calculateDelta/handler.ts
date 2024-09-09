@@ -7,7 +7,6 @@ import { AssetTypeKey, UpdatePayload, isAssetTypeKey } from '@customTypes/eventT
 import {
   geoJsonSchema,
   obstacleFeatureSchema,
-  roadSurfaceFeatureSchema,
   trafficSignFeatureSchema
 } from '@schemas/geoJsonSchema';
 import { FeatureCollection, ValidFeature } from '@customTypes/featureTypes';
@@ -151,8 +150,6 @@ const validateFeatureAssetType = (
       return obstacleFeatureSchema.isValidSync(feature);
     case 'trafficSigns':
       return trafficSignFeatureSchema.isValidSync(feature);
-    case 'roadSurfaces':
-      return roadSurfaceFeatureSchema.isValidSync(feature);
     default:
       return false;
   }

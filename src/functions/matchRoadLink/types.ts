@@ -5,14 +5,10 @@ import {
   isLinkObject
 } from '@functions/typing';
 
-type AssetType = 'obstacles' | 'trafficSigns' | 'roadSurfaces';
+type AssetType = 'obstacles' | 'trafficSigns';
 
 const isAssetType = (assetType: unknown): assetType is AssetType => {
-  return (
-    assetType === 'obstacles' ||
-    assetType === 'trafficSigns' ||
-    assetType === 'roadSurfaces'
-  );
+  return assetType === 'obstacles' || assetType === 'trafficSigns';
 };
 
 interface Delta {

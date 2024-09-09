@@ -1,12 +1,11 @@
 import { array, number, object, string } from 'yup';
 import { allowedAdditionalPanels, allowedTrafficSigns } from '@schemas/trafficSignTypes';
-import { areaGeometrySchema, pointGeometrySchema } from './geometrySchema';
+import { pointGeometrySchema } from './geometrySchema';
 
 enum GeoJsonFeatureType {
   Obstacle = 'OBSTACLE',
   AdditionalPanel = 'ADDITIONALPANEL',
-  TrafficSign = 'TRAFFICSIGN',
-  Surface = 'SURFACE'
+  TrafficSign = 'TRAFFICSIGN'
 }
 
 // v--------------- PROPERTIES ---------------v //
@@ -62,11 +61,6 @@ const trafficSignPropertiesSchema = object({
       otherwise: (schema) => schema.required().max(5)
     })
 }).required();
-
-// TODO implement all fields
-const surfacePropertiesSchema = object({
-  TYPE: string().oneOf([GeoJsonFeatureType.Surface]).required()
-});
 // ^------------------------------------------^ //
 
 // v---------------- FEATURES ----------------v //
@@ -91,12 +85,6 @@ const additionalPanelFeatureSchema = object({
   geometry: pointGeometrySchema.required()
 });
 
-const roadSurfaceFeatureSchema = object({
-  type: string().oneOf(['Feature']).required(),
-  id: string().required(),
-  properties: surfacePropertiesSchema,
-  geometry: areaGeometrySchema.required()
-});
 // ^------------------------------------------^ //
 
 /**
@@ -124,6 +112,5 @@ export {
   geoJsonSchema,
   obstacleFeatureSchema,
   trafficSignFeatureSchema,
-  additionalPanelFeatureSchema,
-  roadSurfaceFeatureSchema
+  additionalPanelFeatureSchema
 };

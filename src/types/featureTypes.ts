@@ -12,12 +12,8 @@ type PointCoordinates = InferType<typeof pointGeometrySchema>['coordinates'];
 type ObstacleType = InferType<typeof obstacleFeatureSchema>;
 type TrafficSignType = InferType<typeof trafficSignFeatureSchema>;
 type AdditionalPanelType = InferType<typeof additionalPanelFeatureSchema>;
-// TODO enable after implementing surfacePropertiesSchema & areaGeometrySchema
-//type RoadSurfaceType = InferType<typeof roadSurfaceFeatureSchema>;
 
 type ValidFeature = ObstacleType | TrafficSignType | AdditionalPanelType;
-// TODO enable after implementing surfacePropertiesSchema & areaGeometrySchema
-//| RoadSurfaceType;
 
 interface InvalidFeature {
   type: 'Invalid';

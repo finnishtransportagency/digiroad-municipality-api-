@@ -8,8 +8,6 @@ import execCreatedTrafficSign from './execTrafficSign/execCreated';
 import execUpdatedTrafficSign from './execTrafficSign/execUpdated';
 import execExpiredTrafficSign from './execTrafficSign/execExpired';
 
-import execCreatedSurface from './execSurface/execCreated';
-import execCleanUp from './execSurface/execCleanup';
 import { bucketName } from '@functions/config';
 import { getFromS3 } from '@libs/s3-tools';
 import { getPostgresClient } from '@libs/pg-tools';
@@ -60,14 +58,6 @@ const execDelta2SQL = async (event) => {
         }
         for (const feature of delta.Updated) {
           await execUpdatedTrafficSign(feature, municipality_code, dbmodifier, client);
-        }
-        break;
-      case 'roadSurfaces':
-        if (delta.Created.length > 0 || delta.Deleted.length > 0) {
-          await execCleanUp(municipality_code, dbmodifier, client);
-          for (const feature of delta.Created) {
-            await execCreatedSurface(feature, municipality_code, dbmodifier, client);
-          }
         }
         break;
       default:

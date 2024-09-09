@@ -18,11 +18,6 @@ export default (
       case 'infrao:Liikennemerkki':
         return trafficSignParser(feature);
 
-      case 'infrao:KatualueenOsa':
-        //TODO: Implement surfaceParser
-        console.warn(`${assetType} not yet implemented in parseFeature`);
-        break;
-
       case 'traffic-sign-reals':
         if (signMap) return helsinkiSignParser(feature, signMap);
         console.warn('Could not fetch singMap');
