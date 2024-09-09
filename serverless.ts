@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import type { Serverless } from 'serverless/aws'
+import type { Serverless } from 'serverless/aws';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -9,9 +9,6 @@ import {
   reportRejectedDelta,
   getNearbyLinks,
   execDelta2SQL,
-  createSchedule,
-  listSchedules,
-  deleteSchedule,
   fetchAndParseData
 } from '@functions/index';
 import {
@@ -131,10 +128,7 @@ const serverlessConfiguration: Serverless = {
     matchRoadLink,
     reportRejectedDelta,
     getNearbyLinks,
-    execDelta2SQL,
-    createSchedule,
-    listSchedules,
-    deleteSchedule
+    execDelta2SQL
   },
   resources: {
     Resources: {
@@ -190,12 +184,6 @@ const serverlessConfiguration: Serverless = {
           }
         }
       }),
-      drKuntaScheduleGroup: {
-        Type: 'AWS::Scheduler::ScheduleGroup',
-        Properties: {
-          Name: `DRKunta-${stage}`
-        }
-      },
       drKuntaBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
@@ -224,219 +212,6 @@ const serverlessConfiguration: Serverless = {
               }
             ]
           }
-        }
-      },
-      createScheduleRole: {
-        Type: 'AWS::IAM::Role',
-        Properties: {
-          RoleName: `DRKunta-${stage}-createScheduleRole`,
-          AssumeRolePolicyDocument: {
-            Version: '2012-10-17',
-            Statement: [
-              {
-                Effect: 'Allow',
-                Principal: {
-                  Service: 'lambda.amazonaws.com'
-                },
-                Action: 'sts:AssumeRole'
-              }
-            ]
-          },
-          ManagedPolicyArns: [
-            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
-          ],
-          Policies: [
-            {
-              PolicyName: `DRKunta-${stage}-createSchedulePolicy`,
-              PolicyDocument: {
-                Version: '2012-10-17',
-                Statement: [
-                  {
-                    Effect: 'Allow',
-                    Action: ['ssm:DescribeParameters'],
-                    Resource: [`arn:aws:ssm:eu-west-1:${awsaccountid}:*`]
-                  },
-                  {
-                    Effect: 'Allow',
-                    Action: [
-                      'ssm:GetParameter',
-                      'ssm:GetParameters',
-                      'ssm:PutParameter',
-                      'ssm:DeleteParameter'
-                    ],
-                    Resource: `arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/DRKunta/${stage}/*`
-                  },
-                  {
-                    Effect: 'Allow',
-                    Action: ['scheduler:CreateSchedule'],
-                    Resource: `arn:aws:scheduler:eu-west-1:${awsaccountid}:schedule/DRKunta-${stage}/DRKunta-${stage}-*`
-                  },
-                  {
-                    Effect: 'Allow',
-                    Action: [
-                      'logs:CreateLogGroup',
-                      'logs:CreateLogStream',
-                      'logs:PutLogEvents'
-                    ],
-                    Resource: `arn:aws:logs:eu-west-1:${awsaccountid}:log-groups:/aws/lambda/*:*:*`
-                  },
-                  {
-                    Action: ['iam:PassRole'],
-                    Resource: `arn:aws:iam::${awsaccountid}:role/DRKunta-${stage}-fetchMunicipalityDataScheduleRole`,
-                    Effect: 'Allow'
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      },
-      deleteScheduleRole: {
-        Type: 'AWS::IAM::Role',
-        Properties: {
-          RoleName: `DRKunta-${stage}-deleteScheduleRole`,
-          AssumeRolePolicyDocument: {
-            Version: '2012-10-17',
-            Statement: [
-              {
-                Effect: 'Allow',
-                Principal: {
-                  Service: 'lambda.amazonaws.com'
-                },
-                Action: 'sts:AssumeRole'
-              }
-            ]
-          },
-          ManagedPolicyArns: [
-            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
-          ],
-          Policies: [
-            {
-              PolicyName: `DRKunta-${stage}-deleteSchedulePolicy`,
-              PolicyDocument: {
-                Version: '2012-10-17',
-                Statement: [
-                  {
-                    Effect: 'Allow',
-                    Action: ['ssm:DescribeParameters'],
-                    Resource: [`arn:aws:ssm:eu-west-1:${awsaccountid}:*`]
-                  },
-                  {
-                    Effect: 'Allow',
-                    Action: [
-                      'ssm:GetParameter',
-                      'ssm:GetParameters',
-                      'ssm:DeleteParameter'
-                    ],
-                    Resource: `arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/DRKunta/${stage}/*`
-                  },
-                  {
-                    Effect: 'Allow',
-                    Action: ['scheduler:GetSchedule', 'scheduler:DeleteSchedule'],
-                    Resource: `arn:aws:scheduler:eu-west-1:${awsaccountid}:schedule/DRKunta-${stage}/DRKunta-${stage}-*`
-                  },
-                  {
-                    Effect: 'Allow',
-                    Action: [
-                      'logs:CreateLogGroup',
-                      'logs:CreateLogStream',
-                      'logs:PutLogEvents'
-                    ],
-                    Resource: `arn:aws:logs:eu-west-1:${awsaccountid}:log-groups:/aws/lambda/*:*:*`
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      },
-      listSchedulesRole: {
-        Type: 'AWS::IAM::Role',
-        Properties: {
-          RoleName: `DRKunta-${stage}-listSchedulesRole`,
-          AssumeRolePolicyDocument: {
-            Version: '2012-10-17',
-            Statement: [
-              {
-                Effect: 'Allow',
-                Principal: {
-                  Service: 'lambda.amazonaws.com'
-                },
-                Action: 'sts:AssumeRole'
-              }
-            ]
-          },
-          ManagedPolicyArns: [
-            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
-          ],
-          Policies: [
-            {
-              PolicyName: `DRKunta-${stage}-listSchedulesPolicy`,
-              PolicyDocument: {
-                Version: '2012-10-17',
-                Statement: [
-                  {
-                    Effect: 'Allow',
-                    Action: ['scheduler:ListSchedules'],
-                    Resource: `arn:aws:scheduler:eu-west-1:${awsaccountid}:schedule/*/*`
-                  },
-                  {
-                    Effect: 'Allow',
-                    Action: ['scheduler:GetSchedule'],
-                    Resource: `arn:aws:scheduler:eu-west-1:${awsaccountid}:schedule/DRKunta-${stage}/*`
-                  },
-                  {
-                    Effect: 'Allow',
-                    Action: [
-                      'logs:CreateLogGroup',
-                      'logs:CreateLogStream',
-                      'logs:PutLogEvents'
-                    ],
-                    Resource: `arn:aws:logs:eu-west-1:${awsaccountid}:log-groups:/aws/lambda/*:*:*`
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      },
-      fetchMunicipalityDataScheduleRole: {
-        Type: 'AWS::IAM::Role',
-        Properties: {
-          RoleName: `DRKunta-${stage}-fetchMunicipalityDataScheduleRole`,
-          AssumeRolePolicyDocument: {
-            Version: '2012-10-17',
-            Statement: [
-              {
-                Effect: 'Allow',
-                Principal: {
-                  Service: 'scheduler.amazonaws.com'
-                },
-                Action: 'sts:AssumeRole'
-              }
-            ]
-          },
-          ManagedPolicyArns: [
-            'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
-          ],
-          Policies: [
-            {
-              PolicyName: `DRKunta-${stage}-fetchMunicipalityDataSchedulePolicy`,
-              PolicyDocument: {
-                Version: '2012-10-17',
-                Statement: [
-                  {
-                    Effect: 'Allow',
-                    Action: ['lambda:InvokeFunction'],
-                    Resource: [
-                      `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-fetchMunicipalityData:*`,
-                      `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-fetchMunicipalityData`
-                    ]
-                  }
-                ]
-              }
-            }
-          ]
         }
       },
       fetchMunicipalityDataRole: {
