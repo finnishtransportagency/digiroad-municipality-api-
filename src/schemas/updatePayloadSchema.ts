@@ -14,7 +14,7 @@ const updatePayloadSchema = object({
   }).required(),
   invalidInfrao: object({
     sum: number().required(),
-    IDs: array().of(number()).required()
+    IDs: array().of(string()).required()
   }).required()
 }).required();
 

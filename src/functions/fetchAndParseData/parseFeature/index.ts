@@ -34,10 +34,10 @@ export default (
   } catch (e: unknown) {
     if (!(e instanceof Error)) throw e;
     console.error('Error in parseFeature:', e.message);
-    console.info('Invalid feature:', feature);
+    //console.info('Invalid feature:', feature);
     return {
       type: 'Invalid',
-      id: -1,
+      id: '-1',
       properties: {
         reason: e.message,
         feature: JSON.stringify(feature)
@@ -46,7 +46,7 @@ export default (
   }
   return {
     type: 'Invalid',
-    id: -1,
+    id: '-1',
     properties: {
       reason: `Asset type not supported by parseFeature: ${assetType ?? 'undefined'}`,
       feature: JSON.stringify(feature)

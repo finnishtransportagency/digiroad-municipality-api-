@@ -21,7 +21,7 @@ type ValidFeature = ObstacleType | TrafficSignType | AdditionalPanelType;
 
 interface InvalidFeature {
   type: 'Invalid';
-  id: number;
+  id: string;
   properties: {
     reason: string;
     feature: string;

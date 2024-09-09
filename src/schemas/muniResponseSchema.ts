@@ -26,7 +26,7 @@ const infraoObstacleSchema = object({
     .required(), // e.g. "Rakenne.123456789"
   geometry: pointGeometrySchema.required(),
   properties: object({
-    yksilointitieto: number().required(),
+    yksilointitieto: string().required(),
     alkuHetki: date().required(),
     loppuHetki: date().min(new Date()).notRequired(),
     malli: string().oneOf(['Pollari', 'Puomi']).required(),
@@ -41,7 +41,7 @@ const infraoTrafficSignSchema = object({
     .required(), // e.g. "Liikennemerkki.123456789"
   geometry: pointGeometrySchema.required(),
   properties: object({
-    yksilointitieto: number().required(),
+    yksilointitieto: string().required(),
     alkuHetki: date().required(),
     loppuHetki: date().min(new Date()).notRequired(),
     suunta: number().notRequired().max(360).min(0),

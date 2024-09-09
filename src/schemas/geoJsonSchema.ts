@@ -115,7 +115,7 @@ const geoJsonSchema = object({
   features: array().required(), // Content in not checked
   invalidInfrao: object({
     sum: number().required(),
-    IDs: array().default([]).of(number().required()).min(0).required()
+    IDs: array().default([]).of(string().required()).min(0).required()
   }).required()
 }).required();
 
