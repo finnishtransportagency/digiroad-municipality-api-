@@ -19,7 +19,8 @@
     "test-clear-traffic-signs": "node testFiles/uploadTestFile.js ./testFiles/empty.json dr-kunta-dev-bucket geojson/espoo/trafficSigns/ .json",
     "test-clear-obstacles": "node testFiles/uploadTestFile.js ./testFiles/empty.json dr-kunta-dev-bucket geojson/espoo/obstacles/ .json",
     "test-new-obstacles": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"json\", \"municipality\": \"espoo\", \"assetTypes\": { \"obstacles\": \"infrao:Rakenne\" }}'",
-    "test-new-traffic-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"json\", \"municipality\": \"espoo\", \"assetTypes\": { \"trafficSigns\": \"infrao:Liikennemerkki\" }}'"
+    "test-new-traffic-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"json\", \"municipality\": \"espoo\", \"assetTypes\": { \"trafficSigns\": \"infrao:Liikennemerkki\" }}'",
+    "test-helsinki-traffic-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://city-infra.test.hel.ninja/v1\", \"format\": \"helsinki\", \"municipality\": \"helsinki\", \"assetTypes\": { \"trafficSigns\": \"traffic-sign-reals\" }}'"
   },
   "engines": {
     "node": ">=18.15.0"

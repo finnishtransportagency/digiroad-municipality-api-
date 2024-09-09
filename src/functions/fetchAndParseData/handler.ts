@@ -20,10 +20,12 @@ import {
 import { middyfy } from '@libs/lambda-tools';
 import { uploadToS3 } from '@libs/s3-tools';
 import { getParameter } from '@libs/ssm-tools';
-import { infraoJsonSchema } from '@schemas/muniResponseSchema';
+import { infraoJsonSchema, helsinkiJsonSchema } from '@schemas/muniResponseSchema';
 import axios from 'axios';
 import parseFeature from './parseFeature';
 import matchAdditionalPanels from './matchAdditionalPanels';
+import { SignMap } from '@customTypes/mapTypes';
+import helsinkiSignMapParser from './parseFeature/helsinkiSignMapParser';
 
 const fetchAndParseData = async (event: unknown) => {
   if (!isScheduleEvent(event)) {
@@ -69,6 +71,19 @@ const fetchAndParseData = async (event: unknown) => {
         // TODO: Parse XML data
         // TODO: Save GeoJSON to S3
         console.warn(`${event.format} parsing not yet implemented`);
+        break;
+      }
+      case 'helsinki': {
+        const geoJson: FeatureCollection = await fetchHelsinkiData(
+          event.assetTypes[assetKey],
+          event.municipality,
+          event.url
+        );
+        await uploadToS3(
+          bucketName,
+          `geojson/helsinki/${assetKey}/${new Date().toISOString().slice(0, 19)}.json`,
+          JSON.stringify(geoJson)
+        );
         break;
       }
 
@@ -173,6 +188,63 @@ const fetchXmlData = async (
     page++;
   }
   return dataArray;
+};
+
+const fetchHelsinkiData = async (
+  assetType: AssetTypeString,
+  municipality: string,
+  baseUrl: string
+): Promise<FeatureCollection> => {
+  let page = 0;
+  const geoJson: FeatureCollection = {
+    type: 'FeatureCollection',
+    name: `${municipality}-Kuntarajapinta`,
+    crs: {
+      type: 'name',
+      properties: {
+        name: 'urn:ogc:def:crs:EPSG::3067'
+      }
+    },
+    features: [],
+    invalidInfrao: {
+      sum: 0,
+      IDs: []
+    }
+  };
+  const response = await axios.get(
+    `${baseUrl}/traffic-control-device-types/?target_model=traffic_sign&limit=700`
+  );
+  const typeData = response.data as unknown;
+  const signMap = helsinkiJsonSchema.validateSync(typeData);
+  const parsedSignMap: Array<SignMap> = signMap.results.map((feature) =>
+    helsinkiSignMapParser(feature)
+  );
+  while (true) {
+    console.info('Fetching page:', page);
+    const { data }: { data: unknown } = await axios.get(
+      `${baseUrl}/${assetType as string}/?geo_format=geojson&limit=${fetchSize}&offset=${
+        page * fetchSize
+      }`
+    );
+    const helsinkiFeatureCollection = helsinkiJsonSchema.validateSync(data);
+    const parsedFeatures: Array<Feature> = helsinkiFeatureCollection.results.map(
+      (feature) => parseFeature(assetType, feature, parsedSignMap)
+    );
+    const validFeatures = parsedFeatures.filter(
+      (f): f is ValidFeature => f.type === 'Feature'
+    );
+    const invalidFeatures = parsedFeatures.filter(
+      (f): f is InvalidFeature => f.type === 'Invalid'
+    );
+
+    geoJson.features.push(...validFeatures);
+    geoJson.invalidInfrao.sum += invalidFeatures.length;
+    geoJson.invalidInfrao.IDs.push(...invalidFeatures.map((f) => Number(f.id)));
+
+    if (!helsinkiFeatureCollection.next) break;
+    page++;
+  }
+  return geoJson;
 };
 
 export const main = middyfy(fetchAndParseData);

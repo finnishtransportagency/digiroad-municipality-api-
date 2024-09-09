@@ -2,8 +2,14 @@ import { AssetTypeString } from '@customTypes/eventTypes';
 import { Feature } from '@customTypes/featureTypes';
 import obstacleParser from './obstacleParser';
 import trafficSignParser from './trafficSignParser';
+import { SignMap } from '@customTypes/mapTypes';
+import helsinkiSignParser from './helsinkiSignParser';
 
-export default (assetType: AssetTypeString, feature: unknown): Feature => {
+export default (
+  assetType: AssetTypeString,
+  feature: unknown,
+  signMap?: Array<SignMap>
+): Feature => {
   try {
     switch (assetType) {
       case 'infrao:Rakenne':
@@ -15,6 +21,11 @@ export default (assetType: AssetTypeString, feature: unknown): Feature => {
       case 'infrao:KatualueenOsa':
         //TODO: Implement surfaceParser
         console.warn(`${assetType} not yet implemented in parseFeature`);
+        break;
+
+      case 'traffic-sign-reals':
+        if (signMap) return helsinkiSignParser(feature, signMap);
+        console.warn('Could not fetch singMap');
         break;
 
       default:

@@ -13,6 +13,12 @@ const infraoJsonSchema = object({
   features: array().required() // Content in not checked
 }).required();
 
+const helsinkiJsonSchema = object({
+  count: number().required(),
+  results: array().required(),
+  next: string().notRequired()
+}).required();
+
 const infraoObstacleSchema = object({
   type: string().oneOf(['Feature']).required(),
   id: string()
@@ -67,4 +73,82 @@ const infraoTrafficSignSchema = object({
   }).required()
 }).required();
 
-export { infraoJsonSchema, infraoObstacleSchema, infraoTrafficSignSchema };
+const helsinkiSignSchema = object({
+  id: string().required(),
+  location: pointGeometrySchema.required(),
+  device_type: string().required(),
+  lifecycle: number().oneOf([3, 4, 5, 6]).notRequired(),
+  condition: number().oneOf([1, 2, 3, 4, 5]).notRequired(),
+  road_name: string().notRequired(),
+  lane_type: number()
+    .oneOf([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 20, 21, 22])
+    .notRequired(),
+  lane_number: string()
+    .oneOf(['11', '21', '31', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9'])
+    .notRequired(),
+  direction: number().required().max(360).min(0),
+  height: number().notRequired().min(0),
+  value: string().notRequired(),
+  size: number()
+    .oneOf([1, 2, 3])
+    .transform((code: string) => {
+      return code === 'S' ? 1 : 'M' ? 2 : 3;
+    })
+    .notRequired(),
+  reflection_class: number()
+    .oneOf([1, 2, 3])
+    .transform((code: string) => {
+      return code === 'R1' ? 1 : code === 'R2' ? 2 : 3;
+    })
+    .notRequired(),
+  txt: string().notRequired(),
+  location_specifier: string().notRequired()
+});
+
+const helsinkiTrafficSignMapSchema = object({
+  id: string().required(),
+  legacy_code: string()
+    .default('INVALID_CODE')
+    .when('code', {
+      is: 'INVALID_CODE',
+      then: (schema) =>
+        schema
+          .transform((value: string) => {
+            if (!value) return 'INVALID_CODE';
+            const splitType = value
+              .trim()
+              .match(/(^[A-I]\d{1,2}(\.\d{1,2})?)|(^[1-9]\d{0,3}$)/);
+            if (!splitType) return 'INVALID_CODE';
+            const code = splitType[0];
+            if (Object.keys(trafficSignRules).includes(code)) return code;
+            const mapping = oldTrafficSignMapping[code];
+            if (!mapping) return 'INVALID_CODE';
+            return mapping.code.default ?? 'INVALID_CODE';
+          })
+          .required(),
+      otherwise: (schema) => schema.notRequired()
+    }),
+  code: string()
+    .transform((value: string) => {
+      if (!value) return 'INVALID_CODE';
+      const splitType = value
+        .trim()
+        .match(/(^[A-I]\d{1,2}(\.\d{1,2})?)|(^[1-9]\d{0,3}$)/);
+      if (!splitType) return 'INVALID_CODE';
+      const code = splitType[0];
+      if (Object.keys(trafficSignRules).includes(code)) return code;
+      const mapping = oldTrafficSignMapping[code];
+      if (!mapping) return 'INVALID_CODE';
+      return mapping.code.default ?? 'INVALID_CODE';
+    })
+    .required()
+}).required();
+
+export {
+  infraoJsonSchema,
+  infraoObstacleSchema,
+  infraoTrafficSignSchema,
+  helsinkiJsonSchema,
+  helsinkiSignSchema,
+  helsinkiTrafficSignMapSchema
+};

@@ -3,9 +3,14 @@ import { ValidFeature } from './featureTypes';
 import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
 import { gnlPayloadSchema } from '@schemas/getNearbyLinksSchema';
 
-type ApiResponseType = 'gml' | 'xml' | 'json';
+type ApiResponseType = 'gml' | 'xml' | 'json' | 'helsinki';
 const isApiResponseType = (responseType: unknown): responseType is ApiResponseType => {
-  return responseType === 'gml' || responseType === 'xml' || responseType === 'json';
+  return (
+    responseType === 'gml' ||
+    responseType === 'xml' ||
+    responseType === 'json' ||
+    responseType === 'helsinki'
+  );
 };
 
 /**
@@ -61,7 +66,7 @@ export const isUpdatePayload = (payload: unknown): payload is UpdatePayload => {
  */
 interface AssetTypes {
   obstacles?: 'infrao:Rakenne';
-  trafficSigns?: 'infrao:Liikennemerkki';
+  trafficSigns?: 'infrao:Liikennemerkki' | 'traffic-sign-reals';
   roadSurfaces?: 'infrao:KatualueenOsa';
 }
 const isAssetTypes = (assetType: unknown): assetType is AssetTypes => {
@@ -72,7 +77,9 @@ const isAssetTypes = (assetType: unknown): assetType is AssetTypes => {
   if (
     (!obstacles && !trafficSigns && !roadSurfaces) ||
     (obstacles && obstacles !== 'infrao:Rakenne') ||
-    (trafficSigns && trafficSigns !== 'infrao:Liikennemerkki') ||
+    (trafficSigns &&
+      trafficSigns !== 'infrao:Liikennemerkki' &&
+      trafficSigns !== 'traffic-sign-reals') ||
     (roadSurfaces && roadSurfaces !== 'infrao:KatualueenOsa')
   ) {
     return false;
@@ -101,9 +108,12 @@ export type AssetTypeString =
 export const isAssetTypeString = (assetType: unknown): assetType is AssetTypeString => {
   if (typeof assetType !== 'string') return false;
 
-  return ['infrao:Rakenne', 'infrao:Liikennemerkki', 'infrao:KatualueenOsa'].includes(
-    assetType
-  );
+  return [
+    'infrao:Rakenne',
+    'infrao:Liikennemerkki',
+    'infrao:KatualueenOsa',
+    'traffic-sign-reals'
+  ].includes(assetType);
 };
 
 /**
