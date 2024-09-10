@@ -1,14 +1,27 @@
-import { Feature } from '@customTypes/featureTypes';
+import {
+  AdditionalPanelType,
+  Feature,
+  InvalidFeature,
+  TrafficSignType
+} from '@customTypes/featureTypes';
 import { SignMap } from '@customTypes/mapTypes';
-import { GeoJsonFeatureType, trafficSignFeatureSchema } from '@schemas/geoJsonSchema';
+import {
+  additionalPanelFeatureSchema,
+  GeoJsonFeatureType,
+  trafficSignFeatureSchema
+} from '@schemas/geoJsonSchema';
 import { helsinkiSignSchema } from '@schemas/muniResponseSchema';
 import { createTrafficSignText, trafficSignRules } from '@schemas/trafficSignTypes';
 
-export default (feature: unknown, signMap: Array<SignMap>): Feature => {
+export default (
+  feature: unknown,
+  signMap: Array<SignMap>,
+  isAdditionalPanel: boolean
+): TrafficSignType | AdditionalPanelType | InvalidFeature => {
   const castedFeature = helsinkiSignSchema.cast(feature);
   const id = castedFeature.id;
-  const typeId = castedFeature.device_type;
-  const sign = signMap.find((item) => item.id === typeId);
+  const deviceTypeId = castedFeature.device_type;
+  const sign = signMap.find((item) => item.id === deviceTypeId);
   const legacy_code = sign ? sign.legacy_code : 'INVALID_CODE';
   const code = sign ? sign.code : 'INVALID_CODE';
   const finalCode = code !== 'INVALID_CODE' ? code : legacy_code;
@@ -33,7 +46,11 @@ export default (feature: unknown, signMap: Array<SignMap>): Feature => {
       }
     };
 
-  return trafficSignFeatureSchema.cast({
+  const schema = isAdditionalPanel
+    ? additionalPanelFeatureSchema
+    : trafficSignFeatureSchema;
+
+  return schema.cast({
     type: 'Feature',
     id,
     properties: {

@@ -19,7 +19,7 @@ export default (
         return trafficSignParser(feature);
 
       case 'traffic-sign-reals':
-        if (signMap) return helsinkiSignParser(feature, signMap);
+        if (signMap) return helsinkiSignParser(feature, signMap, false);
         console.warn('Could not fetch singMap');
         break;
 

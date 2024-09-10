@@ -4,6 +4,7 @@ import {
   isScheduleEvent
 } from '@customTypes/eventTypes';
 import {
+  AdditionalPanelType,
   Feature,
   FeatureCollection,
   InvalidFeature,
@@ -26,6 +27,8 @@ import parseFeature from './parseFeature';
 import matchAdditionalPanels from './matchAdditionalPanels';
 import { SignMap } from '@customTypes/mapTypes';
 import helsinkiSignMapParser from './parseFeature/helsinki/helsinkiSignMapParser';
+import { additionalPanelFeatureSchema } from '@schemas/geoJsonSchema';
+import helsinkiSignParser from './parseFeature/helsinki/helsinkiSignParser';
 
 const fetchAndParseData = async (event: unknown) => {
   if (!isScheduleEvent(event)) {
@@ -190,6 +193,90 @@ const fetchXmlData = async (
   return dataArray;
 };
 
+interface AdditionalPanelParseObject {
+  additionalPanels: { [key: string]: Array<AdditionalPanelType['properties']> };
+  rejected: Array<InvalidFeature>;
+}
+
+const fetchAdditionalPanelsHelsinki = async (
+  baseUrl: string
+): Promise<AdditionalPanelParseObject> => {
+  let page = 0;
+  const signMap: Array<SignMap> = await fetchSignMap(baseUrl, 'additional_sign');
+  const additionalPanelsParseObject: AdditionalPanelParseObject = {
+    additionalPanels: {},
+    rejected: []
+  };
+  while (true) {
+    console.log('Fetching additional panels, page:', page);
+    const { data }: { data: unknown } = await axios.get(
+      `${baseUrl}/additional-sign-reals/?geo_format=geojson&limit=${fetchSize}&offset=${
+        page * fetchSize
+      }`
+    );
+    const helsinkiFeatureCollection = helsinkiJsonSchema.validateSync(data);
+    const parsedPanels =
+      helsinkiFeatureCollection.results.reduce<AdditionalPanelParseObject>(
+        (acc, value): AdditionalPanelParseObject => {
+          const { owner } = value as { owner: unknown };
+          if (!owner || typeof owner !== 'string')
+            return {
+              additionalPanels: acc.additionalPanels,
+              rejected: [
+                ...acc.rejected,
+                {
+                  type: 'Invalid',
+                  id: '-1',
+                  properties: {
+                    reason: 'Additionalpanel missing owner field',
+                    feature: JSON.stringify(value)
+                  }
+                }
+              ]
+            };
+          const parsedFeature = helsinkiSignParser(value, signMap, true);
+          if (!additionalPanelFeatureSchema.isValidSync(parsedFeature))
+            return {
+              additionalPanels: acc.additionalPanels,
+              rejected: [
+                ...acc.rejected,
+                {
+                  type: 'Invalid',
+                  id: '-1',
+                  properties: {
+                    reason: 'Feature is not valid additional panel',
+                    feature: JSON.stringify(value)
+                  }
+                }
+              ]
+            };
+          return {
+            additionalPanels: {
+              ...acc.additionalPanels,
+              [owner]: [parsedFeature.properties]
+            },
+            rejected: acc.rejected
+          };
+        },
+        {} as AdditionalPanelParseObject
+      );
+    // ADD PANELS TO additionalPanelsParseObject
+    page++;
+  }
+};
+
+const fetchSignMap = async (
+  baseUrl: string,
+  fetchType: string
+): Promise<Array<SignMap>> => {
+  const response = await axios.get(
+    `${baseUrl}/traffic-control-device-types/?target_model=${fetchType}&limit=700`
+  );
+  const typeData = response.data as unknown;
+  const signMap = helsinkiJsonSchema.validateSync(typeData);
+  return signMap.results.map((feature) => helsinkiSignMapParser(feature));
+};
+
 const fetchHelsinkiData = async (
   assetType: AssetTypeString,
   municipality: string,
@@ -211,14 +298,13 @@ const fetchHelsinkiData = async (
       IDs: []
     }
   };
-  const response = await axios.get(
-    `${baseUrl}/traffic-control-device-types/?target_model=traffic_sign&limit=700`
-  );
-  const typeData = response.data as unknown;
-  const signMap = helsinkiJsonSchema.validateSync(typeData);
-  const parsedSignMap: Array<SignMap> = signMap.results.map((feature) =>
-    helsinkiSignMapParser(feature)
-  );
+  const isTrafficSign = assetType === 'traffic-sign-reals';
+  const parsedSignMap = isTrafficSign
+    ? await fetchSignMap(baseUrl, 'traffic_sign')
+    : undefined;
+  const additionalPanels = isTrafficSign
+    ? await fetchAdditionalPanelsHelsinki(baseUrl)
+    : undefined;
   while (true) {
     console.info('Fetching page:', page);
     const { data }: { data: unknown } = await axios.get(
