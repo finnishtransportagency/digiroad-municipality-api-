@@ -30,6 +30,11 @@ type FeatureCollection = Omit<InferType<typeof geoJsonSchema>, 'features'> & {
   features: Array<ValidFeature>;
 };
 
+interface AdditionalPanelParseObject {
+  additionalPanels: { [key: string]: Array<AdditionalPanelType['properties']> };
+  rejected: Array<InvalidFeature>;
+}
+
 export {
   PointCoordinates,
   ObstacleType,
@@ -38,5 +43,6 @@ export {
   ValidFeature,
   InvalidFeature,
   Feature,
-  FeatureCollection
+  FeatureCollection,
+  AdditionalPanelParseObject
 };

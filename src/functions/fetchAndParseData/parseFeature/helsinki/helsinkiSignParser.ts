@@ -1,6 +1,6 @@
 import {
+  AdditionalPanelParseObject,
   AdditionalPanelType,
-  Feature,
   InvalidFeature,
   TrafficSignType
 } from '@customTypes/featureTypes';
@@ -10,15 +10,22 @@ import {
   GeoJsonFeatureType,
   trafficSignFeatureSchema
 } from '@schemas/geoJsonSchema';
-import { helsinkiSignSchema } from '@schemas/muniResponseSchema';
+import {
+  helsinkiAdditionalPanelSchema,
+  helsinkiSignSchema
+} from '@schemas/muniResponseSchema';
 import { createTrafficSignText, trafficSignRules } from '@schemas/trafficSignTypes';
 
 export default (
   feature: unknown,
   signMap: Array<SignMap>,
-  isAdditionalPanel: boolean
+  isAdditionalPanel: boolean,
+  additionalPanels?: AdditionalPanelParseObject['additionalPanels']
 ): TrafficSignType | AdditionalPanelType | InvalidFeature => {
-  const castedFeature = helsinkiSignSchema.cast(feature);
+  const castSchema = isAdditionalPanel
+    ? helsinkiAdditionalPanelSchema
+    : helsinkiSignSchema;
+  const castedFeature = castSchema.cast(feature);
   const id = castedFeature.id;
   const deviceTypeId = castedFeature.device_type;
   const sign = signMap.find((item) => item.id === deviceTypeId);
@@ -26,12 +33,14 @@ export default (
   const code = sign ? sign.code : 'INVALID_CODE';
   const finalCode = code !== 'INVALID_CODE' ? code : legacy_code;
 
-  if (!helsinkiSignSchema.isValidSync(castedFeature))
+  if (!castSchema.isValidSync(castedFeature))
     return {
       type: 'Invalid',
       id: id,
       properties: {
-        reason: 'Does not match helsinkiSignSchema',
+        reason: `Does not match ${
+          isAdditionalPanel ? 'helsinkiAdditionalPanelSchema' : 'helsinkiSignSchema'
+        }`,
         feature: JSON.stringify(feature)
       }
     };
@@ -50,19 +59,25 @@ export default (
     ? additionalPanelFeatureSchema
     : trafficSignFeatureSchema;
 
+  const numberValue = Number(castedFeature.value);
+  const panels = additionalPanels ? additionalPanels[id] ?? [] : [];
+
   return schema.cast({
     type: 'Feature',
     id,
     properties: {
-      TYPE: GeoJsonFeatureType.TrafficSign,
+      TYPE: isAdditionalPanel
+        ? GeoJsonFeatureType.AdditionalPanel
+        : GeoJsonFeatureType.TrafficSign,
       ID: id,
-      SUUNTIMA: castedFeature.direction,
+      SUUNTIMA: castedFeature.direction ? castedFeature.direction : 0,
       LM_TYYPPI: createTrafficSignText(finalCode),
-      ARVO: Object.keys(trafficSignRules).includes(finalCode)
-        ? Number(castedFeature.value)
-        : null,
+      ARVO:
+        Object.keys(trafficSignRules).includes(finalCode) && !isNaN(numberValue)
+          ? numberValue
+          : null,
       TEKSTI: castedFeature.txt ? castedFeature.txt.substring(0, 128) : castedFeature.txt,
-      LISAKILVET: []
+      ...(isAdditionalPanel ? {} : { LISAKILVET: panels })
     },
     geometry: {
       type: 'Point',

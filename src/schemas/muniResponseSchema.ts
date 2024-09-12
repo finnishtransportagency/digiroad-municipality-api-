@@ -144,11 +144,33 @@ const helsinkiTrafficSignMapSchema = object({
     .required()
 }).required();
 
+const helsinkiAdditionalPanelSchema = object({
+  id: string().required(),
+  location: pointGeometrySchema.required(),
+  device_type: string().notRequired(),
+  value: string().notRequired(),
+  direction: number().notRequired().max(360).min(0),
+  size: number()
+    .oneOf([1, 2, 3])
+    .transform((code: string) => {
+      return code === 'S' ? 1 : 'M' ? 2 : 3;
+    })
+    .notRequired(),
+  reflection_class: number()
+    .oneOf([1, 2, 3])
+    .transform((code: string) => {
+      return code === 'R1' ? 1 : code === 'R2' ? 2 : 3;
+    })
+    .notRequired(),
+  txt: string().notRequired()
+});
+
 export {
   infraoJsonSchema,
   infraoObstacleSchema,
   infraoTrafficSignSchema,
   helsinkiJsonSchema,
   helsinkiSignSchema,
-  helsinkiTrafficSignMapSchema
+  helsinkiTrafficSignMapSchema,
+  helsinkiAdditionalPanelSchema
 };

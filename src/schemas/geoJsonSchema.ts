@@ -54,7 +54,7 @@ const trafficSignValueSchema = number().when('LM_TYYPPI', ([LM_TYYPPI], schema) 
 const additionalPanelPropertiesSchema = object({
   TYPE: string().oneOf([GeoJsonFeatureType.AdditionalPanel]).required(),
   ID: string().required(),
-  SUUNTIMA: number().required().max(360).min(0),
+  SUUNTIMA: number().notRequired().max(360).min(0),
   LM_TYYPPI: string().required().oneOf(allowedAdditionalPanels),
   ARVO: trafficSignValueSchema,
   TEKSTI: string().notRequired(),
@@ -86,7 +86,8 @@ const trafficSignPropertiesSchema = object({
       is: (value: string) => value[0] === 'H',
       then: (schema) => schema.notRequired(),
       otherwise: (schema) => schema.required().max(5)
-    }),
+    })
+    .required(),
   DR_REJECTED: boolean().notRequired()
 }).required();
 // ^------------------------------------------^ //

@@ -4,7 +4,7 @@ import {
   isScheduleEvent
 } from '@customTypes/eventTypes';
 import {
-  AdditionalPanelType,
+  AdditionalPanelParseObject,
   Feature,
   FeatureCollection,
   InvalidFeature,
@@ -193,11 +193,6 @@ const fetchXmlData = async (
   return dataArray;
 };
 
-interface AdditionalPanelParseObject {
-  additionalPanels: { [key: string]: Array<AdditionalPanelType['properties']> };
-  rejected: Array<InvalidFeature>;
-}
-
 const fetchAdditionalPanelsHelsinki = async (
   baseUrl: string
 ): Promise<AdditionalPanelParseObject> => {
@@ -218,8 +213,8 @@ const fetchAdditionalPanelsHelsinki = async (
     const parsedPanels =
       helsinkiFeatureCollection.results.reduce<AdditionalPanelParseObject>(
         (acc, value): AdditionalPanelParseObject => {
-          const { owner } = value as { owner: unknown };
-          if (!owner || typeof owner !== 'string')
+          const { parent } = value as { parent: unknown };
+          if (!parent || typeof parent !== 'string')
             return {
               additionalPanels: acc.additionalPanels,
               rejected: [
@@ -228,7 +223,7 @@ const fetchAdditionalPanelsHelsinki = async (
                   type: 'Invalid',
                   id: '-1',
                   properties: {
-                    reason: 'Additionalpanel missing owner field',
+                    reason: 'Additionalpanel missing parent field',
                     feature: JSON.stringify(value)
                   }
                 }
@@ -253,16 +248,36 @@ const fetchAdditionalPanelsHelsinki = async (
           return {
             additionalPanels: {
               ...acc.additionalPanels,
-              [owner]: [parsedFeature.properties]
+              [parent]: [
+                ...(acc.additionalPanels[parent] ?? []),
+                parsedFeature.properties
+              ]
             },
             rejected: acc.rejected
           };
         },
-        {} as AdditionalPanelParseObject
+        {
+          additionalPanels: {},
+          rejected: []
+        } as AdditionalPanelParseObject
       );
-    // ADD PANELS TO additionalPanelsParseObject
+    additionalPanelsParseObject.additionalPanels = Object.entries(
+      parsedPanels.additionalPanels
+    ).reduce(
+      (acc, [key, value]) => {
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        acc[key] = [...acc[key], ...value];
+        return acc;
+      },
+      { ...additionalPanelsParseObject.additionalPanels }
+    );
+    additionalPanelsParseObject.rejected.push(...parsedPanels.rejected);
+    if (!helsinkiFeatureCollection.next) break;
     page++;
   }
+  return additionalPanelsParseObject;
 };
 
 const fetchSignMap = async (
@@ -314,7 +329,13 @@ const fetchHelsinkiData = async (
     );
     const helsinkiFeatureCollection = helsinkiJsonSchema.validateSync(data);
     const parsedFeatures: Array<Feature> = helsinkiFeatureCollection.results.map(
-      (feature) => parseFeature(assetType, feature, parsedSignMap)
+      (feature) =>
+        parseFeature(
+          assetType,
+          feature,
+          parsedSignMap,
+          additionalPanels?.additionalPanels
+        )
     );
     const validFeatures = parsedFeatures.filter(
       (f): f is ValidFeature => f.type === 'Feature'
@@ -330,6 +351,7 @@ const fetchHelsinkiData = async (
     if (!helsinkiFeatureCollection.next) break;
     page++;
   }
+
   return geoJson;
 };
 

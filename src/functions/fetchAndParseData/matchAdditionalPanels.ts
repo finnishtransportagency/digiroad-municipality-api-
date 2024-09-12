@@ -31,27 +31,14 @@ export default (features: Array<Feature>): Array<ValidFeature> => {
         mainPanel.geometry.coordinates
       );
       if (
-        'SUUNTIMA' in additionalPanel.properties &&
+        distance <= 2 &&
+        additionalPanel.properties.SUUNTIMA !== null &&
         additionalPanel.properties.SUUNTIMA !== undefined &&
-        'SUUNTIMA' in mainPanel.properties &&
-        mainPanel.properties.SUUNTIMA !== undefined
+        similarBearing(additionalPanel.properties.SUUNTIMA, mainPanel.properties.SUUNTIMA)
       ) {
-        if (
-          distance <= 2 &&
-          similarBearing(
-            additionalPanel.properties.SUUNTIMA,
-            mainPanel.properties.SUUNTIMA
-          )
-        ) {
-          if (
-            'LISAKILVET' in mainPanel.properties &&
-            mainPanel.properties.LISAKILVET !== undefined
-          ) {
-            mainPanel.properties.LISAKILVET.push(additionalPanel.properties);
-            matched = true;
-            break;
-          }
-        }
+        mainPanel.properties.LISAKILVET.push(additionalPanel.properties);
+        matched = true;
+        break;
       }
     }
     if (!matched) {
