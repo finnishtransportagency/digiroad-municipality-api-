@@ -1,4 +1,4 @@
-import { array, date, number, object, string } from 'yup';
+import { array, date, number, object, ref, string } from 'yup';
 import { pointGeometrySchema } from './geometrySchema';
 import { trafficSignRules } from './trafficSignTypes';
 import oldTrafficSignMapping from './oldTrafficSignMapping';
@@ -148,8 +148,16 @@ const helsinkiAdditionalPanelSchema = object({
   id: string().required(),
   location: pointGeometrySchema.required(),
   device_type: string().notRequired(),
-  value: string().notRequired(),
-  direction: number().notRequired().max(360).min(0),
+  value: ref<string>('content_s.limit'),
+  content_s: object({
+    unit: string().notRequired(),
+    limit: string().notRequired()
+  }).notRequired(),
+  direction: number()
+    .transform((value) => (value >= 0 ? value % 360 : 360 + (value % 360)))
+    .max(360)
+    .min(0)
+    .notRequired(),
   size: number()
     .oneOf([1, 2, 3])
     .transform((code: string) => {
@@ -162,7 +170,7 @@ const helsinkiAdditionalPanelSchema = object({
       return code === 'R1' ? 1 : code === 'R2' ? 2 : 3;
     })
     .notRequired(),
-  txt: string().notRequired()
+  txt: ref<string>('content_s.unit')
 });
 
 export {

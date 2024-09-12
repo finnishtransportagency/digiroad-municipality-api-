@@ -235,16 +235,19 @@ const fetchAdditionalPanelsHelsinki = async (
               additionalPanels: acc.additionalPanels,
               rejected: [
                 ...acc.rejected,
-                {
-                  type: 'Invalid',
-                  id: '-1',
-                  properties: {
-                    reason: 'Feature is not valid additional panel',
-                    feature: JSON.stringify(value)
-                  }
-                }
+                parsedFeature.type === 'Invalid'
+                  ? parsedFeature
+                  : {
+                      type: 'Invalid',
+                      id: '-1',
+                      properties: {
+                        reason: 'Feature is not valid additional panel',
+                        feature: JSON.stringify(value)
+                      }
+                    }
               ]
             };
+
           return {
             additionalPanels: {
               ...acc.additionalPanels,
