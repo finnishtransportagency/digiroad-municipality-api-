@@ -1,4 +1,4 @@
-import { array, number, object, string } from 'yup';
+import { array, boolean, number, object, string } from 'yup';
 import {
   allowedAdditionalPanels,
   allowedSpeedLimits,
@@ -20,7 +20,16 @@ enum GeoJsonFeatureType {
 const obstaclePropertiesSchema = object({
   TYPE: string().oneOf([GeoJsonFeatureType.Obstacle]).required(),
   ID: string().required(),
-  EST_TYYPPI: number().required().oneOf([1, 2])
+  EST_TYYPPI: number().required().oneOf([1, 2]),
+  DR_LINK_ID: string().notRequired(),
+  DR_M_VALUE: number().notRequired(),
+  DR_OFFSET: number().notRequired(),
+  DR_REJECTED: boolean().notRequired(),
+  DR_GEOMETRY: object({
+    x: number().notRequired(),
+    y: number().notRequired(),
+    z: number().default(0).notRequired()
+  }).notRequired()
 });
 
 const trafficSignValueSchema = number().when('LM_TYYPPI', ([LM_TYYPPI], schema) => {
@@ -51,7 +60,8 @@ const additionalPanelPropertiesSchema = object({
   TEKSTI: string().notRequired(),
   KOKO: number().oneOf([1, 2, 3]).notRequired(),
   KALVON_TYYPPI: number().oneOf([1, 2, 3]).notRequired(),
-  VARI: number().oneOf([1, 2]).notRequired()
+  VARI: number().oneOf([1, 2]).notRequired(),
+  DR_REJECTED: boolean().notRequired()
 });
 
 /**
@@ -76,7 +86,8 @@ const trafficSignPropertiesSchema = object({
       is: (value: string) => value[0] === 'H',
       then: (schema) => schema.notRequired(),
       otherwise: (schema) => schema.required().max(5)
-    })
+    }),
+  DR_REJECTED: boolean().notRequired()
 }).required();
 // ^------------------------------------------^ //
 

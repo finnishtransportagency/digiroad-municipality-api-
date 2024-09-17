@@ -1,4 +1,5 @@
 import {
+  MAX_OFFSET,
   offline,
   pgdatabase,
   pghost,
@@ -60,6 +61,7 @@ export const getPointQuery = (
   municipality: string,
   features: Array<ValidFeature>
 ): PostgresQuery => {
+  const searchRadius = String(MAX_OFFSET + 3);
   return {
     text: `
   WITH municipality_ AS (
@@ -79,10 +81,10 @@ export const getPointQuery = (
     
     SELECT (value#>'{properties}'->>'ID')::TEXT AS ID, (value#>'{properties}'->>'TYPE')::TEXT AS TYPE,json_agg((st_astext(shape),linkid,directiontype, roadname_fi)) AS roadlinks
     FROM json_array_elements($2) AS features, acceptable_roadlinks
-    WHERE ST_BUFFER(ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067), 5) && acceptable_roadlinks.shape 
+    WHERE ST_BUFFER(ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067), $4) && acceptable_roadlinks.shape
       AND ((features#>'{properties}'->>'TYPE') != 'TRAFFICSIGN' OR (features#>'{properties}'->>'LM_TYYPPI') = ANY(($3)::text[]) OR acceptable_roadlinks.functional_class != 8)
     GROUP BY ID,TYPE
     `,
-    values: [municipality, JSON.stringify(features), allowedOnKapy]
+    values: [municipality, JSON.stringify(features), allowedOnKapy, searchRadius]
   };
 };

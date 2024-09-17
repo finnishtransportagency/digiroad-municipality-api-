@@ -1,20 +1,13 @@
 import { invokeLambda, middyfy } from '@libs/lambda-tools';
-import matchTrafficSign from './trafficSigns/matchTrafficSign';
-import matchObstacle from './obstacles/matchObstacle';
 
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
-import {
-  PayloadFeature,
-  DrKuntaFeature,
-  LinkObject,
-  FeatureType
-} from '@functions/typing';
 import { bucketName, MAX_OFFSET } from '@functions/config';
 import {
   GetNearbyLinksPayload,
   isS3KeyObject,
   isUpdatePayload,
-  S3KeyObject
+  S3KeyObject,
+  UpdatePayload
 } from '@customTypes/eventTypes';
 import { ValidFeature } from '@customTypes/featureTypes';
 import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
@@ -33,12 +26,8 @@ const matchRoadLinks = async (event: S3KeyObject) => {
       ).slice(0, 1000)}`
     );
 
-  let rejectsAmount = 0;
-  const features: Array<ValidFeature> = updatePayload.Created.concat(
-    updatePayload.Updated
-  );
   const getNearbyLinksPayload: GetNearbyLinksPayload = {
-    features: features,
+    features: updatePayload.Created.concat(updatePayload.Updated),
     municipality: updatePayload.metadata.municipality,
     assetType: updatePayload.metadata.assetType
   };
@@ -82,71 +71,26 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     );
   const nearbyLinksList = allRoadLinks.map((link) => featureNearbyLinksSchema.cast(link));
 
-  const matchedFeatures = features.map((feature) => {
+  let rejectsAmount = 0;
+  const mapMatches = (feature: ValidFeature) => {
     const nearbyLinks = nearbyLinksList.find(
       (link) => link.id === feature.properties.ID && link.type === feature.properties.TYPE
     );
-    if (!nearbyLinks) return 'TODOOOOOOOOOOOOO';
-    return matchFeature(feature, nearbyLinks.roadlinks);
-  });
+    if (!nearbyLinks)
+      return { ...feature, properties: { ...feature.properties, DR_REJECTED: true } };
 
-  for (let p = 0; p < features.length; p++) {
-    const feature = features[p];
-    const roadLinks: Array<LinkObject> | undefined = allRoadLinks.find(
-      (i) => i.id === feature.properties.ID && i.type === feature.properties.TYPE
-    )?.roadlinks;
-    if (roadLinks) {
-      switch (feature.properties.TYPE) {
-        case FeatureType.Obstacle: {
-          const obstacleMatchResults = matchObstacle(roadLinks, feature, MAX_OFFSET);
-          if (!obstacleMatchResults) {
-            console.error('matchResult is undefined (Obstacle)');
-            return;
-          }
+    const match = matchFeature(feature, nearbyLinks.roadlinks);
+    if (!match || (match && match.properties.DR_REJECTED)) rejectsAmount++;
+    return match;
+  };
+  const createdFeatures = updatePayload.Created.map(mapMatches);
+  const updatedFeatures = updatePayload.Updated.map(mapMatches);
 
-          if (obstacleMatchResults.DR_REJECTED) {
-            rejectsAmount++;
-          }
-
-          feature.properties = {
-            ...feature.properties,
-            ...obstacleMatchResults
-          };
-          break;
-        }
-        case FeatureType.TrafficSign: {
-          const trafficSignMatchResults = matchTrafficSign(roadLinks, feature);
-          if (!trafficSignMatchResults) {
-            console.error('matchResult is undefined (TrafficSign)');
-            return;
-          }
-
-          if (trafficSignMatchResults.DR_REJECTED) {
-            rejectsAmount++;
-          }
-
-          feature.properties = {
-            ...feature.properties,
-            ...trafficSignMatchResults
-          };
-          break;
-        }
-      }
-    } else {
-      rejectsAmount++;
-      feature.properties.DR_REJECTED = true;
-    }
-  }
-  const execDelta2SQLBody: PayloadFeature = {
-    Created: updatePayload.Created.filter(
-      (feature: DrKuntaFeature) => !feature.properties.DR_REJECTED
-    ),
+  const execDelta2SQLBody: UpdatePayload = {
+    Created: createdFeatures.filter((feature) => !feature.properties.DR_REJECTED),
+    Updated: updatedFeatures.filter((feature) => !feature.properties.DR_REJECTED),
     Deleted: updatePayload.Deleted,
-    Updated: updatePayload.Updated.filter(
-      (feature: DrKuntaFeature) => !feature.properties.DR_REJECTED
-    ),
     metadata: {
-      OFFSET_LIMIT: MAX_OFFSET,
       municipality: updatePayload.metadata.municipality,
       assetType: updatePayload.metadata.assetType
     }
@@ -154,21 +98,13 @@ const matchRoadLinks = async (event: S3KeyObject) => {
 
   const logsBody = {
     Rejected: {
-      Created: updatePayload.Created.filter(
-        (feature: DrKuntaFeature) => feature.properties.DR_REJECTED
-      ),
-      Updated: updatePayload.Updated.filter(
-        (feature: DrKuntaFeature) => feature.properties.DR_REJECTED
-      )
+      Created: createdFeatures.filter((feature) => feature.properties.DR_REJECTED),
+      Updated: updatedFeatures.filter((feature) => feature.properties.DR_REJECTED)
     },
     Accepted: {
-      Created: updatePayload.Created.filter(
-        (feature: DrKuntaFeature) => !feature.properties.DR_REJECTED
-      ),
+      Created: updatePayload.Created.filter((feature) => !feature.properties.DR_REJECTED),
       Deleted: updatePayload.Deleted,
-      Updated: updatePayload.Updated.filter(
-        (feature: DrKuntaFeature) => !feature.properties.DR_REJECTED
-      )
+      Updated: updatedFeatures.filter((feature) => !feature.properties.DR_REJECTED)
     },
     invalidInfrao: updatePayload.invalidInfrao,
     metadata: {
