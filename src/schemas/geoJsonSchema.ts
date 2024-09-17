@@ -24,7 +24,6 @@ const obstaclePropertiesSchema = object({
   DR_LINK_ID: string().notRequired(),
   DR_M_VALUE: number().notRequired(),
   DR_OFFSET: number().notRequired(),
-  DR_REJECTED: boolean().notRequired(),
   DR_GEOMETRY: object({
     x: number().notRequired(),
     y: number().notRequired(),
@@ -60,8 +59,7 @@ const additionalPanelPropertiesSchema = object({
   TEKSTI: string().notRequired(),
   KOKO: number().oneOf([1, 2, 3]).notRequired(),
   KALVON_TYYPPI: number().oneOf([1, 2, 3]).notRequired(),
-  VARI: number().oneOf([1, 2]).notRequired(),
-  DR_REJECTED: boolean().notRequired()
+  VARI: number().oneOf([1, 2]).notRequired()
 });
 
 /**
@@ -87,8 +85,7 @@ const trafficSignPropertiesSchema = object({
       then: (schema) => schema.notRequired(),
       otherwise: (schema) => schema.required().max(5)
     })
-    .required(),
-  DR_REJECTED: boolean().notRequired()
+    .required()
 }).required();
 // ^------------------------------------------^ //
 

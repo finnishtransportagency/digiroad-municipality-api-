@@ -13,6 +13,7 @@ import { ValidFeature } from '@customTypes/featureTypes';
 import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
 import { featureNearbyLinksSchema } from '@schemas/featureNearbyLinksSchema';
 import matchFeature from './matchFeature';
+import { invalidFeature } from '@libs/schema-tools';
 
 const now = new Date().toISOString().slice(0, 19);
 
@@ -76,20 +77,24 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     const nearbyLinks = nearbyLinksList.find(
       (link) => link.id === feature.properties.ID && link.type === feature.properties.TYPE
     );
-    if (!nearbyLinks)
-      return { ...feature, properties: { ...feature.properties, DR_REJECTED: true } };
+    if (!nearbyLinks) return invalidFeature(feature, 'No links close enough to asset.');
 
     const match = matchFeature(feature, nearbyLinks.roadlinks);
-    if (!match || (match && match.properties.DR_REJECTED)) rejectsAmount++;
+    if (!match || (match && match.type === 'Invalid')) rejectsAmount++;
     return match;
   };
   const createdFeatures = updatePayload.Created.map(mapMatches);
   const updatedFeatures = updatePayload.Updated.map(mapMatches);
 
   const execDelta2SQLBody: UpdatePayload = {
-    Created: createdFeatures.filter((feature) => !feature.properties.DR_REJECTED),
-    Updated: updatedFeatures.filter((feature) => !feature.properties.DR_REJECTED),
+    Created: createdFeatures.filter(
+      (feature): feature is ValidFeature => feature.type === 'Feature'
+    ),
+    Updated: updatedFeatures.filter(
+      (feature): feature is ValidFeature => feature.type === 'Feature'
+    ),
     Deleted: updatePayload.Deleted,
+    invalidInfrao: updatePayload.invalidInfrao,
     metadata: {
       municipality: updatePayload.metadata.municipality,
       assetType: updatePayload.metadata.assetType
@@ -98,13 +103,13 @@ const matchRoadLinks = async (event: S3KeyObject) => {
 
   const logsBody = {
     Rejected: {
-      Created: createdFeatures.filter((feature) => feature.properties.DR_REJECTED),
-      Updated: updatedFeatures.filter((feature) => feature.properties.DR_REJECTED)
+      Created: createdFeatures.filter((feature) => feature.type === 'Invalid'),
+      Updated: updatedFeatures.filter((feature) => feature.type === 'Invalid')
     },
     Accepted: {
-      Created: updatePayload.Created.filter((feature) => !feature.properties.DR_REJECTED),
-      Deleted: updatePayload.Deleted,
-      Updated: updatedFeatures.filter((feature) => !feature.properties.DR_REJECTED)
+      Created: updatePayload.Created.filter((feature) => feature.type === 'Feature'),
+      Updated: updatedFeatures.filter((feature) => feature.type === 'Feature'),
+      Deleted: updatePayload.Deleted
     },
     invalidInfrao: updatePayload.invalidInfrao,
     metadata: {

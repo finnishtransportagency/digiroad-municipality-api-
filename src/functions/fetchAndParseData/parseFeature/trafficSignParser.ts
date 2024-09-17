@@ -1,4 +1,5 @@
 import { Feature } from '@customTypes/featureTypes';
+import { invalidFeature } from '@libs/schema-tools';
 import { GeoJsonFeatureType, trafficSignFeatureSchema } from '@schemas/geoJsonSchema';
 import { infraoTrafficSignSchema } from '@schemas/muniResponseSchema';
 import { createTrafficSignText } from '@schemas/trafficSignTypes';
@@ -9,14 +10,7 @@ export default (feature: unknown): Feature => {
   const id = properties.yksilointitieto;
 
   if (!infraoTrafficSignSchema.isValidSync(castedFeature))
-    return {
-      type: 'Invalid',
-      id: id,
-      properties: {
-        reason: 'Does not match infraoTrafficSignSchema',
-        feature: JSON.stringify(feature)
-      }
-    };
+    return invalidFeature(feature, 'Does not match infraoTrafficSignSchema');
 
   const trafficSignCode =
     properties.liikennemerkkityyppi2020 === 'INVALID_CODE'
@@ -24,14 +18,10 @@ export default (feature: unknown): Feature => {
       : properties.liikennemerkkityyppi2020;
 
   if (trafficSignCode === 'INVALID_CODE')
-    return {
-      type: 'Invalid',
-      id: id,
-      properties: {
-        reason: 'Invalid liikennemerkkityyppi & liikennemerkkityyppi2020',
-        feature: JSON.stringify(feature)
-      }
-    };
+    return invalidFeature(
+      feature,
+      'Invalid liikennemerkkityyppi & liikennemerkkityyppi2020'
+    );
 
   const value = parseInt(properties.teksti ?? '');
 

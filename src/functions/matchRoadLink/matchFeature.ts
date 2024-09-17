@@ -1,18 +1,19 @@
-import { ValidFeature } from '@customTypes/featureTypes';
+import { Feature, ValidFeature } from '@customTypes/featureTypes';
 import { FeatureNearbyLinks } from '@customTypes/roadLinkTypes';
 import { MAX_OFFSET } from '@functions/config';
+import { invalidFeature } from '@libs/schema-tools';
 import { GeoJsonFeatureType } from '@schemas/geoJsonSchema';
 import LineString from 'ol/geom/LineString.js';
 
 const matchFeature = (
   feature: ValidFeature,
   nearbyLinks: FeatureNearbyLinks['roadlinks']
-): ValidFeature => {
+): Feature => {
   const featureCoords = feature.geometry.coordinates;
+  if (nearbyLinks.length < 1)
+    return invalidFeature(feature, 'No links close enough to asset.');
   switch (feature.properties.TYPE) {
     case GeoJsonFeatureType.Obstacle: {
-      if (nearbyLinks.length < 1)
-        return { ...feature, properties: { ...feature.properties, DR_REJECTED: true } };
       const closestLink = nearbyLinks.reduce(
         (closest, link) => {
           const shape = new LineString(
@@ -55,6 +56,9 @@ const matchFeature = (
           closestZ: number;
         }
       );
+      if (closestLink.distance > MAX_OFFSET)
+        return invalidFeature(feature, 'No links close enough to asset.');
+
       return {
         ...feature,
         properties: {
@@ -62,7 +66,6 @@ const matchFeature = (
           DR_LINK_ID: closestLink.link?.linkId,
           DR_M_VALUE: closestLink.mValue,
           DR_OFFSET: closestLink.distance,
-          DR_REJECTED: closestLink.distance < MAX_OFFSET ? false : true,
           DR_GEOMETRY: {
             x: closestLink.closestX,
             y: closestLink.closestY,
@@ -78,7 +81,10 @@ const matchFeature = (
       console.warn('TrafficSigns matchFeature not yet implemented.');
       break;
   }
-  return { ...feature, properties: { ...feature.properties, DR_REJECTED: true } };
+  return invalidFeature(
+    feature,
+    `AssetType not supported by matchFeature: ${feature.properties.TYPE}`
+  );
 };
 
 export default matchFeature;

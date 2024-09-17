@@ -5,6 +5,7 @@ import {
   TrafficSignType
 } from '@customTypes/featureTypes';
 import { SignMap } from '@customTypes/mapTypes';
+import { invalidFeature } from '@libs/schema-tools';
 import {
   additionalPanelFeatureSchema,
   GeoJsonFeatureType,
@@ -34,26 +35,15 @@ export default (
   const finalCode = code !== 'INVALID_CODE' ? code : legacy_code;
 
   if (!castSchema.isValidSync(castedFeature))
-    return {
-      type: 'Invalid',
-      id: id,
-      properties: {
-        reason: `Does not match ${
-          isAdditionalPanel ? 'helsinkiAdditionalPanelSchema' : 'helsinkiSignSchema'
-        }`,
-        feature: JSON.stringify(feature)
-      }
-    };
+    return invalidFeature(
+      feature,
+      `Does not match ${
+        isAdditionalPanel ? 'helsinkiAdditionalPanelSchema' : 'helsinkiSignSchema'
+      }`
+    );
 
   if (finalCode === 'INVALID_CODE')
-    return {
-      type: 'Invalid',
-      id: id,
-      properties: {
-        reason: 'Invalid traffic sign code',
-        feature: JSON.stringify(feature)
-      }
-    };
+    return invalidFeature(feature, 'Invalid traffic sign code');
 
   const schema = isAdditionalPanel
     ? additionalPanelFeatureSchema

@@ -29,6 +29,7 @@ import { SignMap } from '@customTypes/mapTypes';
 import helsinkiSignMapParser from './parseFeature/helsinki/helsinkiSignMapParser';
 import { additionalPanelFeatureSchema } from '@schemas/geoJsonSchema';
 import helsinkiSignParser from './parseFeature/helsinki/helsinkiSignParser';
+import { invalidFeature } from '@libs/schema-tools';
 
 const fetchAndParseData = async (event: unknown) => {
   if (!isScheduleEvent(event)) {
@@ -219,14 +220,7 @@ const fetchAdditionalPanelsHelsinki = async (
               additionalPanels: acc.additionalPanels,
               rejected: [
                 ...acc.rejected,
-                {
-                  type: 'Invalid',
-                  id: '-1',
-                  properties: {
-                    reason: 'Additionalpanel missing parent field',
-                    feature: JSON.stringify(value)
-                  }
-                }
+                invalidFeature(value, 'Additionalpanel missing parent field')
               ]
             };
           const parsedFeature = helsinkiSignParser(value, signMap, true);
@@ -237,14 +231,7 @@ const fetchAdditionalPanelsHelsinki = async (
                 ...acc.rejected,
                 parsedFeature.type === 'Invalid'
                   ? parsedFeature
-                  : {
-                      type: 'Invalid',
-                      id: '-1',
-                      properties: {
-                        reason: 'Feature is not valid additional panel',
-                        feature: JSON.stringify(value)
-                      }
-                    }
+                  : invalidFeature(value, 'Feature is not valid additional panel')
               ]
             };
 

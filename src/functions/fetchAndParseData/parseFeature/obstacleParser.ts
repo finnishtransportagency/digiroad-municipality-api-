@@ -1,4 +1,5 @@
 import { Feature } from '@customTypes/featureTypes';
+import { invalidFeature } from '@libs/schema-tools';
 import { GeoJsonFeatureType } from '@schemas/geoJsonSchema';
 import { infraoObstacleSchema } from '@schemas/muniResponseSchema';
 
@@ -9,14 +10,7 @@ export default (feature: unknown): Feature => {
   const coordinates = castedFeature.geometry.coordinates;
 
   if (!infraoObstacleSchema.isValidSync(castedFeature))
-    return {
-      type: 'Invalid',
-      id: id,
-      properties: {
-        reason: 'Does not match infraoObstacleSchema',
-        feature: JSON.stringify(feature)
-      }
-    };
+    return invalidFeature(feature, 'Does not match infraoObstacleSchema');
 
   return {
     type: 'Feature',
