@@ -1,4 +1,4 @@
-import { array, boolean, number, object, string } from 'yup';
+import { array, number, object, string } from 'yup';
 import {
   allowedAdditionalPanels,
   allowedSpeedLimits,
@@ -14,13 +14,8 @@ enum GeoJsonFeatureType {
 }
 
 // v--------------- PROPERTIES ---------------v //
-/**
- * @field EST_TYYPPI: 1 = Suljettu yhteys, 2 = Avattava puomi
- */
-const obstaclePropertiesSchema = object({
-  TYPE: string().oneOf([GeoJsonFeatureType.Obstacle]).required(),
+const matchablePropertiesSchema = object({
   ID: string().required(),
-  EST_TYYPPI: number().required().oneOf([1, 2]),
   DR_LINK_ID: string().notRequired(),
   DR_M_VALUE: number().notRequired(),
   DR_OFFSET: number().notRequired(),
@@ -29,6 +24,14 @@ const obstaclePropertiesSchema = object({
     y: number().notRequired(),
     z: number().default(0).notRequired()
   }).notRequired()
+});
+
+/**
+ * @field EST_TYYPPI: 1 = Suljettu yhteys, 2 = Avattava puomi
+ */
+const obstaclePropertiesSchema = matchablePropertiesSchema.shape({
+  TYPE: string().oneOf([GeoJsonFeatureType.Obstacle]).required(),
+  EST_TYYPPI: number().required().oneOf([1, 2])
 });
 
 const trafficSignValueSchema = number().when('LM_TYYPPI', ([LM_TYYPPI], schema) => {
@@ -67,26 +70,27 @@ const additionalPanelPropertiesSchema = object({
  * @field KUNTO: 1 = Erittäin huono, 2 = Huono, 3 = Tyydyttävä, 4 = Hyvä, 5 = Erittäin hyvä
  * @field KOKO: 1 = Pienikokoinen merkki, 2 = Normaalikokoinen merkki (oletus), 3 = Suurikokoinen merkki
  */
-const trafficSignPropertiesSchema = object({
-  TYPE: string().oneOf([GeoJsonFeatureType.TrafficSign]).required(),
-  ID: string().required(),
-  SUUNTIMA: number().required().max(360).min(0),
-  LM_TYYPPI: string().required().oneOf(allowedTrafficSigns),
-  ARVO: trafficSignValueSchema,
-  TEKSTI: string().max(128).notRequired(),
-  LISATIETO: string().notRequired(),
-  RAKENNE: number().oneOf([1, 2, 3, 4, 5, 6]).notRequired(),
-  KUNTO: number().oneOf([1, 2, 3, 4, 5]).notRequired(),
-  KOKO: number().oneOf([1, 2, 3]).notRequired(),
-  LISAKILVET: array()
-    .of(additionalPanelPropertiesSchema)
-    .when('LM_TYYPPI', {
-      is: (value: string) => value[0] === 'H',
-      then: (schema) => schema.notRequired(),
-      otherwise: (schema) => schema.required().max(5)
-    })
-    .required()
-}).required();
+const trafficSignPropertiesSchema = matchablePropertiesSchema
+  .shape({
+    TYPE: string().oneOf([GeoJsonFeatureType.TrafficSign]).required(),
+    SUUNTIMA: number().required().max(360).min(0),
+    LM_TYYPPI: string().required().oneOf(allowedTrafficSigns),
+    ARVO: trafficSignValueSchema,
+    TEKSTI: string().max(128).notRequired(),
+    LISATIETO: string().notRequired(),
+    RAKENNE: number().oneOf([1, 2, 3, 4, 5, 6]).notRequired(),
+    KUNTO: number().oneOf([1, 2, 3, 4, 5]).notRequired(),
+    KOKO: number().oneOf([1, 2, 3]).notRequired(),
+    LISAKILVET: array()
+      .of(additionalPanelPropertiesSchema)
+      .when('LM_TYYPPI', {
+        is: (value: string) => value[0] === 'H',
+        then: (schema) => schema.notRequired(),
+        otherwise: (schema) => schema.required().max(5)
+      })
+      .required()
+  })
+  .required();
 // ^------------------------------------------^ //
 
 // v---------------- FEATURES ----------------v //

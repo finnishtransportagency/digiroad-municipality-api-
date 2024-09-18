@@ -1,6 +1,7 @@
 import { PointCoordinates } from '@customTypes/featureTypes';
-import { Coordinate, GeometryFactory } from 'jsts/org/locationtech/jts/geom';
+import { GeometryFactory } from 'jsts/org/locationtech/jts/geom';
 import { PrecisionModel } from 'jsts/org/locationtech/jts/geom';
+import { Coordinate } from 'ol/coordinate';
 
 const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
 
@@ -48,10 +49,7 @@ export const getDistance3D = (
  * @param {PointCoordinates} end - The coordinates of the end point [x, y]
  * @returns The bearing of the roadlink in degrees
  */
-export const getLinkBearing = (
-  start: PointCoordinates,
-  end: PointCoordinates
-): number => {
+export const getLinkBearing = (start: Coordinate, end: Coordinate): number => {
   return 180 + Math.atan2(start[0] - end[0], start[1] - end[1]) * (180 / Math.PI);
 };
 

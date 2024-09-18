@@ -1,5 +1,9 @@
 import { AssetTypeString } from '@customTypes/eventTypes';
-import { AdditionalPanelParseObject, Feature } from '@customTypes/featureTypes';
+import {
+  AdditionalPanelParseObject,
+  AdditionalPanelType,
+  Feature
+} from '@customTypes/featureTypes';
 import obstacleParser from './obstacleParser';
 import trafficSignParser from './trafficSignParser';
 import { SignMap } from '@customTypes/mapTypes';
@@ -11,7 +15,7 @@ export default (
   feature: unknown,
   signMap?: Array<SignMap>,
   additionalPanels?: AdditionalPanelParseObject['additionalPanels']
-): Feature => {
+): Feature | AdditionalPanelType => {
   try {
     switch (assetType) {
       case 'infrao:Rakenne':

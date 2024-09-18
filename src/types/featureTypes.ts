@@ -13,7 +13,7 @@ type ObstacleType = InferType<typeof obstacleFeatureSchema>;
 type TrafficSignType = InferType<typeof trafficSignFeatureSchema>;
 type AdditionalPanelType = InferType<typeof additionalPanelFeatureSchema>;
 
-type ValidFeature = ObstacleType | TrafficSignType | AdditionalPanelType;
+type ValidFeature = ObstacleType | TrafficSignType;
 
 interface InvalidFeature {
   type: 'Invalid';

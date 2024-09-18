@@ -13,8 +13,10 @@ import { GeoJsonFeatureType } from '@schemas/geoJsonSchema';
  * @param features Array of all traffic signs to be matched
  * @returns Main traffic signs with additional panels added to them
  */
-export default (features: Array<Feature>): Array<ValidFeature> => {
-  const validFeatures = features.filter((f): f is ValidFeature => f.type === 'Feature');
+export default (features: Array<Feature | AdditionalPanelType>): Array<ValidFeature> => {
+  const validFeatures = features.filter(
+    (f): f is ValidFeature | AdditionalPanelType => f.type === 'Feature'
+  );
   const additionalPanels = validFeatures.filter(
     (f): f is AdditionalPanelType =>
       f.properties.TYPE === GeoJsonFeatureType.AdditionalPanel
@@ -22,7 +24,7 @@ export default (features: Array<Feature>): Array<ValidFeature> => {
   const mainPanels = validFeatures.filter(
     (f): f is TrafficSignType => f.properties.TYPE === GeoJsonFeatureType.TrafficSign
   );
-  const rejectedAdditionalPanels: Array<Feature> = [];
+  const rejectedAdditionalPanels: Array<AdditionalPanelType> = [];
   for (const additionalPanel of additionalPanels) {
     let matched = false;
     for (const mainPanel of mainPanels) {

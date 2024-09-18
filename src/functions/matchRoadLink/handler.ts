@@ -107,7 +107,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
       Updated: updatedFeatures.filter((feature) => feature.type === 'Invalid')
     },
     Accepted: {
-      Created: updatePayload.Created.filter((feature) => feature.type === 'Feature'),
+      Created: createdFeatures.filter((feature) => feature.type === 'Feature'),
       Updated: updatedFeatures.filter((feature) => feature.type === 'Feature'),
       Deleted: updatePayload.Deleted
     },
