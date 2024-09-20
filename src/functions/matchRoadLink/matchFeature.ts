@@ -2,8 +2,34 @@ import { Feature, ValidFeature } from '@customTypes/featureTypes';
 import { FeatureNearbyLinks } from '@customTypes/roadLinkTypes';
 import { MAX_OFFSET } from '@functions/config';
 import { invalidFeature } from '@libs/schema-tools';
+import { pointOnLine, getLinkBearing, similarBearing } from '@libs/spatial-tools';
 import { GeoJsonFeatureType } from '@schemas/geoJsonSchema';
 import LineString from 'ol/geom/LineString.js';
+import { Coordinate } from 'ol/coordinate';
+
+const isSimilarBearing = (
+  feature: ValidFeature,
+  link: FeatureNearbyLinks['roadlinks'][0],
+  closestPoint: Coordinate
+) => {
+  if (feature.properties.TYPE === GeoJsonFeatureType.TrafficSign) {
+    const segmentStartPoint = link.points.slice(0, -1).find((point, i) => {
+      const nextPoint = link.points[i + 1];
+      return pointOnLine(
+        [
+          [point.x, point.y],
+          [nextPoint.x, nextPoint.y]
+        ],
+        [closestPoint[0], closestPoint[1]]
+      );
+    });
+    const segmentBearing = segmentStartPoint
+      ? getLinkBearing([segmentStartPoint.x, segmentStartPoint.y], closestPoint)
+      : NaN;
+    return similarBearing(segmentBearing, feature.properties.SUUNTIMA);
+  }
+  return false;
+};
 
 const getClosestLink = (
   feature: ValidFeature,
@@ -33,9 +59,23 @@ const getClosestLink = (
       const closestY = closestPoint[1];
       const closestZ = closestPoint[2];
 
-      return closest.distance < distance
-        ? closest
-        : { link, distance, mValue, closestX, closestY, closestZ };
+      const similarLink = {
+        link,
+        distance,
+        mValue,
+        closestX,
+        closestY,
+        closestZ
+      };
+
+      if (feature.properties.TYPE === GeoJsonFeatureType.TrafficSign) {
+        return closest.distance > distance &&
+          isSimilarBearing(feature, link, closestPoint)
+          ? similarLink
+          : closest;
+      }
+
+      return closest.distance < distance ? closest : similarLink;
     },
     {
       link: undefined,

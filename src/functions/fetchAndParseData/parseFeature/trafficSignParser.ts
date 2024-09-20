@@ -34,7 +34,7 @@ export default (feature: unknown): Feature => {
           ? GeoJsonFeatureType.AdditionalPanel
           : GeoJsonFeatureType.TrafficSign,
       ID: String(id),
-      SUUNTIMA: properties.suunta ? properties.suunta * (180 / Math.PI) : 0,
+      SUUNTIMA: Math.round(properties.suunta ? properties.suunta * (180 / Math.PI) : 0), // MAYBE SHOULD RETURN InvalidFeature in case of no bearing.
       LM_TYYPPI: createTrafficSignText(trafficSignCode),
       ARVO: isNaN(value) ? undefined : value,
       TEKSTI: properties.teksti ? properties.teksti.substring(0, 128) : properties.teksti,

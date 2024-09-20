@@ -1,16 +1,7 @@
 import { PointCoordinates } from '@customTypes/featureTypes';
-import { GeometryFactory } from 'jsts/org/locationtech/jts/geom';
-import { PrecisionModel } from 'jsts/org/locationtech/jts/geom';
+import booleanPointOnLine from '@turf/boolean-point-on-line';
+import { Point, LineString } from 'geojson';
 import { Coordinate } from 'ol/coordinate';
-
-const geomFactory = new GeometryFactory(new PrecisionModel(), 3067);
-
-/**
- * Creates jsts LineString from jsts Coordinates
- * @param {Array<Coordinate>} coordinates - The coordinates of the LineString
- */
-export const createLineString = (coordinates: Array<Coordinate>) =>
-  geomFactory.createLineString(coordinates);
 
 /**
  * Calculates the distance between two points
@@ -63,4 +54,29 @@ export const similarBearing = (bearingA: number, bearingB: number): boolean => {
     throw new Error('Invalid bearings');
   const diff = Math.abs(bearingA - bearingB);
   return diff <= 45 || diff >= 315;
+};
+
+export const pointOnLine = (
+  lineCoordinates: [[number, number], [number, number]],
+  pointCoordinates: [number, number]
+): boolean => {
+  /* const EXTENT = 0.5; */
+  /* const wgsLineString = lineCoordinates.map((c) => proj4('EPSG:3067', 'EPSG:4326', c));
+  const wgsPoint = proj4('EPSG:3067', 'EPSG:4326', pointCoordinates); */
+  const lineString: LineString = {
+    type: 'LineString',
+    coordinates: lineCoordinates
+  };
+  const point: Point = {
+    type: 'Point',
+    coordinates: pointCoordinates
+  };
+  /* const lineBuffer = buffer(lineString, EXTENT, { units: 'meters' });
+  if (!lineBuffer)
+    throw new Error(
+      `Failed to create line buffer.\n Line coordinates: ${String(
+        lineCoordinates
+      )}\n Point coordinates: ${String(pointCoordinates)}`
+    ); */
+  return booleanPointOnLine(point, lineString, { epsilon: 5e-8 });
 };

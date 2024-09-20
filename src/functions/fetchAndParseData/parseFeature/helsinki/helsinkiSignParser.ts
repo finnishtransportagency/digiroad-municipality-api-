@@ -60,7 +60,7 @@ export default (
         ? GeoJsonFeatureType.AdditionalPanel
         : GeoJsonFeatureType.TrafficSign,
       ID: id,
-      SUUNTIMA: castedFeature.direction ? castedFeature.direction : 0,
+      SUUNTIMA: Math.round(castedFeature.direction ? castedFeature.direction : 0),
       LM_TYYPPI: createTrafficSignText(finalCode),
       ARVO:
         Object.keys(trafficSignRules).includes(finalCode) && !isNaN(numberValue)

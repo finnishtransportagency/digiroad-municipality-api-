@@ -73,6 +73,11 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   const nearbyLinksList = allRoadLinks.map((link) => featureNearbyLinksSchema.cast(link));
 
   let rejectsAmount = 0;
+  /**
+   * Matches closest road link for each feature. Used in Array.prototype.map().
+   * @param feature
+   * @returns Feature with closest link params.
+   */
   const mapMatches = (feature: ValidFeature) => {
     const nearbyLinks = nearbyLinksList.find(
       (link) => link.id === feature.properties.ID && link.type === feature.properties.TYPE
