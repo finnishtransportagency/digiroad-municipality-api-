@@ -49,20 +49,23 @@ export const getLinkBearing = (start: Coordinate, end: Coordinate): number => {
  * @param {number} bearingA - The first bearing in degrees
  * @param {number} bearingB - The second bearing in degrees
  */
-export const similarBearing = (bearingA: number, bearingB: number): boolean => {
+export const similarBearing = (
+  bearingA: number,
+  bearingB: number,
+  bothDirections = false
+): boolean => {
   if (bearingA < 0 || bearingA > 360 || bearingB < 0 || bearingB > 360)
     throw new Error('Invalid bearings');
   const diff = Math.abs(bearingA - bearingB);
-  return diff <= 45 || diff >= 315;
+  return bothDirections
+    ? diff <= 45 || (diff > 135 && diff <= 225) || diff > 315
+    : diff <= 45 || diff >= 315;
 };
 
 export const pointOnLine = (
   lineCoordinates: [[number, number], [number, number]],
   pointCoordinates: [number, number]
 ): boolean => {
-  /* const EXTENT = 0.5; */
-  /* const wgsLineString = lineCoordinates.map((c) => proj4('EPSG:3067', 'EPSG:4326', c));
-  const wgsPoint = proj4('EPSG:3067', 'EPSG:4326', pointCoordinates); */
   const lineString: LineString = {
     type: 'LineString',
     coordinates: lineCoordinates
@@ -71,12 +74,5 @@ export const pointOnLine = (
     type: 'Point',
     coordinates: pointCoordinates
   };
-  /* const lineBuffer = buffer(lineString, EXTENT, { units: 'meters' });
-  if (!lineBuffer)
-    throw new Error(
-      `Failed to create line buffer.\n Line coordinates: ${String(
-        lineCoordinates
-      )}\n Point coordinates: ${String(pointCoordinates)}`
-    ); */
   return booleanPointOnLine(point, lineString, { epsilon: 5e-8 });
 };

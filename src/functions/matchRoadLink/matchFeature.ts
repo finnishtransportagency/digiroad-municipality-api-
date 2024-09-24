@@ -1,4 +1,4 @@
-import { Feature, ValidFeature } from '@customTypes/featureTypes';
+import { Feature, TrafficSignType, ValidFeature } from '@customTypes/featureTypes';
 import { FeatureNearbyLinks } from '@customTypes/roadLinkTypes';
 import { MAX_OFFSET } from '@functions/config';
 import { invalidFeature } from '@libs/schema-tools';
@@ -8,27 +8,36 @@ import LineString from 'ol/geom/LineString.js';
 import { Coordinate } from 'ol/coordinate';
 
 const isSimilarBearing = (
-  feature: ValidFeature,
+  feature: TrafficSignType,
   link: FeatureNearbyLinks['roadlinks'][0],
   closestPoint: Coordinate
 ) => {
-  if (feature.properties.TYPE === GeoJsonFeatureType.TrafficSign) {
-    const segmentStartPoint = link.points.slice(0, -1).find((point, i) => {
-      const nextPoint = link.points[i + 1];
-      return pointOnLine(
-        [
-          [point.x, point.y],
-          [nextPoint.x, nextPoint.y]
-        ],
-        [closestPoint[0], closestPoint[1]]
-      );
-    });
-    const segmentBearing = segmentStartPoint
-      ? getLinkBearing([segmentStartPoint.x, segmentStartPoint.y], closestPoint)
-      : NaN;
-    return similarBearing(segmentBearing, feature.properties.SUUNTIMA);
+  const segmentStartPoint = link.points.slice(0, -1).find((point, i) => {
+    const nextPoint = link.points[i + 1];
+    return pointOnLine(
+      [
+        [point.x, point.y],
+        [nextPoint.x, nextPoint.y]
+      ],
+      [closestPoint[0], closestPoint[1]]
+    );
+  });
+  const segmentBearing = segmentStartPoint
+    ? getLinkBearing([segmentStartPoint.x, segmentStartPoint.y], closestPoint)
+    : NaN;
+  const bearing = feature.properties.SUUNTIMA;
+  const towardsDigitizing = bearing > 270 || bearing <= 90;
+  const accepted = similarBearing(bearing, segmentBearing, true);
+  switch (link.directiontype) {
+    case 0:
+      return accepted;
+    case 1:
+      return accepted && towardsDigitizing;
+    case 2:
+      return accepted && !towardsDigitizing;
+    default:
+      return false;
   }
-  return false;
 };
 
 const getClosestLink = (
@@ -68,14 +77,17 @@ const getClosestLink = (
         closestZ
       };
 
-      if (feature.properties.TYPE === GeoJsonFeatureType.TrafficSign) {
+      if (
+        ((f: ValidFeature): f is TrafficSignType =>
+          f.properties.TYPE === GeoJsonFeatureType.TrafficSign)(feature)
+      ) {
         return closest.distance > distance &&
           isSimilarBearing(feature, link, closestPoint)
           ? similarLink
           : closest;
       }
 
-      return closest.distance < distance ? closest : similarLink;
+      return closest.distance > distance ? similarLink : closest;
     },
     {
       link: undefined,
@@ -94,7 +106,7 @@ const getClosestLink = (
     }
   );
   if (closestLink.distance > MAX_OFFSET)
-    return invalidFeature(feature, 'No links close enough to asset.');
+    return invalidFeature(feature, 'MAX_OFFSET too small');
 
   return {
     ...feature,
@@ -116,8 +128,7 @@ const matchFeature = (
   feature: ValidFeature,
   nearbyLinks: FeatureNearbyLinks['roadlinks']
 ): Feature => {
-  if (nearbyLinks.length < 1)
-    return invalidFeature(feature, 'No links close enough to asset.');
+  if (nearbyLinks.length < 1) return invalidFeature(feature, 'No nearby links');
   switch (feature.properties.TYPE) {
     case GeoJsonFeatureType.Obstacle: {
       return getClosestLink(feature, nearbyLinks);
