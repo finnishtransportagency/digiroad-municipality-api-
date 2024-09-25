@@ -11,7 +11,7 @@ export default async function execCreatedObstacle(
   const obstacleProperties: ObstacleProperties = feature.properties as ObstacleProperties;
 
   const assetTypeID = 220;
-  
+
   /** Selects existing asset checking if the id is same */
   const checkExistingAssetQuery = {
     text: `

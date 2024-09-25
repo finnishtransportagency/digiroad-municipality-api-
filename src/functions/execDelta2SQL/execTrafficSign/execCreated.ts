@@ -90,9 +90,9 @@ export default async function execCreatedTrafficSign(
 
   await client.query(valueQuery);
 
-  /** 
-   * Selects property corresponding to @param publicId . 
-   * Inserts into number_property_value value from @param value . 
+  /**
+   * Selects property corresponding to @param publicId .
+   * Inserts into number_property_value value from @param value .
    */
   async function numberQuery(publicId: string, value: number) {
     const query = {
@@ -116,8 +116,8 @@ export default async function execCreatedTrafficSign(
 
   await numberQuery('terrain_coordinates_y', feature.geometry.coordinates[1] as number);
 
-  /** 
-   * Selects the traffic sign property id and enumerated value id corresponding to the type of 
+  /**
+   * Selects the traffic sign property id and enumerated value id corresponding to the type of
    * traffic sign. Inserts into single_choice_value these values for asset being created.
    */
   const typeQuery = {
@@ -140,9 +140,9 @@ export default async function execCreatedTrafficSign(
   };
   await client.query(typeQuery);
 
-  /** 
-   * Selects property id corresponding to @param publicId . 
-   * Inserts into text_property_value value @param value 
+  /**
+   * Selects property id corresponding to @param publicId .
+   * Inserts into text_property_value value @param value
    */
   async function textQuery(publicId: string, value: string) {
     if (!value) return;
@@ -171,7 +171,7 @@ export default async function execCreatedTrafficSign(
    * Selects property id corresponding to @param publicId and enumerated value id corresponding to @param value.
    * Inserts into single_choice_value the chosen value for asset being processed.
    */
-  
+
   async function singleChoiseQuery(publicId: string, value: number) {
     const enumeratedValue = value ? value : 99;
 

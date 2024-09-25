@@ -10,11 +10,20 @@ import execExpiredTrafficSign from './execTrafficSign/execExpired';
 
 import { bucketName } from '@functions/config';
 import { getFromS3 } from '@libs/s3-tools';
-import { getPostgresClient } from '@libs/pg-tools';
+import { executeTransaction, getPostgresClient } from '@libs/pg-tools';
+import { isUpdatePayload, S3KeyObject } from '@customTypes/eventTypes';
+import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
 
-const execDelta2SQL = async (event) => {
-  const data = await getFromS3(bucketName, event.key);
-  const delta = JSON.parse(data) as unknown;
+const execDelta2SQL = async (event: S3KeyObject) => {
+  const s3Response = JSON.parse(await getFromS3(bucketName, event.key)) as unknown;
+  const delta = updatePayloadSchema.cast(s3Response);
+  if (!isUpdatePayload(delta))
+    throw new Error(
+      `S3 object ${event.key} is not valid UpdatePayload object:\n${JSON.stringify(
+        delta
+      ).slice(0, 1000)}`
+    );
+  console.log('delta:');
 
   const client = await getPostgresClient();
   await client.connect();
@@ -23,7 +32,11 @@ const execDelta2SQL = async (event) => {
 
   const dbmodifier = `municipality-api-${municipality}`;
 
-  try {
+  const queryFunctions = 
+
+  await executeTransaction(queryFunctions, (e) => console.error(e));
+
+  /* try {
     await client.query('BEGIN');
     const municipality_code: number = parseInt(
       (
@@ -73,7 +86,7 @@ const execDelta2SQL = async (event) => {
   }
 
   await client.end();
-  return;
+  return; */
 };
 
 export const main = middyfy(execDelta2SQL);
