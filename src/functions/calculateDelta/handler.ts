@@ -3,7 +3,12 @@ import { isEqual } from 'lodash';
 import { deleteFromS3, getFromS3, listS3Objects, uploadToS3 } from '@libs/s3-tools';
 import { S3Event } from 'aws-lambda';
 import { bucketName } from '@functions/config';
-import { AssetTypeKey, UpdatePayload, isAssetTypeKey } from '@customTypes/eventTypes';
+import {
+  AssetTypeKey,
+  isAssetTypeKey,
+  isSupportedMunicipality,
+  UpdatePayload
+} from '@customTypes/eventTypes';
 import {
   geoJsonSchema,
   obstacleFeatureSchema,
@@ -26,7 +31,8 @@ const calculateDelta = async (event: S3Event) => {
    * @example geojson/espoo/obstacles/2024-07-11T13:55:21.json
    */
   const updateObjectKey: string = event.Records[0].s3.object.key;
-  const municipality: string = updateObjectKey.split('/')[1];
+  const municipality = updateObjectKey.split('/')[1];
+  if (!isSupportedMunicipality(municipality)) throw new Error('Invalid municipality');
   const assetType: string = updateObjectKey.split('/')[2];
   if (!isAssetTypeKey(assetType)) throw new Error('Invalid assetType');
 

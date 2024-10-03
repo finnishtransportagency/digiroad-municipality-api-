@@ -5,9 +5,9 @@ import { bucketName, MAX_OFFSET } from '@functions/config';
 import {
   GetNearbyLinksPayload,
   isS3KeyObject,
-  isUpdatePayload,
+  isMatchedPayload,
   S3KeyObject,
-  UpdatePayload
+  MatchedPayload
 } from '@customTypes/eventTypes';
 import { InvalidFeature, MatchedFeature, ValidFeature } from '@customTypes/featureTypes';
 import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
@@ -20,7 +20,7 @@ const now = new Date().toISOString().slice(0, 19);
 const matchRoadLinks = async (event: S3KeyObject) => {
   const s3Response = JSON.parse(await getFromS3(bucketName, event.key)) as unknown;
   const updatePayload = updatePayloadSchema.cast(s3Response);
-  if (!isUpdatePayload(updatePayload))
+  if (!isMatchedPayload(updatePayload))
     throw new Error(
       `S3 object ${event.key} is not valid UpdatePayload object:\n${JSON.stringify(
         updatePayload
@@ -108,7 +108,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
   const createdFeatures = updatePayload.Created.map(mapMatches);
   const updatedFeatures = updatePayload.Updated.map(mapMatches);
 
-  const execDelta2SQLBody: UpdatePayload = {
+  const execDelta2SQLBody: MatchedPayload = {
     Created: createdFeatures.filter(
       (feature): feature is MatchedFeature => feature.type === 'Feature'
     ),

@@ -15,7 +15,7 @@ type ObstacleType = InferType<typeof obstacleFeatureSchema>;
 type TrafficSignType = InferType<typeof trafficSignFeatureSchema>;
 type AdditionalPanelType = InferType<typeof additionalPanelFeatureSchema>;
 
-type ValidFeature = ObstacleType | TrafficSignType;
+type ValidFeature = ObstacleType | TrafficSignType | AdditionalPanelType;
 
 type MatchedTrafficSignType = InferType<typeof matchedTrafficSignSchema>;
 type MatchedObstacleType = InferType<typeof matchedObstacleSchema>;

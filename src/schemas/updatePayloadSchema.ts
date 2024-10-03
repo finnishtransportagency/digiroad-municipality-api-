@@ -1,3 +1,4 @@
+import { supportedMunicipalities } from '@functions/config';
 import { arrayOfValidFeature } from '@libs/schema-tools';
 import { array, number, object, string } from 'yup';
 
@@ -9,7 +10,7 @@ const updatePayloadSchema = object({
   Updated: arrayOfValidFeature('metadata.assetType').required(),
   Deleted: arrayOfValidFeature('metadata.assetType').required(),
   metadata: object({
-    municipality: string().oneOf(['espoo', 'helsinki']).required(),
+    municipality: string().oneOf(supportedMunicipalities).required(),
     assetType: string().oneOf(['obstacles', 'trafficSigns']).required()
   }).required(),
   invalidInfrao: object({

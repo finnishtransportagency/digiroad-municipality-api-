@@ -2,7 +2,7 @@ import { middyfy } from '@libs/lambda-tools';
 import { bucketName } from '@functions/config';
 import { getFromS3 } from '@libs/s3-tools';
 import { executeTransaction } from '@libs/pg-tools';
-import { isUpdatePayload, S3KeyObject } from '@customTypes/eventTypes';
+import { isMatchedPayload, S3KeyObject } from '@customTypes/eventTypes';
 import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
 import execInsert from './execInsert';
 import { municipalityCodeMap } from '@schemas/dbIdMapping';
@@ -13,7 +13,7 @@ import execDelete from './execDelete';
 const execDelta2SQL = async (event: S3KeyObject) => {
   const s3Response = JSON.parse(await getFromS3(bucketName, event.key)) as unknown;
   const delta = updatePayloadSchema.cast(s3Response);
-  if (!isUpdatePayload(delta))
+  if (!isMatchedPayload(delta))
     throw new Error(
       `S3 object ${event.key} is not valid UpdatePayload object:\n${JSON.stringify(
         delta

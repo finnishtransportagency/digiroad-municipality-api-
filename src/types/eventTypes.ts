@@ -2,6 +2,13 @@ import { InferType } from 'yup';
 import { MatchedFeature, ValidFeature } from './featureTypes';
 import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
 import { gnlPayloadSchema } from '@schemas/getNearbyLinksSchema';
+import { supportedMunicipalities } from '@functions/config';
+
+type SupportedMunicipality = (typeof supportedMunicipalities)[number];
+export const isSupportedMunicipality = (
+  municipality: string
+): municipality is SupportedMunicipality =>
+  supportedMunicipalities.includes(municipality as SupportedMunicipality);
 
 type ApiResponseType = 'gml' | 'xml' | 'json' | 'helsinki';
 const isApiResponseType = (responseType: unknown): responseType is ApiResponseType => {
@@ -48,11 +55,26 @@ export type UpdatePayload = Pick<
   InferType<typeof updatePayloadSchema>,
   'metadata' | 'invalidInfrao'
 > & {
+  Created: Array<ValidFeature>;
+  Updated: Array<ValidFeature>;
+  Deleted: Array<ValidFeature>;
+};
+export const isUpdatePayload = (payload: unknown): payload is UpdatePayload => {
+  return updatePayloadSchema.isValidSync(payload);
+};
+
+/**
+ * Payload saved to S3 by calculateDelta
+ */
+export type MatchedPayload = Pick<
+  InferType<typeof updatePayloadSchema>,
+  'metadata' | 'invalidInfrao'
+> & {
   Created: Array<MatchedFeature>;
   Updated: Array<MatchedFeature>;
   Deleted: Array<MatchedFeature>;
 };
-export const isUpdatePayload = (payload: unknown): payload is UpdatePayload => {
+export const isMatchedPayload = (payload: unknown): payload is MatchedPayload => {
   return updatePayloadSchema.isValidSync(payload);
 };
 
