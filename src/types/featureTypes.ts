@@ -1,6 +1,8 @@
 import {
   additionalPanelFeatureSchema,
   geoJsonSchema,
+  matchedObstacleSchema,
+  matchedTrafficSignSchema,
   obstacleFeatureSchema,
   trafficSignFeatureSchema
 } from '@schemas/geoJsonSchema';
@@ -14,6 +16,11 @@ type TrafficSignType = InferType<typeof trafficSignFeatureSchema>;
 type AdditionalPanelType = InferType<typeof additionalPanelFeatureSchema>;
 
 type ValidFeature = ObstacleType | TrafficSignType;
+
+type MatchedTrafficSignType = InferType<typeof matchedTrafficSignSchema>;
+type MatchedObstacleType = InferType<typeof matchedObstacleSchema>;
+
+type MatchedFeature = MatchedTrafficSignType | MatchedObstacleType;
 
 interface InvalidFeature {
   type: 'Invalid';
@@ -44,5 +51,6 @@ export {
   InvalidFeature,
   Feature,
   FeatureCollection,
-  AdditionalPanelParseObject
+  AdditionalPanelParseObject,
+  MatchedFeature
 };

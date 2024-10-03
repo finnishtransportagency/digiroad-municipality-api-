@@ -1,4 +1,9 @@
-import { Feature, TrafficSignType, ValidFeature } from '@customTypes/featureTypes';
+import {
+  InvalidFeature,
+  MatchedFeature,
+  TrafficSignType,
+  ValidFeature
+} from '@customTypes/featureTypes';
 import { FeatureNearbyLinks } from '@customTypes/roadLinkTypes';
 import { MAX_OFFSET } from '@functions/config';
 import { invalidFeature } from '@libs/schema-tools';
@@ -30,20 +35,27 @@ const isSimilarBearing = (
   const accepted = similarBearing(bearing, segmentBearing, true);
   switch (link.directiontype) {
     case 0:
-      return accepted;
+      return { accepted, segmentBearing };
     case 1:
-      return accepted && towardsDigitizing;
+      return { accepted: accepted && towardsDigitizing, segmentBearing };
     case 2:
-      return accepted && !towardsDigitizing;
+      return { accepted: accepted && !towardsDigitizing, segmentBearing };
     default:
-      return false;
+      return { accepted: false, segmentBearing: undefined };
   }
 };
 
-const getClosestLink = (
+const matchFeature = (
   feature: ValidFeature,
   nearbyLinks: FeatureNearbyLinks['roadlinks']
-): Feature => {
+): MatchedFeature | InvalidFeature => {
+  if (nearbyLinks.length < 1) return invalidFeature(feature, 'No nearby links');
+  if (
+    feature.properties.TYPE !== GeoJsonFeatureType.TrafficSign &&
+    feature.properties.TYPE !== GeoJsonFeatureType.Obstacle
+  )
+    return invalidFeature(feature, `AssetType not supported by matchFeature.`);
+
   const featureCoords = feature.geometry.coordinates;
   const closestLink = nearbyLinks.reduce(
     (closest, link) => {
@@ -81,10 +93,13 @@ const getClosestLink = (
         ((f: ValidFeature): f is TrafficSignType =>
           f.properties.TYPE === GeoJsonFeatureType.TrafficSign)(feature)
       ) {
-        return closest.distance > distance &&
-          isSimilarBearing(feature, link, closestPoint)
-          ? similarLink
-          : closest;
+        const { accepted, segmentBearing } = isSimilarBearing(
+          feature,
+          link,
+          closestPoint
+        );
+        const newSimilarLink = { ...similarLink, segmentBearing };
+        return closest.distance > distance && accepted ? newSimilarLink : closest;
       }
 
       return closest.distance > distance ? similarLink : closest;
@@ -103,10 +118,28 @@ const getClosestLink = (
       closestX: number;
       closestY: number;
       closestZ: number;
+      segmentBearing?: number;
     }
   );
   if (closestLink.distance > MAX_OFFSET)
     return invalidFeature(feature, 'MAX_OFFSET too small');
+
+  const latDiff = feature.geometry.coordinates[1] - closestLink.closestY;
+  const lonDiff = feature.geometry.coordinates[0] - closestLink.closestX;
+
+  const towardsDigitizing = closestLink.segmentBearing
+    ? ((closestLink.segmentBearing <= 45 || closestLink.segmentBearing > 315) &&
+        lonDiff > 0) ||
+      (closestLink.segmentBearing <= 135 &&
+        closestLink.segmentBearing > 45 &&
+        latDiff < 0) ||
+      (closestLink.segmentBearing <= 225 &&
+        closestLink.segmentBearing > 135 &&
+        lonDiff < 0) ||
+      (closestLink.segmentBearing <= 315 &&
+        closestLink.segmentBearing > 225 &&
+        latDiff > 0)
+    : undefined;
 
   return {
     ...feature,
@@ -119,26 +152,10 @@ const getClosestLink = (
         x: closestLink.closestX,
         y: closestLink.closestY,
         z: closestLink.closestZ
-      }
+      },
+      TOWARDSDIGITIZING: towardsDigitizing
     }
-  } as ValidFeature;
-};
-
-const matchFeature = (
-  feature: ValidFeature,
-  nearbyLinks: FeatureNearbyLinks['roadlinks']
-): Feature => {
-  if (nearbyLinks.length < 1) return invalidFeature(feature, 'No nearby links');
-  switch (feature.properties.TYPE) {
-    case GeoJsonFeatureType.Obstacle: {
-      return getClosestLink(feature, nearbyLinks);
-    }
-    case GeoJsonFeatureType.TrafficSign:
-      return getClosestLink(feature, nearbyLinks);
-    default:
-      break;
-  }
-  return invalidFeature(feature, `AssetType not supported by matchFeature.`);
+  } as MatchedFeature;
 };
 
 export default matchFeature;

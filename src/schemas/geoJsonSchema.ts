@@ -1,4 +1,4 @@
-import { array, number, object, string } from 'yup';
+import { array, boolean, number, object, string } from 'yup';
 import {
   allowedAdditionalPanels,
   allowedSpeedLimits,
@@ -14,22 +14,12 @@ enum GeoJsonFeatureType {
 }
 
 // v--------------- PROPERTIES ---------------v //
-const matchablePropertiesSchema = object({
-  ID: string().required(),
-  DR_LINK_ID: string().notRequired(),
-  DR_M_VALUE: number().notRequired(),
-  DR_OFFSET: number().notRequired(),
-  DR_GEOMETRY: object({
-    x: number().notRequired(),
-    y: number().notRequired(),
-    z: number().default(0).notRequired()
-  }).notRequired()
-});
 
 /**
  * @field EST_TYYPPI: 1 = Suljettu yhteys, 2 = Avattava puomi
  */
-const obstaclePropertiesSchema = matchablePropertiesSchema.shape({
+const obstaclePropertiesSchema = object({
+  ID: string().required(),
   TYPE: string().oneOf([GeoJsonFeatureType.Obstacle]).required(),
   EST_TYYPPI: number().required().oneOf([1, 2])
 });
@@ -70,51 +60,77 @@ const additionalPanelPropertiesSchema = object({
  * @field KUNTO: 1 = Erittäin huono, 2 = Huono, 3 = Tyydyttävä, 4 = Hyvä, 5 = Erittäin hyvä
  * @field KOKO: 1 = Pienikokoinen merkki, 2 = Normaalikokoinen merkki (oletus), 3 = Suurikokoinen merkki
  */
-const trafficSignPropertiesSchema = matchablePropertiesSchema
+const trafficSignPropertiesSchema = object({
+  ID: string().required(),
+  TYPE: string().oneOf([GeoJsonFeatureType.TrafficSign]).required(),
+  SUUNTIMA: number().required().max(360).min(0),
+  LM_TYYPPI: string().required().oneOf(allowedTrafficSigns),
+  ARVO: trafficSignValueSchema,
+  TEKSTI: string().max(128).notRequired(),
+  LISATIETO: string().notRequired(),
+  RAKENNE: number().oneOf([1, 2, 3, 4, 5, 6]).notRequired(),
+  KUNTO: number().oneOf([1, 2, 3, 4, 5]).notRequired(),
+  KOKO: number().oneOf([1, 2, 3]).notRequired(),
+  LISAKILVET: array()
+    .of(additionalPanelPropertiesSchema)
+    .when('LM_TYYPPI', {
+      is: (value: string) => value[0] === 'H',
+      then: (schema) => schema.notRequired(),
+      otherwise: (schema) => schema.required().max(5)
+    })
+    .required()
+}).required();
+// ^------------------------------------------^ //
+
+// v---------- ADDITIONAL PROPERTIES ---------v //
+const matchedPropertiesSchema = object({
+  DR_LINK_ID: string().required(),
+  DR_M_VALUE: number().required(),
+  DR_OFFSET: number().required(),
+  DR_GEOMETRY: object({
+    x: number().required(),
+    y: number().required(),
+    z: number().default(0).notRequired()
+  }).required()
+});
+
+const matchedTrafficSignPropertiesSchema = trafficSignPropertiesSchema
+  .concat(matchedPropertiesSchema)
   .shape({
-    TYPE: string().oneOf([GeoJsonFeatureType.TrafficSign]).required(),
-    SUUNTIMA: number().required().max(360).min(0),
-    LM_TYYPPI: string().required().oneOf(allowedTrafficSigns),
-    ARVO: trafficSignValueSchema,
-    TEKSTI: string().max(128).notRequired(),
-    LISATIETO: string().notRequired(),
-    RAKENNE: number().oneOf([1, 2, 3, 4, 5, 6]).notRequired(),
-    KUNTO: number().oneOf([1, 2, 3, 4, 5]).notRequired(),
-    KOKO: number().oneOf([1, 2, 3]).notRequired(),
-    LISAKILVET: array()
-      .of(additionalPanelPropertiesSchema)
-      .when('LM_TYYPPI', {
-        is: (value: string) => value[0] === 'H',
-        then: (schema) => schema.notRequired(),
-        otherwise: (schema) => schema.required().max(5)
-      })
-      .required()
-  })
-  .required();
+    TOWARDSDIGITIZING: boolean().required()
+  });
+
+const matchedObstaclePropertiesSchema = obstaclePropertiesSchema.concat(
+  matchedPropertiesSchema
+);
 // ^------------------------------------------^ //
 
 // v---------------- FEATURES ----------------v //
-const obstacleFeatureSchema = object({
+const geoJsonFeatureSchema = object({
   type: string().oneOf(['Feature']).required(),
   id: string().required(),
-  properties: obstaclePropertiesSchema,
   geometry: pointGeometrySchema.required()
 });
 
-const trafficSignFeatureSchema = object({
-  type: string().oneOf(['Feature']).required(),
-  id: string().required(),
-  properties: trafficSignPropertiesSchema,
-  geometry: pointGeometrySchema.required()
+const obstacleFeatureSchema = geoJsonFeatureSchema.shape({
+  properties: obstaclePropertiesSchema
 });
 
-const additionalPanelFeatureSchema = object({
-  type: string().oneOf(['Feature']).required(),
-  id: string().required(),
-  properties: additionalPanelPropertiesSchema,
-  geometry: pointGeometrySchema.required()
+const trafficSignFeatureSchema = geoJsonFeatureSchema.shape({
+  properties: trafficSignPropertiesSchema
 });
 
+const additionalPanelFeatureSchema = geoJsonFeatureSchema.shape({
+  properties: additionalPanelPropertiesSchema
+});
+
+const matchedTrafficSignSchema = geoJsonFeatureSchema.shape({
+  properties: matchedTrafficSignPropertiesSchema
+});
+
+const matchedObstacleSchema = geoJsonFeatureSchema.shape({
+  properties: matchedObstaclePropertiesSchema
+});
 // ^------------------------------------------^ //
 
 /**
@@ -142,5 +158,7 @@ export {
   geoJsonSchema,
   obstacleFeatureSchema,
   trafficSignFeatureSchema,
-  additionalPanelFeatureSchema
+  additionalPanelFeatureSchema,
+  matchedTrafficSignSchema,
+  matchedObstacleSchema
 };

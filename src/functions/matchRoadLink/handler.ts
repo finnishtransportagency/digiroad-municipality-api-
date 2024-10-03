@@ -9,7 +9,7 @@ import {
   S3KeyObject,
   UpdatePayload
 } from '@customTypes/eventTypes';
-import { ValidFeature } from '@customTypes/featureTypes';
+import { InvalidFeature, MatchedFeature, ValidFeature } from '@customTypes/featureTypes';
 import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
 import { featureNearbyLinksSchema } from '@schemas/featureNearbyLinksSchema';
 import matchFeature from './matchFeature';
@@ -83,13 +83,13 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     features: [] as Array<ValidFeature>
   };
   let rejectsAmount = 0;
+
   /**
    * Matches closest road link for each feature. Used in Array.prototype.map().
    * @param feature
    * @returns Feature with closest link params.
    */
-
-  const mapMatches = (feature: ValidFeature) => {
+  const mapMatches = (feature: ValidFeature): MatchedFeature | InvalidFeature => {
     const nearbyLinks = nearbyLinksList.find(
       (link) => link.id === feature.properties.ID && link.type === feature.properties.TYPE
     );
@@ -110,10 +110,10 @@ const matchRoadLinks = async (event: S3KeyObject) => {
 
   const execDelta2SQLBody: UpdatePayload = {
     Created: createdFeatures.filter(
-      (feature): feature is ValidFeature => feature.type === 'Feature'
+      (feature): feature is MatchedFeature => feature.type === 'Feature'
     ),
     Updated: updatedFeatures.filter(
-      (feature): feature is ValidFeature => feature.type === 'Feature'
+      (feature): feature is MatchedFeature => feature.type === 'Feature'
     ),
     Deleted: updatePayload.Deleted,
     invalidInfrao: updatePayload.invalidInfrao,

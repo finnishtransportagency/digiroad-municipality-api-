@@ -1,5 +1,5 @@
 import { InferType } from 'yup';
-import { ValidFeature } from './featureTypes';
+import { MatchedFeature, ValidFeature } from './featureTypes';
 import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
 import { gnlPayloadSchema } from '@schemas/getNearbyLinksSchema';
 
@@ -48,9 +48,9 @@ export type UpdatePayload = Pick<
   InferType<typeof updatePayloadSchema>,
   'metadata' | 'invalidInfrao'
 > & {
-  Created: Array<ValidFeature>;
-  Updated: Array<ValidFeature>;
-  Deleted: Array<ValidFeature>;
+  Created: Array<MatchedFeature>;
+  Updated: Array<MatchedFeature>;
+  Deleted: Array<MatchedFeature>;
 };
 export const isUpdatePayload = (payload: unknown): payload is UpdatePayload => {
   return updatePayloadSchema.isValidSync(payload);
