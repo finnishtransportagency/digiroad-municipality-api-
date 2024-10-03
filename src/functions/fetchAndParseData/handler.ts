@@ -16,7 +16,8 @@ import {
   offlineApiKey,
   stage,
   bbox,
-  bucketName
+  bucketName,
+  helsinkiBbox
 } from '@functions/config';
 import { middyfy } from '@libs/lambda-tools';
 import { uploadToS3 } from '@libs/s3-tools';
@@ -315,7 +316,7 @@ const fetchHelsinkiData = async (
     const { data }: { data: unknown } = await axios.get(
       `${baseUrl}/${assetType as string}/?geo_format=geojson&limit=${fetchSize}&offset=${
         page * fetchSize
-      }`
+      }${helsinkiBbox}`
     );
     const helsinkiFeatureCollection = helsinkiJsonSchema.validateSync(data);
     const parsedFeatures: Array<Feature> = helsinkiFeatureCollection.results.map(

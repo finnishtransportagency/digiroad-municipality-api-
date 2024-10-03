@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import type { Serverless } from 'serverless/aws';
 import * as dotenv from 'dotenv';
 dotenv.config();
