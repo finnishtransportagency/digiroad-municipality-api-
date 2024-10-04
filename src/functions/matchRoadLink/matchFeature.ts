@@ -7,7 +7,12 @@ import {
 import { FeatureNearbyLinks } from '@customTypes/roadLinkTypes';
 import { MAX_OFFSET } from '@functions/config';
 import { invalidFeature } from '@libs/schema-tools';
-import { pointOnLine, getLinkBearing, similarBearing } from '@libs/spatial-tools';
+import {
+  pointOnLine,
+  getLinkBearing,
+  similarBearing,
+  oppositeBearing
+} from '@libs/spatial-tools';
 import { GeoJsonFeatureType } from '@schemas/geoJsonSchema';
 import LineString from 'ol/geom/LineString.js';
 import { Coordinate } from 'ol/coordinate';
@@ -127,19 +132,19 @@ const matchFeature = (
   const latDiff = feature.geometry.coordinates[1] - closestLink.closestY;
   const lonDiff = feature.geometry.coordinates[0] - closestLink.closestX;
 
-  const towardsDigitizing = closestLink.segmentBearing
-    ? ((closestLink.segmentBearing <= 45 || closestLink.segmentBearing > 315) &&
-        lonDiff > 0) ||
-      (closestLink.segmentBearing <= 135 &&
-        closestLink.segmentBearing > 45 &&
-        latDiff < 0) ||
-      (closestLink.segmentBearing <= 225 &&
-        closestLink.segmentBearing > 135 &&
-        lonDiff < 0) ||
-      (closestLink.segmentBearing <= 315 &&
-        closestLink.segmentBearing > 225 &&
-        latDiff > 0)
+  const segmentBearing = closestLink.segmentBearing;
+
+  const towardsDigitizing = segmentBearing
+    ? ((segmentBearing <= 45 || segmentBearing > 315) && lonDiff > 0) ||
+      (segmentBearing <= 135 && segmentBearing > 45 && latDiff < 0) ||
+      (segmentBearing <= 225 && segmentBearing > 135 && lonDiff < 0) ||
+      (segmentBearing <= 315 && segmentBearing > 225 && latDiff > 0)
     : undefined;
+
+  const signBearing =
+    towardsDigitizing || !segmentBearing
+      ? segmentBearing
+      : oppositeBearing(segmentBearing);
 
   return {
     ...feature,
@@ -153,6 +158,7 @@ const matchFeature = (
         y: closestLink.closestY,
         z: closestLink.closestZ
       },
+      SUUNTIMA: signBearing ? Math.round(signBearing) : undefined,
       TOWARDSDIGITIZING: towardsDigitizing
     }
   } as MatchedFeature;

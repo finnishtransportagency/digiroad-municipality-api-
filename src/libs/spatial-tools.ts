@@ -74,6 +74,17 @@ export const similarBearing = (
     : diff <= 45 || diff >= 315;
 };
 
+/**
+ * Turns bearing around 180 degrees and returns the opposite direction between 0 and 360.
+ *
+ * @param bearing Bearing in degrees
+ * @returns Opposite direction in degrees
+ */
+export const oppositeBearing = (bearing: number) => {
+  const bearingModulo = bearing < 0 ? 360 - (bearing % 360) : bearing % 360;
+  return bearingModulo <= 180 ? bearingModulo + 180 : bearingModulo - 180;
+};
+
 export const pointOnLine = (
   lineCoordinates: [[number, number], [number, number]],
   pointCoordinates: [number, number]
