@@ -2,6 +2,18 @@ import { PointCoordinates } from '@customTypes/featureTypes';
 import booleanPointOnLine from '@turf/boolean-point-on-line';
 import { Point, LineString } from 'geojson';
 import { Coordinate } from 'ol/coordinate';
+import proj4 from 'proj4';
+
+proj4.defs(
+  'EPSG:3879',
+  '+proj=tmerc +lat_0=0 +lon_0=25 +k=1 +x_0=25500000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs'
+);
+proj4.defs(
+  'EPSG:3067',
+  '+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs'
+);
+export const helsinkiCoordTransform = (coords: [number, number]) =>
+  proj4('EPSG:3879', 'EPSG:3067').forward(coords);
 
 /**
  * Calculates the distance between two points

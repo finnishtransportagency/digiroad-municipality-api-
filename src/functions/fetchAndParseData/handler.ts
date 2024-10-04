@@ -209,7 +209,7 @@ const fetchAdditionalPanelsHelsinki = async (
     const { data }: { data: unknown } = await axios.get(
       `${baseUrl}/additional-sign-reals/?geo_format=geojson&limit=${fetchSize}&offset=${
         page * fetchSize
-      }`
+      }${helsinkiBbox}`
     );
     const helsinkiFeatureCollection = helsinkiJsonSchema.validateSync(data);
     const parsedPanels =

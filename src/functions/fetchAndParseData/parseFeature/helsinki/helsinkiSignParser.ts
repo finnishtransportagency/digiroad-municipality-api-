@@ -6,6 +6,7 @@ import {
 } from '@customTypes/featureTypes';
 import { SignMap } from '@customTypes/mapTypes';
 import { invalidFeature } from '@libs/schema-tools';
+import { helsinkiCoordTransform } from '@libs/spatial-tools';
 import {
   additionalPanelFeatureSchema,
   GeoJsonFeatureType,
@@ -51,6 +52,11 @@ export default (
 
   const numberValue = Number(castedFeature.value);
   const panels = additionalPanels ? additionalPanels[id] ?? [] : [];
+  const gk25coordinates = castedFeature.location.coordinates;
+  const projectedCoordinates = helsinkiCoordTransform([
+    gk25coordinates[0],
+    gk25coordinates[1]
+  ]);
 
   return schema.cast({
     type: 'Feature',
@@ -71,7 +77,7 @@ export default (
     },
     geometry: {
       type: 'Point',
-      coordinates: castedFeature.location.coordinates
+      coordinates: [...projectedCoordinates, 0]
     }
   });
 };
