@@ -71,17 +71,6 @@ const matchRoadLinks = async (event: S3KeyObject) => {
       `S3 object ${allRoadLinksS3Key} is not valid Array<FeatureRoadlinkMap>`
     );
   const nearbyLinksList = allRoadLinks.map((link) => featureNearbyLinksSchema.cast(link));
-  const rejectedGeoJSon = {
-    type: 'FeatureCollection',
-    name: 'rejected',
-    crs: {
-      type: 'name',
-      properties: {
-        name: 'urn:ogc:def:crs:EPSG::3067'
-      }
-    },
-    features: [] as Array<ValidFeature>
-  };
   let rejectsAmount = 0;
 
   /**
@@ -93,16 +82,10 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     const nearbyLinks = nearbyLinksList.find(
       (link) => link.id === feature.properties.ID && link.type === feature.properties.TYPE
     );
-    if (!nearbyLinks) {
-      rejectedGeoJSon.features.push(feature);
-      return invalidFeature(feature, 'No links close enough to asset.');
-    }
+    if (!nearbyLinks) return invalidFeature(feature, 'No links close enough to asset.');
 
     const match = matchFeature(feature, nearbyLinks.roadlinks);
-    if (!match || (match && match.type === 'Invalid')) {
-      rejectsAmount++;
-      rejectedGeoJSon.features.push(feature);
-    }
+    if (!match || (match && match.type === 'Invalid')) rejectsAmount++;
     return match;
   };
   const createdFeatures = updatePayload.Created.map(mapMatches);
@@ -151,12 +134,6 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     bucketName,
     `logs/${updatePayload.metadata.municipality}/${now}.json`,
     JSON.stringify(logsBody)
-  );
-
-  await uploadToS3(
-    bucketName,
-    `rejected/${updatePayload.metadata.municipality}/${now}.json`,
-    JSON.stringify(rejectedGeoJSon)
   );
 
   await invokeLambda(
