@@ -14,8 +14,8 @@ export const invalidFeature = (feature: unknown, reason: string): InvalidFeature
     type: 'Invalid',
     id: '-1',
     properties: {
-      reason: reason,
-      feature: JSON.stringify(feature)
+      reason,
+      feature: feature as Record<string, unknown>
     }
   };
 };

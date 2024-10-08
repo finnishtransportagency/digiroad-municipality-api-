@@ -1,6 +1,7 @@
 import {
   additionalPanelFeatureSchema,
   geoJsonSchema,
+  invalidFeatureSchema,
   matchedObstacleSchema,
   matchedTrafficSignSchema,
   obstacleFeatureSchema,
@@ -22,14 +23,7 @@ type MatchedObstacleType = InferType<typeof matchedObstacleSchema>;
 
 type MatchedFeature = MatchedTrafficSignType | MatchedObstacleType;
 
-interface InvalidFeature {
-  type: 'Invalid';
-  id: string;
-  properties: {
-    reason: string;
-    feature: string;
-  };
-}
+type InvalidFeature = InferType<typeof invalidFeatureSchema>;
 
 type Feature = ValidFeature | InvalidFeature;
 

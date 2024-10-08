@@ -1,4 +1,4 @@
-import { array, boolean, number, object, string } from 'yup';
+import { array, boolean, mixed, number, object, string } from 'yup';
 import {
   allowedAdditionalPanels,
   allowedSpeedLimits,
@@ -131,6 +131,15 @@ const matchedTrafficSignSchema = geoJsonFeatureSchema.shape({
 const matchedObstacleSchema = geoJsonFeatureSchema.shape({
   properties: matchedObstaclePropertiesSchema
 });
+
+const invalidFeatureSchema = object({
+  type: string().oneOf(['Invalid']).required(),
+  id: string().required(),
+  properties: object({
+    reason: string().required(),
+    feature: mixed((i): i is NonNullable<unknown> => true).required()
+  }).required()
+});
 // ^------------------------------------------^ //
 
 /**
@@ -149,7 +158,7 @@ const geoJsonSchema = object({
   features: array().required(), // Content in not checked
   invalidInfrao: object({
     sum: number().required(),
-    IDs: array().default([]).of(string().required()).min(0).required()
+    IDs: array().default([]).of(invalidFeatureSchema.required()).min(0).required()
   }).required()
 }).required();
 
@@ -160,5 +169,6 @@ export {
   trafficSignFeatureSchema,
   additionalPanelFeatureSchema,
   matchedTrafficSignSchema,
-  matchedObstacleSchema
+  matchedObstacleSchema,
+  invalidFeatureSchema
 };

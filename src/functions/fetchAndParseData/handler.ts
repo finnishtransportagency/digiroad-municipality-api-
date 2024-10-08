@@ -153,7 +153,7 @@ const fetchJsonData = async (
 
     geoJson.features.push(...validFeatures);
     geoJson.invalidInfrao.sum += invalidFeatures.length;
-    geoJson.invalidInfrao.IDs.push(...invalidFeatures.map((f) => f.id));
+    geoJson.invalidInfrao.IDs.push(...invalidFeatures);
 
     if (infraoFeatureCollection.numberReturned < fetchSize) break;
     page++;
@@ -337,7 +337,7 @@ const fetchHelsinkiData = async (
 
     geoJson.features.push(...validFeatures);
     geoJson.invalidInfrao.sum += invalidFeatures.length;
-    geoJson.invalidInfrao.IDs.push(...invalidFeatures.map((f) => f.id));
+    geoJson.invalidInfrao.IDs.push(...invalidFeatures);
 
     if (!helsinkiFeatureCollection.next) break;
     page++;
