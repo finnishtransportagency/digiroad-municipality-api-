@@ -17,7 +17,7 @@ const featureNearbyLinksSchema = object({
             })
           )
           .required(),
-        directiontype: number().oneOf([0, 1, 2]).notRequired(),
+        directiontype: number().oneOf([0, 1, 2]).required(),
         roadname: string().notRequired(),
         geometrylength: number().notRequired()
       })

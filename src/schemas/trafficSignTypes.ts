@@ -2947,8 +2947,10 @@ export const trafficSignRules: TrafficSignRules = {
  * @param trafficSignCode e.g. 'A1.1'
  * @returns e.g. 'A1.1 Mutka oikealle'
  */
-export const createTrafficSignText = (trafficSignCode: string): string =>
-  `${trafficSignCode} ${trafficSignRules[trafficSignCode].text}`;
+export const createTrafficSignText = (trafficSignCode: string): string => {
+  const trafficSignText = trafficSignRules[trafficSignCode];
+  return `${trafficSignCode} ${trafficSignText ? trafficSignText.text : 'no text found'}`;
+};
 
 /**
  * Traffic sign codes allowed in Digiroad database.

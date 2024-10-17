@@ -8,47 +8,12 @@ import { FeatureNearbyLinks } from '@customTypes/roadLinkTypes';
 import { MAX_OFFSET } from '@functions/config';
 import { invalidFeature } from '@libs/schema-tools';
 import {
-  pointOnLine,
-  getLinkBearing,
+  oppositeBearing,
   similarBearing,
-  oppositeBearing
+  similarSegmentBearing
 } from '@libs/spatial-tools';
 import { GeoJsonFeatureType } from '@schemas/geoJsonSchema';
 import LineString from 'ol/geom/LineString.js';
-import { Coordinate } from 'ol/coordinate';
-
-const isSimilarBearing = (
-  feature: TrafficSignType,
-  link: FeatureNearbyLinks['roadlinks'][0],
-  closestPoint: Coordinate
-) => {
-  const segmentStartPoint = link.points.slice(0, -1).find((point, i) => {
-    const nextPoint = link.points[i + 1];
-    return pointOnLine(
-      [
-        [point.x, point.y],
-        [nextPoint.x, nextPoint.y]
-      ],
-      [closestPoint[0], closestPoint[1]]
-    );
-  });
-  const segmentBearing = segmentStartPoint
-    ? getLinkBearing([segmentStartPoint.x, segmentStartPoint.y], closestPoint)
-    : NaN;
-  const bearing = feature.properties.SUUNTIMA;
-  const towardsDigitizing = bearing > 270 || bearing <= 90;
-  const accepted = similarBearing(bearing, segmentBearing, true);
-  switch (link.directiontype) {
-    case 0:
-      return { accepted, segmentBearing };
-    case 1:
-      return { accepted: accepted && towardsDigitizing, segmentBearing };
-    case 2:
-      return { accepted: accepted && !towardsDigitizing, segmentBearing };
-    default:
-      return { accepted: false, segmentBearing: undefined };
-  }
-};
 
 const matchFeature = (
   feature: ValidFeature,
@@ -91,14 +56,15 @@ const matchFeature = (
         mValue,
         closestX,
         closestY,
-        closestZ
+        closestZ,
+        segmentBearing: undefined as number | undefined
       };
 
       if (
         ((f: ValidFeature): f is TrafficSignType =>
           f.properties.TYPE === GeoJsonFeatureType.TrafficSign)(feature)
       ) {
-        const { accepted, segmentBearing } = isSimilarBearing(
+        const { accepted, segmentBearing } = similarSegmentBearing(
           feature,
           link,
           closestPoint
@@ -115,7 +81,8 @@ const matchFeature = (
       mValue: NaN,
       closestX: 0,
       closestY: 0,
-      closestZ: 0
+      closestZ: 0,
+      segmentBearing: undefined
     } as {
       link: FeatureNearbyLinks['roadlinks'][0] | undefined;
       distance: number;
@@ -126,26 +93,61 @@ const matchFeature = (
       segmentBearing?: number;
     }
   );
+  if (
+    feature.properties.TYPE === GeoJsonFeatureType.TrafficSign &&
+    closestLink.segmentBearing &&
+    !similarBearing(closestLink.segmentBearing, feature.properties.SUUNTIMA, true)
+  )
+    return invalidFeature(
+      feature,
+      `Invalid directions: link (${
+        closestLink.link ? closestLink.link.linkId : 'undefined'
+      }) ${closestLink.segmentBearing}, feature direction ${feature.properties.SUUNTIMA}`
+    );
+
   if (closestLink.distance > MAX_OFFSET)
-    return invalidFeature(feature, 'MAX_OFFSET too small');
+    return invalidFeature(
+      feature,
+      `No same direction links within ${MAX_OFFSET}m distance: closest link (${
+        closestLink.link ? closestLink.link.linkId : 'undefined'
+      })`
+    );
 
-  const latDiff = feature.geometry.coordinates[1] - closestLink.closestY;
-  const lonDiff = feature.geometry.coordinates[0] - closestLink.closestX;
+  if (feature.properties.TYPE === GeoJsonFeatureType.TrafficSign) {
+    const latDiff = feature.geometry.coordinates[1] - closestLink.closestY;
+    const lonDiff = feature.geometry.coordinates[0] - closestLink.closestX;
 
-  const segmentBearing = closestLink.segmentBearing;
+    const segmentBearing = closestLink.segmentBearing;
 
-  const towardsDigitizing = segmentBearing
-    ? ((segmentBearing <= 45 || segmentBearing > 315) && lonDiff > 0) ||
-      (segmentBearing <= 135 && segmentBearing > 45 && latDiff < 0) ||
-      (segmentBearing <= 225 && segmentBearing > 135 && lonDiff < 0) ||
-      (segmentBearing <= 315 && segmentBearing > 225 && latDiff > 0)
-    : undefined;
+    const towardsDigitizing = segmentBearing
+      ? ((segmentBearing <= 45 || segmentBearing > 315) && lonDiff > 0) ||
+        (segmentBearing <= 135 && segmentBearing > 45 && latDiff < 0) ||
+        (segmentBearing <= 225 && segmentBearing > 135 && lonDiff < 0) ||
+        (segmentBearing <= 315 && segmentBearing > 225 && latDiff > 0)
+      : undefined;
 
-  const signBearing =
-    towardsDigitizing || !segmentBearing
-      ? segmentBearing
-      : oppositeBearing(segmentBearing);
+    const signBearing =
+      towardsDigitizing || !segmentBearing
+        ? segmentBearing
+        : oppositeBearing(segmentBearing);
 
+    return {
+      ...feature,
+      properties: {
+        ...feature.properties,
+        DR_LINK_ID: closestLink.link?.linkId,
+        DR_M_VALUE: closestLink.mValue,
+        DR_OFFSET: closestLink.distance,
+        DR_GEOMETRY: {
+          x: closestLink.closestX,
+          y: closestLink.closestY,
+          z: closestLink.closestZ
+        },
+        SUUNTIMA: signBearing ? Math.round(signBearing) : undefined,
+        TOWARDSDIGITIZING: towardsDigitizing
+      }
+    } as MatchedFeature;
+  }
   return {
     ...feature,
     properties: {
@@ -157,9 +159,7 @@ const matchFeature = (
         x: closestLink.closestX,
         y: closestLink.closestY,
         z: closestLink.closestZ
-      },
-      SUUNTIMA: signBearing ? Math.round(signBearing) : undefined,
-      TOWARDSDIGITIZING: towardsDigitizing
+      }
     }
   } as MatchedFeature;
 };

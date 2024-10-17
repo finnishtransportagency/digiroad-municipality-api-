@@ -1,5 +1,5 @@
 import { supportedMunicipalities } from '@functions/config';
-import { arrayOfValidFeature } from '@libs/schema-tools';
+import { arrayOfMatchedFeature, arrayOfValidFeature } from '@libs/schema-tools';
 import { array, number, object, string } from 'yup';
 import { invalidFeatureSchema } from './geoJsonSchema';
 
@@ -20,4 +20,25 @@ const updatePayloadSchema = object({
   }).required()
 }).required();
 
-export { updatePayloadSchema };
+const logsSchema = object({
+  Rejected: object({
+    Created: array().default([]).of(invalidFeatureSchema).required(),
+    Updated: array().default([]).of(invalidFeatureSchema).required(),
+    Deleted: array().default([]).of(invalidFeatureSchema).required()
+  }).required(),
+  Accepted: object({
+    Created: arrayOfMatchedFeature('metadata.assetType').required(),
+    Updated: arrayOfMatchedFeature('metadata.assetType').required(),
+    Deleted: arrayOfValidFeature('metadata.assetType', true).required()
+  }),
+  metadata: object({
+    municipality: string().oneOf(supportedMunicipalities).required(),
+    assetType: string().oneOf(['obstacles', 'trafficSigns']).required()
+  }).required(),
+  invalidInfrao: object({
+    sum: number().required(),
+    IDs: array().of(invalidFeatureSchema.required()).required()
+  }).required()
+}).required();
+
+export { updatePayloadSchema, logsSchema };

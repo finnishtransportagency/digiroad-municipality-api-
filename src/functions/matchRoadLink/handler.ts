@@ -165,7 +165,8 @@ const matchRoadLinks = async (event: S3KeyObject) => {
             ? 'matchedWithFailures'
             : 'matchedSuccessfully',
         Municipality: updatePayload.metadata.municipality,
-        Body: reportRejectedDeltabody
+        Body: reportRejectedDeltabody,
+        S3Key: `logs/${updatePayload.metadata.municipality}/${now}.json`
       })
     )
   );

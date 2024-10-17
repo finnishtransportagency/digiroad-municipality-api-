@@ -1,4 +1,5 @@
-import { PointCoordinates } from '@customTypes/featureTypes';
+import { PointCoordinates, TrafficSignType } from '@customTypes/featureTypes';
+import { FeatureNearbyLinks } from '@customTypes/roadLinkTypes';
 import booleanPointOnLine from '@turf/boolean-point-on-line';
 import { Point, LineString } from 'geojson';
 import { Coordinate } from 'ol/coordinate';
@@ -68,10 +69,54 @@ export const similarBearing = (
 ): boolean => {
   if (bearingA < 0 || bearingA > 360 || bearingB < 0 || bearingB > 360)
     throw new Error('Invalid bearings');
-  const diff = Math.abs(bearingA - bearingB);
-  return bothDirections
-    ? diff <= 45 || (diff > 135 && diff <= 225) || diff > 315
-    : diff <= 45 || diff >= 315;
+  const initialDiff = Math.abs(bearingA - bearingB);
+  const diff = initialDiff > 180 ? 360 - initialDiff : initialDiff;
+  return bothDirections ? diff <= 45 || diff > 135 : diff <= 45;
+};
+
+/**
+ * Compares bearings of traffic sign and road link taking into account the direction type of the link.
+ * @param feature The traffic sign being compared
+ * @param link The link being compared
+ * @param closestPoint Closet point on link to the traffic sign being compared
+ * @returns Accepted is true if bearings are within 45 degrees of each other. segmentBearing is bearing of link at closestPoint.
+ */
+export const similarSegmentBearing = (
+  feature: TrafficSignType,
+  link: FeatureNearbyLinks['roadlinks'][0],
+  closestPoint: Coordinate
+): { accepted: boolean; segmentBearing: number | undefined } => {
+  const segmentStartPoint = link.points.slice(0, -1).find((point, i) => {
+    const nextPoint = link.points[i + 1];
+    const pointLine = pointOnLine(
+      [
+        [point.x, point.y],
+        [nextPoint.x, nextPoint.y]
+      ],
+      [closestPoint[0], closestPoint[1]]
+    );
+    return pointLine;
+  });
+  const segmentBearing = segmentStartPoint
+    ? getLinkBearing([segmentStartPoint.x, segmentStartPoint.y], closestPoint)
+    : NaN;
+  const bearing = feature.properties.SUUNTIMA;
+  switch (link.directiontype) {
+    case 0:
+      return { accepted: similarBearing(bearing, segmentBearing, true), segmentBearing };
+    case 1:
+      return {
+        accepted: similarBearing(bearing, segmentBearing),
+        segmentBearing
+      };
+    case 2:
+      return {
+        accepted: similarBearing(bearing, oppositeBearing(segmentBearing)),
+        segmentBearing
+      };
+    default:
+      return { accepted: false, segmentBearing: undefined };
+  }
 };
 
 /**
@@ -97,5 +142,5 @@ export const pointOnLine = (
     type: 'Point',
     coordinates: pointCoordinates
   };
-  return booleanPointOnLine(point, lineString, { epsilon: 5e-8 });
+  return booleanPointOnLine(point, lineString, { epsilon: 5e-7 });
 };
