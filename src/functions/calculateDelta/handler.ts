@@ -43,7 +43,6 @@ const calculateDelta = async (event: S3Event) => {
   );
   if (!updateCollectionResult.object) {
     await reportUpdateObjectError(
-      municipality,
       updateCollectionResult.error || 'Unknown error',
       updateObjectKey
     );
@@ -127,22 +126,7 @@ const getFeatureCollection = async (
   }
 };
 
-const reportUpdateObjectError = async (
-  municipality: string,
-  error: string,
-  updateObjectKey: string
-) => {
-  await invokeLambda(
-    'reportRejectedDelta',
-    'Event',
-    Buffer.from(
-      JSON.stringify({
-        ReportType: 'invalidData',
-        Municipality: municipality,
-        Body: { Message: error }
-      })
-    )
-  );
+const reportUpdateObjectError = async (error: string, updateObjectKey: string) => {
   await deleteFromS3(bucketName, updateObjectKey);
   console.error(`${updateObjectKey} deleted because of invalid data: ${error}`);
 };
