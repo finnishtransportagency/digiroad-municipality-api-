@@ -9,19 +9,13 @@
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "lint": "eslint . --ext .ts",
     "lint-and-fix": "eslint . --ext .ts --fix",
-    "clear-obstacles": "aws s3 --endpoint-url http://localhost:4569 cp ./testFiles/empty.json s3://dr-kunta-dev-bucket/geojson/espoo/obstacles/empty.json",
-    "clear-traffic-signs": "aws s3 --endpoint-url http://localhost:4569 cp ./testFiles/empty.json s3://dr-kunta-dev-bucket/geojson/espoo/trafficSigns/empty.json",
-    "clear-road-surfaces": "aws s3 --endpoint-url http://localhost:4569 cp ./testFiles/empty.json s3://dr-kunta-dev-bucket/geojson/espoo/roadSurfaces/empty.json",
-    "reset-s3": "npm run clear-obstacles && npm run clear-traffic-signs && npm run clear-road-surfaces",
-    "obstacles": "sls invoke local --function fetchMunicipalityData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"xml\", \"municipality\": \"espoo\", \"assetTypes\": { \"obstacles\": \"infrao:Rakenne\" }}'",
-    "traffic-signs": "sls invoke local --function fetchMunicipalityData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"xml\", \"municipality\": \"espoo\", \"assetTypes\": { \"trafficSigns\": \"infrao:Liikennemerkki\" }}'",
-    "road-surfaces": "sls invoke local --function fetchMunicipalityData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"xml\", \"municipality\": \"espoo\", \"assetTypes\": { \"roadSurfaces\": \"infrao:KatualueenOsa\" }}'",
-    "test-clear-traffic-signs": "node testFiles/uploadTestFile.js ./testFiles/empty.json dr-kunta-dev-bucket geojson/espoo/trafficSigns/ .json",
-    "test-clear-obstacles": "node testFiles/uploadTestFile.js ./testFiles/empty.json dr-kunta-dev-bucket geojson/espoo/obstacles/ .json",
-    "test-new-obstacles": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"json\", \"municipality\": \"espoo\", \"assetTypes\": { \"obstacles\": \"infrao:Rakenne\" }}'",
-    "test-new-traffic-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"json\", \"municipality\": \"espoo\", \"assetTypes\": { \"trafficSigns\": \"infrao:Liikennemerkki\" }}'",
-    "test-helsinki-traffic-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://city-infra.test.hel.ninja/v1\", \"format\": \"helsinki\", \"municipality\": \"helsinki\", \"assetTypes\": { \"trafficSigns\": \"traffic-sign-reals\" }}'",
-    "test-clear-helsinki-signs": "node testFiles/uploadTestFile.js ./testFiles/empty.json dr-kunta-dev-bucket geojson/helsinki/trafficSigns/ .json"
+    "clear-espoo-signs": "node testFiles/uploadTestFile.js ./testFiles/empty.json dr-kunta-dev-bucket geojson/espoo/trafficSigns/ .json",
+    "clear-espoo-obstacles": "node testFiles/uploadTestFile.js ./testFiles/empty.json dr-kunta-dev-bucket geojson/espoo/obstacles/ .json",
+    "espoo-obstacles": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"json\", \"municipality\": \"espoo\", \"assetTypes\": { \"obstacles\": \"infrao:Rakenne\" }}'",
+    "espoo-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"json\", \"municipality\": \"espoo\", \"assetTypes\": { \"trafficSigns\": \"infrao:Liikennemerkki\" }}'",
+    "helsinki-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://city-infra.test.hel.ninja/v1\", \"format\": \"helsinki\", \"municipality\": \"helsinki\", \"assetTypes\": { \"trafficSigns\": \"traffic-sign-reals\" }}'",
+    "clear-helsinki-signs": "node testFiles/uploadTestFile.js ./testFiles/empty.json dr-kunta-dev-bucket geojson/helsinki/trafficSigns/ .json",
+    "helsinki-prod-signs":  "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://cityinfra.api.hel.fi/v1\", \"format\": \"helsinki\", \"municipality\": \"helsinki\", \"assetTypes\": { \"trafficSigns\": \"traffic-sign-reals\" }}'"
   },
   "engines": {
     "node": ">=18.15.0"
