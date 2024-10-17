@@ -6,7 +6,7 @@ import {
 } from '@customTypes/featureTypes';
 import { SignMap } from '@customTypes/mapTypes';
 import { invalidFeature } from '@libs/schema-tools';
-import { helsinkiCoordTransform } from '@libs/spatial-tools';
+import { helsinkiCoordTransform, oppositeBearing } from '@libs/spatial-tools';
 import {
   additionalPanelFeatureSchema,
   GeoJsonFeatureType,
@@ -35,6 +35,9 @@ export default (
   const code = sign ? sign.code : 'INVALID_CODE';
   const finalCode = code !== 'INVALID_CODE' ? code : legacy_code;
 
+  if (finalCode === 'INVALID_CODE')
+    return invalidFeature(feature, 'Invalid traffic sign code');
+
   if (!castSchema.isValidSync(castedFeature))
     return invalidFeature(
       feature,
@@ -42,9 +45,6 @@ export default (
         isAdditionalPanel ? 'helsinkiAdditionalPanelSchema' : 'helsinkiSignSchema'
       }`
     );
-
-  if (finalCode === 'INVALID_CODE')
-    return invalidFeature(feature, 'Invalid traffic sign code');
 
   const schema = isAdditionalPanel
     ? additionalPanelFeatureSchema
@@ -58,7 +58,10 @@ export default (
     gk25coordinates[1]
   ]);
 
-  return schema.cast({
+  const direction = castedFeature.direction;
+  const correctedDirection = direction ? oppositeBearing(direction) : direction;
+
+  const geoJsonFeature = {
     type: 'Feature',
     id,
     properties: {
@@ -66,7 +69,7 @@ export default (
         ? GeoJsonFeatureType.AdditionalPanel
         : GeoJsonFeatureType.TrafficSign,
       ID: id,
-      SUUNTIMA: Math.round(castedFeature.direction ? castedFeature.direction : 0),
+      SUUNTIMA: correctedDirection,
       LM_TYYPPI: createTrafficSignText(finalCode),
       ARVO:
         Object.keys(trafficSignRules).includes(finalCode) && !isNaN(numberValue)
@@ -79,5 +82,10 @@ export default (
       type: 'Point',
       coordinates: [...projectedCoordinates, 0]
     }
-  });
+  };
+
+  if (castedFeature.direction === null || castedFeature.direction === undefined)
+    return invalidFeature(geoJsonFeature, 'Missing direction for traffic sign');
+
+  return schema.cast(geoJsonFeature);
 };
