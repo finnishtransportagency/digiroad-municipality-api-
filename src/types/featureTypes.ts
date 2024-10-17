@@ -7,10 +7,7 @@ import {
   obstacleFeatureSchema,
   trafficSignFeatureSchema
 } from '@schemas/geoJsonSchema';
-import { pointGeometrySchema } from '@schemas/geometrySchema';
 import { InferType } from 'yup';
-
-type PointCoordinates = InferType<typeof pointGeometrySchema>['coordinates'];
 
 type ObstacleType = InferType<typeof obstacleFeatureSchema>;
 type TrafficSignType = InferType<typeof trafficSignFeatureSchema>;
@@ -37,7 +34,6 @@ interface AdditionalPanelParseObject {
 }
 
 export {
-  PointCoordinates,
   ObstacleType,
   TrafficSignType,
   AdditionalPanelType,

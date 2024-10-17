@@ -7,11 +7,7 @@ import {
 import { FeatureNearbyLinks } from '@customTypes/roadLinkTypes';
 import { MAX_OFFSET } from '@functions/config';
 import { invalidFeature } from '@libs/schema-tools';
-import {
-  oppositeBearing,
-  similarBearing,
-  similarSegmentBearing
-} from '@libs/spatial-tools';
+import { similarBearing, similarSegmentBearing } from '@libs/spatial-tools';
 import { GeoJsonFeatureType } from '@schemas/geoJsonSchema';
 import LineString from 'ol/geom/LineString.js';
 
@@ -114,22 +110,11 @@ const matchFeature = (
     );
 
   if (feature.properties.TYPE === GeoJsonFeatureType.TrafficSign) {
-    const latDiff = feature.geometry.coordinates[1] - closestLink.closestY;
-    const lonDiff = feature.geometry.coordinates[0] - closestLink.closestX;
-
     const segmentBearing = closestLink.segmentBearing;
 
     const towardsDigitizing = segmentBearing
-      ? ((segmentBearing <= 45 || segmentBearing > 315) && lonDiff > 0) ||
-        (segmentBearing <= 135 && segmentBearing > 45 && latDiff < 0) ||
-        (segmentBearing <= 225 && segmentBearing > 135 && lonDiff < 0) ||
-        (segmentBearing <= 315 && segmentBearing > 225 && latDiff > 0)
+      ? similarBearing(feature.properties.SUUNTIMA, segmentBearing)
       : undefined;
-
-    const signBearing =
-      towardsDigitizing || !segmentBearing
-        ? segmentBearing
-        : oppositeBearing(segmentBearing);
 
     return {
       ...feature,
@@ -143,7 +128,7 @@ const matchFeature = (
           y: closestLink.closestY,
           z: closestLink.closestZ
         },
-        SUUNTIMA: signBearing ? Math.round(signBearing) : undefined,
+        SUUNTIMA: segmentBearing ? Math.round(segmentBearing) : undefined,
         TOWARDSDIGITIZING: towardsDigitizing
       }
     } as MatchedFeature;

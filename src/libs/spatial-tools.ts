@@ -1,4 +1,5 @@
-import { PointCoordinates, TrafficSignType } from '@customTypes/featureTypes';
+import { TrafficSignType } from '@customTypes/featureTypes';
+import { FeatureCoordinates, PointCoordinates } from '@customTypes/geometryTypes';
 import { FeatureNearbyLinks } from '@customTypes/roadLinkTypes';
 import booleanPointOnLine from '@turf/boolean-point-on-line';
 import { Point, LineString } from 'geojson';
@@ -86,20 +87,38 @@ export const similarSegmentBearing = (
   link: FeatureNearbyLinks['roadlinks'][0],
   closestPoint: Coordinate
 ): { accepted: boolean; segmentBearing: number | undefined } => {
-  const segmentStartPoint = link.points.slice(0, -1).find((point, i) => {
-    const nextPoint = link.points[i + 1];
-    const pointLine = pointOnLine(
-      [
-        [point.x, point.y],
-        [nextPoint.x, nextPoint.y]
-      ],
-      [closestPoint[0], closestPoint[1]]
-    );
-    return pointLine;
-  });
-  const segmentBearing = segmentStartPoint
-    ? getLinkBearing([segmentStartPoint.x, segmentStartPoint.y], closestPoint)
-    : NaN;
+  const segmentPoints = link.points.slice(0, -1).reduce(
+    (previousValue, currentPoint, i) => {
+      const nextPoint = link.points[i + 1];
+      const pointLine = pointOnLine(
+        [
+          [currentPoint.x, currentPoint.y],
+          [nextPoint.x, nextPoint.y]
+        ],
+        [closestPoint[0], closestPoint[1]]
+      );
+      return pointLine
+        ? {
+            startPoint: currentPoint,
+            endPoint: nextPoint
+          }
+        : previousValue;
+    },
+    {
+      startPoint: undefined,
+      endPoint: undefined
+    } as {
+      startPoint: FeatureCoordinates | undefined;
+      endPoint: FeatureCoordinates | undefined;
+    }
+  );
+  const segmentBearing =
+    segmentPoints.startPoint && segmentPoints.endPoint
+      ? getLinkBearing(
+          [segmentPoints.startPoint.x, segmentPoints.startPoint.y],
+          [segmentPoints.endPoint.x, segmentPoints.endPoint.y]
+        )
+      : NaN;
   const bearing = feature.properties.SUUNTIMA;
   switch (link.directiontype) {
     case 0:
