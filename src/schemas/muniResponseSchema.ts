@@ -92,13 +92,31 @@ const helsinkiSignSchema = object({
   size: number()
     .oneOf([1, 2, 3])
     .transform((code: string) => {
-      return code === 'S' ? 1 : 'M' ? 2 : 3;
+      switch (code) {
+        case 'S':
+          return 1;
+        case 'M':
+          return 2;
+        case 'L':
+          return 3;
+        default:
+          break;
+      }
     })
     .notRequired(),
   reflection_class: number()
     .oneOf([1, 2, 3])
     .transform((code: string) => {
-      return code === 'R1' ? 1 : code === 'R2' ? 2 : 3;
+      switch (code) {
+        case 'R1':
+          return 1;
+        case 'R2':
+          return 2;
+        case 'R3':
+          return 3;
+        default:
+          break;
+      }
     })
     .notRequired(),
   txt: string().notRequired(),
@@ -161,13 +179,31 @@ const helsinkiAdditionalPanelSchema = object({
   size: number()
     .oneOf([1, 2, 3])
     .transform((code: string) => {
-      return code === 'S' ? 1 : 'M' ? 2 : 3;
+      switch (code) {
+        case 'S':
+          return 1;
+        case 'M':
+          return 2;
+        case 'L':
+          return 3;
+        default:
+          break;
+      }
     })
     .notRequired(),
   reflection_class: number()
     .oneOf([1, 2, 3])
     .transform((code: string) => {
-      return code === 'R1' ? 1 : code === 'R2' ? 2 : 3;
+      switch (code) {
+        case 'R1':
+          return 1;
+        case 'R2':
+          return 2;
+        case 'R3':
+          return 3;
+        default:
+          break;
+      }
     })
     .notRequired(),
   txt: ref<string>('content_s.unit')
