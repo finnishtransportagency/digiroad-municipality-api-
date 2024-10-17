@@ -141,7 +141,7 @@ export const getPointQuery = (
               WHERE administrative_class.link_id = kgv_roadlink.linkid AND administrative_class.administrative_class = 1
             )
             AND (kgv_roadlink.adminclass != 1 OR kgv_roadlink.adminclass IS NULL)
-            AND expired_date is null
+            AND kgv_roadlink.expired_date is null
         )
 
       SELECT
