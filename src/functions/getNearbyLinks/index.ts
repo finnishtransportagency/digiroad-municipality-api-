@@ -13,7 +13,7 @@ import { handlerPath } from '@libs/handler-resolver';
 export default {
   handler: `${handlerPath(__dirname)}/handler.main`,
   maximumRetryAttempts: 0,
-  timeout: 60,
+  timeout: 300,
   vpc: {
     securityGroupIds: [drsecuritygroupid],
     subnetIds: [drsubnetid1, drsubnetid2]
