@@ -45,7 +45,7 @@ interface ServerlessConfiguration extends AWS {
 }
 
 const serverlessConfiguration: ServerlessConfiguration = {
-  service: 'DRKunta',
+  service: 'dr-kunta',
   frameworkVersion: '3',
   plugins: [
     'serverless-esbuild',
