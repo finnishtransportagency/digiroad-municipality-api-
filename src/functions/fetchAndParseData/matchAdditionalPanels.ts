@@ -28,6 +28,7 @@ export default (features: Array<Feature | AdditionalPanelType>): Array<ValidFeat
   for (const additionalPanel of additionalPanels) {
     let matched = false;
     for (const mainPanel of mainPanels) {
+      if (mainPanel.properties.LISAKILVET.length >= 5) continue;
       const distance = getDistance2D(
         additionalPanel.geometry.coordinates,
         mainPanel.geometry.coordinates

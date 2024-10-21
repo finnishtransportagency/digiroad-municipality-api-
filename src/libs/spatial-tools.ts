@@ -1,6 +1,7 @@
 import { TrafficSignType } from '@customTypes/featureTypes';
 import { FeatureCoordinates, PointCoordinates } from '@customTypes/geometryTypes';
 import { FeatureNearbyLinks } from '@customTypes/roadLinkTypes';
+import { allowedAgainstTraffic } from '@schemas/trafficSignTypes';
 import booleanPointOnLine from '@turf/boolean-point-on-line';
 import { Point, LineString } from 'geojson';
 import { Coordinate } from 'ol/coordinate';
@@ -120,6 +121,8 @@ export const similarSegmentBearing = (
         )
       : NaN;
   const bearing = feature.properties.SUUNTIMA;
+  if (allowedAgainstTraffic.includes(feature.properties.LM_TYYPPI))
+    return { accepted: similarBearing(bearing, segmentBearing, true), segmentBearing };
   switch (link.directiontype) {
     case 0:
       return { accepted: similarBearing(bearing, segmentBearing, true), segmentBearing };

@@ -6,6 +6,7 @@ interface TrafficSignRules {
     maxValue: number | null;
     minValue: number | null;
     unit: string | null;
+    allowedAgainstTraffic: boolean;
   };
 }
 
@@ -18,7 +19,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A1.2': {
     text: 'Mutka vasemmalle',
@@ -26,7 +28,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A2.1': {
     text: 'Mutkia, joista ensimmäinen oikealle',
@@ -34,7 +37,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A2.2': {
     text: 'Mutkia, joista ensimmäinen vasemmalle',
@@ -42,7 +46,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A3.1': {
     text: 'Jyrkkä ylämäki',
@@ -50,7 +55,8 @@ export const trafficSignRules: TrafficSignRules = {
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A3.2': {
     text: 'Jyrkkä alamäki',
@@ -58,7 +64,8 @@ export const trafficSignRules: TrafficSignRules = {
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A4: {
     text: 'Kapeneva tie',
@@ -66,7 +73,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A5: {
     text: 'Kaksisuuntainen liikenne',
@@ -74,7 +82,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A6: {
     text: 'Avattava silta',
@@ -82,7 +91,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A7: {
     text: 'Lautta, laituri tai ranta',
@@ -90,7 +100,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A8: {
     text: 'Liikenneruuhka',
@@ -98,7 +109,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A9: {
     text: 'Epätasainen tie',
@@ -106,7 +118,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A10: {
     text: 'Töyssyjä',
@@ -114,7 +127,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A11: {
     text: 'Tietyö',
@@ -122,7 +136,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A12: {
     text: 'Irtokiviä',
@@ -130,7 +145,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A13: {
     text: 'Liukas ajorata',
@@ -138,7 +154,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A14: {
     text: 'Vaarallinen tien reuna',
@@ -146,7 +163,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A15: {
     text: 'Suojatien ennakkovaroitus',
@@ -154,7 +172,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A16: {
     text: 'Jalankulkijoita',
@@ -162,7 +181,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A17: {
     text: 'Lapsia',
@@ -170,7 +190,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A18: {
     text: 'Pyöräilijöitä',
@@ -178,7 +199,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A19: {
     text: 'Hiihtolatu',
@@ -186,7 +208,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A20.1': {
     text: 'Hirvi',
@@ -194,7 +217,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A20.2': {
     text: 'Poro',
@@ -202,7 +226,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A20.3': {
     text: 'Kauriseläin',
@@ -210,7 +235,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A21: {
     text: 'Tienristeys',
@@ -218,7 +244,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A22.1': {
     text: 'Sivutien risteys molemmin puolin',
@@ -226,7 +253,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A22.2': {
     text: 'Sivutien risteys molemmin puolin porrastetusti',
@@ -234,7 +262,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A22.3': {
     text: 'Sivutien risteys oikealla/vasemmalla',
@@ -242,7 +271,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A22.4': {
     text: 'Sivutien risteys oikealla/vasemmalla viistoon',
@@ -250,7 +280,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A23: {
     text: 'Liikennevalot',
@@ -258,7 +289,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A24: {
     text: 'Liikenneympyrä',
@@ -266,7 +298,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A25: {
     text: 'Raitiovaunu',
@@ -274,7 +307,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A26: {
     text: 'Rautatien tasoristeys ilman puomeja',
@@ -282,7 +316,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A27: {
     text: 'Rautatien tasoristeys, jossa on puomit',
@@ -290,7 +325,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A28.1': {
     text: 'Rautatien tasoristeyksen lähestymismerkki',
@@ -298,7 +334,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A28.2': {
     text: 'Rautatien tasoristeyksen lähestymismerkki',
@@ -306,7 +343,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A28.3': {
     text: 'Rautatien tasoristeyksen lähestymismerkki',
@@ -314,7 +352,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A29.1': {
     text: 'Yksiraiteisen rautatien tasoristeys',
@@ -322,7 +361,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'A29.2': {
     text: 'Kaksi tai useampiraiteisen rautatien tasoristeys',
@@ -330,7 +370,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A30: {
     text: 'Putoavia kiviä',
@@ -338,7 +379,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A31: {
     text: 'Matalalla lentäviä lentokoneita',
@@ -346,7 +388,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A32: {
     text: 'Sivutuuli',
@@ -354,7 +397,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   A33: {
     text: 'Muu vaara',
@@ -362,7 +406,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   B1: {
     text: 'Etuajo-oikeutettu tie',
@@ -370,7 +415,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   B2: {
     text: 'Etuajo-oikeuden päättyminen',
@@ -378,7 +424,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   B3: {
     text: 'Etuajo-oikeus kohdattaessa',
@@ -386,7 +433,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   B4: {
     text: 'Väistämisvelvollisuus kohdattaessa',
@@ -394,7 +442,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   B5: {
     text: 'Väistämisvelvollisuus risteyksessä',
@@ -402,7 +451,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   B6: {
     text: 'Pakollinen pysäyttäminen',
@@ -410,7 +460,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   B7: {
     text: 'Väistämisvelvollisuus pyöräilijän tienylityspaikassa',
@@ -418,7 +469,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C1: {
     text: 'Ajoneuvolla ajo kielletty',
@@ -426,7 +478,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C2: {
     text: 'Moottorikäyttöisellä ajoneuvolla ajo kielletty',
@@ -434,7 +487,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C3: {
     text: 'Kuorma- ja pakettiautolla ajo kielletty',
@@ -442,7 +496,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C4: {
     text: 'Ajoneuvoyhdistelmällä ajo kielletty',
@@ -450,7 +505,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C5: {
     text: 'Traktorilla ajo kielletty',
@@ -458,7 +514,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C6: {
     text: 'Moottoripyörällä ajo kielletty',
@@ -466,7 +523,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C7: {
     text: 'Moottorikelkalla ajo kielletty',
@@ -474,7 +532,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C8: {
     text: 'Vaarallisten aineiden kuljetus kielletty',
@@ -482,7 +541,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C9: {
     text: 'Linja-autolla ajo kielletty',
@@ -490,7 +550,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C10: {
     text: 'Mopolla ajo kielletty',
@@ -498,7 +559,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C11: {
     text: 'Polkupyörällä ajo kielletty',
@@ -506,7 +568,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   C12: {
     text: 'Polkupyörällä ja mopolla ajo kielletty',
@@ -514,7 +577,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C13: {
     text: 'Jalankulku kielletty',
@@ -522,7 +586,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   C14: {
     text: 'Jalankulku ja polkupyörällä ajo kielletty',
@@ -530,7 +595,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   C15: {
     text: 'Jalankulku ja polkupyörällä ja mopolla ajo kielletty',
@@ -538,7 +604,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C16: {
     text: 'Ratsastus kielletty',
@@ -546,7 +613,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C17: {
     text: 'Kielletty ajosuunta',
@@ -554,7 +622,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   C18: {
     text: 'Vasemmalle kääntyminen kielletty',
@@ -562,7 +631,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C19: {
     text: 'Oikealle kääntyminen kielletty',
@@ -570,7 +640,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C20: {
     text: 'U-käännös kielletty',
@@ -578,7 +649,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C21: {
     text: 'Ajoneuvon suurin sallittu leveys',
@@ -586,7 +658,8 @@ export const trafficSignRules: TrafficSignRules = {
     minValue: 200,
     unit: 'cm',
     type: 'TRAFFICSIGN',
-    allowedOnKapy: true
+    allowedOnKapy: true,
+    allowedAgainstTraffic: false
   },
   C22: {
     text: 'Ajoneuvon suurin sallittu korkeus',
@@ -594,7 +667,8 @@ export const trafficSignRules: TrafficSignRules = {
     minValue: 100,
     unit: 'cm',
     type: 'TRAFFICSIGN',
-    allowedOnKapy: true
+    allowedOnKapy: true,
+    allowedAgainstTraffic: false
   },
   C23: {
     text: 'Ajoneuvon tai ajoneuvoyhdistelmän suurin sallittu pituus',
@@ -602,7 +676,8 @@ export const trafficSignRules: TrafficSignRules = {
     minValue: 200,
     unit: 'cm',
     type: 'TRAFFICSIGN',
-    allowedOnKapy: false
+    allowedOnKapy: false,
+    allowedAgainstTraffic: false
   },
   C24: {
     text: 'Ajoneuvon suurin sallittu massa',
@@ -610,7 +685,8 @@ export const trafficSignRules: TrafficSignRules = {
     minValue: 100,
     unit: 'kg',
     type: 'TRAFFICSIGN',
-    allowedOnKapy: true
+    allowedOnKapy: true,
+    allowedAgainstTraffic: false
   },
   C25: {
     text: 'Ajoneuvoyhdistelmän suurin sallittu massa',
@@ -618,7 +694,8 @@ export const trafficSignRules: TrafficSignRules = {
     minValue: 100,
     unit: 'kg',
     type: 'TRAFFICSIGN',
-    allowedOnKapy: false
+    allowedOnKapy: false,
+    allowedAgainstTraffic: false
   },
   C26: {
     text: 'Ajoneuvon suurin sallittu akselille kohdistuva massa',
@@ -626,7 +703,8 @@ export const trafficSignRules: TrafficSignRules = {
     minValue: 100,
     unit: 'kg',
     type: 'TRAFFICSIGN',
-    allowedOnKapy: false
+    allowedOnKapy: false,
+    allowedAgainstTraffic: false
   },
   C27: {
     text: 'Ajoneuvon suurin sallittu telille kohdistuva massa',
@@ -634,7 +712,8 @@ export const trafficSignRules: TrafficSignRules = {
     minValue: 100,
     unit: 'kg',
     type: 'TRAFFICSIGN',
-    allowedOnKapy: false
+    allowedOnKapy: false,
+    allowedAgainstTraffic: false
   },
   C28: {
     text: 'Ohituskielto',
@@ -642,7 +721,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C29: {
     text: 'Ohituskielto päättyy',
@@ -650,7 +730,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C30: {
     text: 'Ohituskielto kuorma-autolla',
@@ -658,7 +739,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C31: {
     text: 'Ohituskielto kuorma-autolla päättyy',
@@ -666,7 +748,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C32: {
     text: 'Nopeusrajoitus',
@@ -674,7 +757,8 @@ export const trafficSignRules: TrafficSignRules = {
     minValue: 10,
     unit: 'km/h',
     type: 'TRAFFICSIGN',
-    allowedOnKapy: false
+    allowedOnKapy: false,
+    allowedAgainstTraffic: false
   },
   C33: {
     text: 'Nopeusrajoitus päättyy',
@@ -682,7 +766,8 @@ export const trafficSignRules: TrafficSignRules = {
     minValue: 10,
     unit: 'km/h',
     type: 'TRAFFICSIGN',
-    allowedOnKapy: false
+    allowedOnKapy: false,
+    allowedAgainstTraffic: false
   },
   C34: {
     text: 'Nopeusrajoitusalue',
@@ -690,7 +775,8 @@ export const trafficSignRules: TrafficSignRules = {
     minValue: 10,
     unit: 'km/h',
     type: 'TRAFFICSIGN',
-    allowedOnKapy: false
+    allowedOnKapy: false,
+    allowedAgainstTraffic: false
   },
   C35: {
     text: 'Nopeusrajoitusalue päättyy',
@@ -698,7 +784,8 @@ export const trafficSignRules: TrafficSignRules = {
     minValue: 10,
     unit: 'km/h',
     type: 'TRAFFICSIGN',
-    allowedOnKapy: false
+    allowedOnKapy: false,
+    allowedAgainstTraffic: false
   },
   C36: {
     text: 'Ajokaistakohtainen kielto, rajoitus tai määräys',
@@ -706,7 +793,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C37: {
     text: 'Pysäyttäminen kielletty',
@@ -714,7 +802,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C38: {
     text: 'Pysäköinti kielletty',
@@ -722,7 +811,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C39: {
     text: 'Pysäköintikieltoalue',
@@ -730,7 +820,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C40: {
     text: 'Pysäköintikieltoalue päättyy',
@@ -738,7 +829,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C41: {
     text: 'Taksiasema-alue',
@@ -746,7 +838,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C42: {
     text: 'Taksin pysähtymispaikka',
@@ -754,7 +847,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C43: {
     text: 'Kuormauspaikka',
@@ -762,7 +856,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'C44.1': {
     text: 'Vuoropysäköinti (kielletty parittomina päivinä)',
@@ -770,7 +865,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'C44.2': {
     text: 'Vuoropysäköinti (kielletty parillisina päivinä)',
@@ -778,7 +874,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C45: {
     text: 'Pakollinen pysäyttäminen tullitarkastusta varten',
@@ -786,7 +883,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C46: {
     text: 'Pakollinen pysäyttäminen tarkastusta varten',
@@ -794,7 +892,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   C47: {
     text: 'Moottorikäyttöisten ajoneuvojen vähimmäisetäisyys',
@@ -802,7 +901,8 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
-    minValue: 10
+    minValue: 10,
+    allowedAgainstTraffic: false
   },
   C48: {
     text: 'Nastarenkailla varustetulla moottorikäyttöisellä ajoneuvolla ajo kielletty',
@@ -810,7 +910,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'D1.1': {
     text: 'Pakollinen ajosuunta oikealle',
@@ -818,7 +919,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'D1.2': {
     text: 'Pakollinen ajosuunta vasemmalle',
@@ -826,7 +928,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'D1.3': {
     text: 'Pakollinen ajosuunta suoraan',
@@ -834,7 +937,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'D1.4': {
     text: 'Pakollinen ajosuunta kääntyminen oikealle',
@@ -842,7 +946,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'D1.5': {
     text: 'Pakollinen ajosuunta kääntyminen vasemmalle',
@@ -850,7 +955,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'D1.6': {
     text: 'Pakollinen ajosuunta suoraan tai kääntyminen oikealle',
@@ -858,7 +964,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'D1.7': {
     text: 'Pakollinen ajosuunta suoraan tai kääntyminen vasemmalle',
@@ -866,7 +973,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'D1.8': {
     text: 'Pakollinen ajosuunta kääntyminen oikealle tai vasemmalle',
@@ -874,7 +982,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'D1.9': {
     text: 'Pakollinen ajosuunta suoraan tai kääntyminen oikealle tai vasemmalle',
@@ -882,7 +991,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   D2: {
     text: 'Pakollinen ajosuunta',
@@ -890,7 +1000,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'D3.1': {
     text: 'Liikenteenjakaja oikea',
@@ -898,7 +1009,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'D3.2': {
     text: 'Liikenteenjakaja vasen',
@@ -906,7 +1018,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'D3.3': {
     text: 'Liikenteenjakaja molemmin puolin',
@@ -914,7 +1027,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   D4: {
     text: 'Jalkakäytävä',
@@ -922,7 +1036,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   D5: {
     text: 'Pyörätie',
@@ -930,7 +1045,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   D6: {
     text: 'Yhdistetty pyörätie ja jalkakäytävä',
@@ -938,7 +1054,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'D7.1': {
     text: 'Pyörätie ja jalkakäytävä rinnakkain, pyörätie vasemmalla',
@@ -946,7 +1063,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'D7.2': {
     text: 'Pyörätie ja jalkakäytävä rinnakkain, pyörätie oikealla',
@@ -954,7 +1072,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   D8: {
     text: 'Moottorikelkkailureitti',
@@ -962,7 +1081,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   D9: {
     text: 'Ratsastustie',
@@ -970,7 +1090,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   D10: {
     text: 'Vähimmäisnopeus',
@@ -978,7 +1099,8 @@ export const trafficSignRules: TrafficSignRules = {
     minValue: 10,
     unit: 'km/h',
     type: 'TRAFFICSIGN',
-    allowedOnKapy: false
+    allowedOnKapy: false,
+    allowedAgainstTraffic: false
   },
   D11: {
     text: 'Vähimmäisnopeus päättyy',
@@ -986,7 +1108,8 @@ export const trafficSignRules: TrafficSignRules = {
     minValue: 10,
     unit: 'km/h',
     type: 'TRAFFICSIGN',
-    allowedOnKapy: false
+    allowedOnKapy: false,
+    allowedAgainstTraffic: false
   },
   E1: {
     text: 'Suojatie',
@@ -994,7 +1117,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E2: {
     text: 'Pysäköintipaikka',
@@ -1002,7 +1126,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E3.1': {
     text: 'Liityntäpysäköintipaikka juna',
@@ -1010,7 +1135,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E3.2': {
     text: 'Liityntäpysäköintipaikka linja-auto',
@@ -1018,7 +1144,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E3.3': {
     text: 'Liityntäpysäköintipaikka raitiovaunu',
@@ -1026,7 +1153,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E3.4': {
     text: 'Liityntäpysäköintipaikka metro',
@@ -1034,7 +1162,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E3.5': {
     text: 'Liityntäpysäköintipaikka useita joukkoliikennevälineitä',
@@ -1042,7 +1171,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E4.1': {
     text: 'Ajoneuvojen sijoitus pysäköintipaikalla suoraan',
@@ -1050,7 +1180,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E4.2': {
     text: 'Ajoneuvojen sijoitus pysäköintipaikalla vastakkain',
@@ -1058,7 +1189,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E4.3': {
     text: 'Ajoneuvojen sijoitus pysäköintipaikalla vinoon',
@@ -1066,7 +1198,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E5: {
     text: 'Kohtaamispaikka',
@@ -1074,7 +1207,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E6: {
     text: 'Linja-autopysäkki',
@@ -1082,7 +1216,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E7: {
     text: 'Raitiovaunupysäkki',
@@ -1090,7 +1225,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E8: {
     text: 'Taksiasema',
@@ -1098,7 +1234,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E9.1': {
     text: 'Linja-autokaista',
@@ -1106,7 +1243,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E9.2': {
     text: 'Linja-auto ja taksikaista',
@@ -1114,7 +1252,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E10.1': {
     text: 'Linja-autokaista päättyy',
@@ -1122,7 +1261,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E10.2': {
     text: 'Linja-auto ja taksikaista päättyy',
@@ -1130,7 +1270,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E11.1': {
     text: 'Raitiovaunukaista',
@@ -1138,7 +1279,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E11.2': {
     text: 'Raitiovaunu- ja taksikaista',
@@ -1146,7 +1288,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E12.1': {
     text: 'Raitiovaunukaista päättyy',
@@ -1154,7 +1297,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E12.2': {
     text: 'Raitiovaunu- ja taksikaista päättyy',
@@ -1162,7 +1306,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E13.1': {
     text: 'Pyöräkaista oikealla',
@@ -1170,7 +1315,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E13.2': {
     text: 'Pyöräkaista keskellä',
@@ -1178,7 +1324,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E14.1': {
     text: 'Yksisuuntainen tie suoraan',
@@ -1186,7 +1333,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'E14.2': {
     text: 'Yksisuuntainen tie oikealle/vasemmalle',
@@ -1194,7 +1342,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E15: {
     text: 'Moottoritie',
@@ -1202,7 +1351,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E16: {
     text: 'Moottoritie päättyy',
@@ -1210,7 +1360,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E17: {
     text: 'Moottoriliikennetie',
@@ -1218,7 +1369,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E18: {
     text: 'Moottoriliikennetie päättyy',
@@ -1226,7 +1378,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E19: {
     text: 'Tunneli',
@@ -1234,7 +1387,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E20: {
     text: 'Tunneli päättyy',
@@ -1242,7 +1396,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E21: {
     text: 'Hätäpysäyttämispaikka',
@@ -1250,7 +1405,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E22: {
     text: 'Taajama',
@@ -1258,7 +1414,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E23: {
     text: 'Taajama päättyy',
@@ -1266,7 +1423,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E24: {
     text: 'Pihakatu',
@@ -1274,7 +1432,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E25: {
     text: 'Pihakatu päättyy',
@@ -1282,7 +1441,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E26: {
     text: 'Kävelykatu',
@@ -1290,7 +1450,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E27: {
     text: 'Kävelykatu päättyy',
@@ -1298,7 +1459,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E28: {
     text: 'Pyöräkatu',
@@ -1306,7 +1468,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E29: {
     text: 'Pyöräkatu päättyy',
@@ -1314,7 +1477,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   E30: {
     text: 'Ajokaistojen yhdistyminen',
@@ -1322,7 +1486,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F1.1': {
     text: 'Suunnistustaulu',
@@ -1330,7 +1495,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F1.2': {
     text: 'Suunnistustaulu',
@@ -1338,7 +1504,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F1.3': {
     text: 'Suunnistustaulu',
@@ -1346,7 +1513,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F2.1': {
     text: 'Suunnistustaulu',
@@ -1354,7 +1522,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F2.2': {
     text: 'Suunnistustaulu',
@@ -1362,7 +1531,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F2.3': {
     text: 'Suunnistustaulu',
@@ -1370,7 +1540,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F3: {
     text: 'Ajokaistakohtainen suunnistustaulu',
@@ -1378,7 +1549,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F4.1': {
     text: 'Kiertotien suunnistustaulu (sininen pohja)',
@@ -1386,7 +1558,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F4.2': {
     text: 'Kiertotien suunnistustaulu (keltainen pohja)',
@@ -1394,7 +1567,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F5: {
     text: 'Kiertotieopastus',
@@ -1402,7 +1576,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F6: {
     text: 'Ajoreittiopastus',
@@ -1410,7 +1585,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F7.1': {
     text: 'Ajokaistaopastus',
@@ -1418,7 +1594,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F7.2': {
     text: 'Ajokaistaopastus',
@@ -1426,7 +1603,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F7.3': {
     text: 'Ajokaistaopastus',
@@ -1434,7 +1612,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F7.4': {
     text: 'Ajokaistaopastus',
@@ -1442,7 +1621,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F7.5': {
     text: 'Ajokaistaopastus',
@@ -1450,7 +1630,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F7.6': {
     text: 'Ajokaistaopastus',
@@ -1458,7 +1639,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F8.1': {
     text: 'Ajokaistan päättyminen',
@@ -1466,7 +1648,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F8.2': {
     text: 'Ajokaistan päättyminen',
@@ -1474,7 +1657,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F9: {
     text: 'Viitoituksen koontimerkki',
@@ -1482,7 +1666,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F10: {
     text: 'Ajokaistan yläpuolinen viitta',
@@ -1490,7 +1675,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F11: {
     text: 'Ajokaistan yläpuolinen viitta',
@@ -1498,7 +1684,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F12: {
     text: 'Ajokaistan yläpuolinen erkanemisviitta',
@@ -1506,7 +1693,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F13: {
     text: 'Tienviitta',
@@ -1514,7 +1702,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F14: {
     text: 'Erkanemisviitta',
@@ -1522,7 +1711,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F15: {
     text: 'Kiertotien viitta',
@@ -1530,7 +1720,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F16: {
     text: 'Osoiteviitta',
@@ -1538,7 +1729,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F17: {
     text: 'Osoiteviitan ennakkomerkki',
@@ -1546,7 +1738,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F18.1': {
     text: 'Liityntäpysäköintiviitta juna',
@@ -1554,7 +1747,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F18.2': {
     text: 'Liityntäpysäköintiviitta bussi',
@@ -1562,7 +1756,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F18.3': {
     text: 'Liityntäpysäköintiviitta raitiovaunu',
@@ -1570,7 +1765,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F18.4': {
     text: 'Liityntäpysäköintiviitta metro',
@@ -1578,7 +1774,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F18.5': {
     text: 'Liityntäpysäköintiviitta useita joukkoliikennevälineitä',
@@ -1586,7 +1783,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F19: {
     text: 'Jalankulun viitta',
@@ -1594,7 +1792,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F20.1': {
     text: 'Pyöräilyn viitta ilman etäisyyksiä',
@@ -1602,7 +1801,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F20.2': {
     text: 'Pyöräilyn viitta etäisyyslukemilla',
@@ -1610,7 +1810,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F21.1': {
     text: 'Pyöräilyn suunnistustaulu etäisyyslukemilla',
@@ -1618,7 +1819,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F21.2': {
     text: 'Pyöräilyn suunnistustaulu ilman etäisyyksiä',
@@ -1626,7 +1828,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   F22: {
     text: 'Pyöräilyn etäisyystaulu',
@@ -1634,7 +1837,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   F23: {
     text: 'Pyöräilyn paikannimi',
@@ -1642,7 +1846,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F24.1': {
     text: 'Umpitie edessä',
@@ -1650,7 +1855,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F24.2': {
     text: 'Umpitie oikealla/vasemmalla',
@@ -1658,7 +1864,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F24.3': {
     text: 'Umpitie',
@@ -1666,7 +1873,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F25: {
     text: 'Enimmäisnopeussuositus',
@@ -1674,7 +1882,8 @@ export const trafficSignRules: TrafficSignRules = {
     minValue: 10,
     unit: 'km/h',
     type: 'TRAFFICSIGN',
-    allowedOnKapy: false
+    allowedOnKapy: false,
+    allowedAgainstTraffic: false
   },
   F26: {
     text: 'Etäisyystaulu',
@@ -1682,7 +1891,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F27.1': {
     text: 'Paikannimi',
@@ -1690,7 +1900,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F27.2': {
     text: 'Vesistön nimi',
@@ -1698,7 +1909,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F28: {
     text: 'Kansainvälisen pääliikenneväylän numero',
@@ -1706,7 +1918,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F29: {
     text: 'Valtatien numero',
@@ -1714,7 +1927,8 @@ export const trafficSignRules: TrafficSignRules = {
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F30: {
     text: 'Kantatien numero',
@@ -1722,7 +1936,8 @@ export const trafficSignRules: TrafficSignRules = {
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F31: {
     text: 'Seututien numero',
@@ -1730,7 +1945,8 @@ export const trafficSignRules: TrafficSignRules = {
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F32: {
     text: 'Muun maantien numero',
@@ -1738,7 +1954,8 @@ export const trafficSignRules: TrafficSignRules = {
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F33: {
     text: 'Kehätien numero',
@@ -1746,7 +1963,8 @@ export const trafficSignRules: TrafficSignRules = {
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F34: {
     text: 'Eritasoliittymän numero',
@@ -1754,7 +1972,8 @@ export const trafficSignRules: TrafficSignRules = {
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F35: {
     text: 'Opastus merkin tarkoittamalle tielle',
@@ -1762,7 +1981,8 @@ export const trafficSignRules: TrafficSignRules = {
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F36: {
     text: 'Varareitti',
@@ -1770,7 +1990,8 @@ export const trafficSignRules: TrafficSignRules = {
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F37: {
     text: 'Moottoritien tunnus',
@@ -1778,7 +1999,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F38: {
     text: 'Moottoriliikennetien tunnus',
@@ -1786,7 +2008,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F39: {
     text: 'Lentoasema',
@@ -1794,7 +2017,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F40: {
     text: 'Autolautta',
@@ -1802,7 +2026,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F41: {
     text: 'Matkustajasatama',
@@ -1810,7 +2035,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F42: {
     text: 'Tavarasatama',
@@ -1818,7 +2044,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F43: {
     text: 'Tavaraterminaali',
@@ -1826,7 +2053,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F44: {
     text: 'Teollisuusalue tai yritysalue',
@@ -1834,7 +2062,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F45: {
     text: 'Vähittäiskaupan suuryksikkö',
@@ -1842,7 +2071,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F46.1': {
     text: 'Pysäköinti',
@@ -1850,7 +2080,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F46.2': {
     text: 'Katettu pysäköinti',
@@ -1858,7 +2089,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F47: {
     text: 'Rautatieasema',
@@ -1866,7 +2098,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F48: {
     text: 'Linja-autoasema',
@@ -1874,7 +2107,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F49: {
     text: 'Keskusta',
@@ -1882,7 +2116,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F50: {
     text: 'Tietylle ajoneuvolle tarkoitettu reitti',
@@ -1890,7 +2125,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F50.1': {
     text: 'Kuorma-autolle tarkoitettu reitti',
@@ -1898,7 +2134,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F50.2': {
     text: 'Henkilöautolle tarkoitettu reitti',
@@ -1906,7 +2143,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F50.3': {
     text: 'Linja-autolle tarkoitettu reitti',
@@ -1914,7 +2152,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F50.4': {
     text: 'Pakettiautolle tarkoitettu reitti',
@@ -1922,7 +2161,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F50.5': {
     text: 'Moottoripyörälle tarkoitettu reitti',
@@ -1930,7 +2170,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F50.6': {
     text: 'Mopolle tarkoitettu reitti',
@@ -1938,7 +2179,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F50.7': {
     text: 'Traktorille tarkoitettu reitti',
@@ -1946,7 +2188,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F50.8': {
     text: 'Matkailuajoneuvolle tarkoitettu reitti',
@@ -1954,7 +2197,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'F50.9': {
     text: 'Polkupyörälle tarkoitettu reitti',
@@ -1962,7 +2206,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F51: {
     text: 'Vaarallisten aineiden kuljetukselle tarkoitettu reitti',
@@ -1970,7 +2215,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   F52: {
     text: 'Jalankulkijalle tarkoitettu reitti',
@@ -1978,7 +2224,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   F53: {
     text: 'Esteetön reitti',
@@ -1986,7 +2233,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F54.1': {
     text: 'Reitti, jolla on portaat alas',
@@ -1994,7 +2242,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F54.2': {
     text: 'Reitti, jolla on portaat ylös',
@@ -2002,7 +2251,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F55.1': {
     text: 'Reitti ilman portaita alas',
@@ -2010,7 +2260,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F55.2': {
     text: 'Reitti ilman portaita ylös',
@@ -2018,7 +2269,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F55.3': {
     text: 'Pyörätuoliramppi alas',
@@ -2026,7 +2278,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F55.4': {
     text: 'Pyörätuoliramppii ylös',
@@ -2034,7 +2287,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F56.1': {
     text: 'Hätäuloskäynti vasemmalla',
@@ -2042,7 +2296,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F56.2': {
     text: 'Hätäuloskäynti oikealla',
@@ -2050,7 +2305,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F57.1': {
     text: 'Poistumisreitti (yksi)',
@@ -2058,7 +2314,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: true
   },
   'F57.2': {
     text: 'Poistumisreitti (useita)',
@@ -2066,7 +2323,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G1: {
     text: 'Palvelukohteen opastustaulu',
@@ -2074,7 +2332,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G2: {
     text: 'Palvelukohteen opastustaulu nuolella',
@@ -2082,7 +2341,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G3: {
     text: 'Palvelukohteen erkanemisviitta',
@@ -2090,7 +2350,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G4: {
     text: 'Palvelukohteen osoiteviitta',
@@ -2098,7 +2359,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G5: {
     text: 'Palvelukohteen osoiteviitan ennakkomerkki',
@@ -2106,7 +2368,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G6: {
     text: 'Radioaseman taajuus',
@@ -2114,7 +2377,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G7: {
     text: 'Opastuspiste',
@@ -2122,7 +2386,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G8: {
     text: 'Opastustoimisto',
@@ -2130,7 +2395,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G9: {
     text: 'Ensiapu',
@@ -2138,7 +2404,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G10: {
     text: 'Autokorjaamo',
@@ -2146,7 +2413,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'G11.1': {
     text: 'Polttoaineen jakelu bensiini tai etanoli',
@@ -2154,7 +2422,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'G11.2': {
     text: 'Polttoaineen jakelu paineistettu maakaasu',
@@ -2162,7 +2431,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'G11.3': {
     text: 'Polttoaineen jakelu sähkö',
@@ -2170,7 +2440,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'G11.4': {
     text: 'Polttoaineen jakelu vety',
@@ -2178,7 +2449,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G12: {
     text: 'Hotelli tai motelli',
@@ -2186,7 +2458,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G13: {
     text: 'Ruokailupaikka',
@@ -2194,7 +2467,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G14: {
     text: 'Kahvila tai pikaruokapaikka',
@@ -2202,7 +2476,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G15: {
     text: 'Käymälä',
@@ -2210,7 +2485,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G16: {
     text: 'Retkeilymaja',
@@ -2218,7 +2494,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G17: {
     text: 'Leirintäalue',
@@ -2226,7 +2503,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G18: {
     text: 'Matkailuajoneuvoalue',
@@ -2234,7 +2512,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G19: {
     text: 'Levähdysalue',
@@ -2242,7 +2521,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G20: {
     text: 'Ulkoilualue',
@@ -2250,7 +2530,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G21: {
     text: 'Hätäpuhelin',
@@ -2258,7 +2539,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G22: {
     text: 'Sammutin',
@@ -2266,7 +2548,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G23: {
     text: 'Museo tai historiallinen rakennus',
@@ -2274,7 +2557,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G24: {
     text: 'Maailmanperintökohde',
@@ -2282,7 +2566,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G25: {
     text: 'Luontokohde',
@@ -2290,7 +2575,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G26: {
     text: 'Näköalapaikka',
@@ -2298,7 +2584,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G27: {
     text: 'Eläintarha tai -puisto',
@@ -2306,7 +2593,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G28: {
     text: 'Muu nähtävyys',
@@ -2314,7 +2602,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G29: {
     text: 'Uintipaikka',
@@ -2322,7 +2611,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G30: {
     text: 'Kalastuspaikka',
@@ -2330,7 +2620,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G31: {
     text: 'Hiihtohissi',
@@ -2338,7 +2629,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G32: {
     text: 'Maastohiihtokeskus',
@@ -2346,7 +2638,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G33: {
     text: 'Golfkenttä',
@@ -2354,7 +2647,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G34: {
     text: 'Huvi- ja teemapuisto',
@@ -2362,7 +2656,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G35: {
     text: 'Mökkimajoitus',
@@ -2370,7 +2665,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G36: {
     text: 'Aamiaismajoitus',
@@ -2378,7 +2674,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G37: {
     text: 'Suoramyyntipaikka',
@@ -2386,7 +2683,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G38: {
     text: 'Käsityöpaja',
@@ -2394,7 +2692,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G39: {
     text: 'Kotieläinpiha',
@@ -2402,7 +2701,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   G40: {
     text: 'Ratsastuspaikka',
@@ -2410,7 +2710,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'G41.1': {
     text: 'Matkailutie (pelkkä teksti)',
@@ -2418,7 +2719,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'G41.2': {
     text: 'Matkailutie (kuva ja teksti)',
@@ -2426,7 +2728,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   I5: {
     text: 'Taustamerkki',
@@ -2434,7 +2737,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   I6: {
     text: 'Kaarteen suuntamerkki',
@@ -2442,7 +2746,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'I7.1': {
     text: 'Reunamerkki vasemmalla',
@@ -2450,7 +2755,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'I7.2': {
     text: 'Reunamerkki oikealla',
@@ -2458,7 +2764,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   I8: {
     text: 'Korkeusmerkki',
@@ -2466,7 +2773,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   I9: {
     text: 'Alikulun korkeusmitta',
@@ -2474,7 +2782,8 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
-    minValue: 2
+    minValue: 2,
+    allowedAgainstTraffic: false
   },
   'I10.1': {
     text: 'Liikennemerkkipylvään tehostamismerkki (sinivalkoinen)',
@@ -2482,7 +2791,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'I10.2': {
     text: 'Liikennemerkkipylvään tehostamismerkki (keltamusta)',
@@ -2490,7 +2800,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   I11: {
     text: 'Erkanemismerkki',
@@ -2498,7 +2809,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   I13: {
     text: 'Siirtokehotus',
@@ -2506,7 +2818,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   I14: {
     text: 'Paikannusmerkki',
@@ -2514,7 +2827,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   I15: {
     text: 'Automaattinen liikennevalvonta',
@@ -2522,7 +2836,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   I16: {
     text: 'Tekninen valvonta',
@@ -2530,7 +2845,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'I17.1': {
     text: 'Poronhoitoalue tekstillinen',
@@ -2538,7 +2854,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'I17.2': {
     text: 'Poronhoitoalue ilman tekstiä',
@@ -2546,7 +2863,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   I18: {
     text: 'Yleinen nopeusrajoitus rajalla',
@@ -2554,7 +2872,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   I19: {
     text: 'Valtion raja',
@@ -2562,7 +2881,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   H1: {
     text: 'Kohde risteävässä suunnassa',
@@ -2570,7 +2890,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H2.1': {
     text: 'Kohde nuolen suunnassa',
@@ -2578,7 +2899,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H2.2': {
     text: 'Kohde nuolen suunnassa ja etäisyys',
@@ -2586,7 +2908,8 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'km',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0
+    minValue: 0,
+    allowedAgainstTraffic: false
   },
   'H2.3': {
     text: 'Kohde edessä ja etäisyys',
@@ -2594,7 +2917,8 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'km',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0
+    minValue: 0,
+    allowedAgainstTraffic: false
   },
   H3: {
     text: 'Vaikutusalueen pituus',
@@ -2602,7 +2926,8 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'km',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0
+    minValue: 0,
+    allowedAgainstTraffic: false
   },
   H4: {
     text: 'Etäisyys kohteeseen',
@@ -2610,7 +2935,8 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0
+    minValue: 0,
+    allowedAgainstTraffic: false
   },
   H5: {
     text: 'Etäisyys pakolliseen pysäyttämiseen',
@@ -2618,7 +2944,8 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0
+    minValue: 0,
+    allowedAgainstTraffic: false
   },
   H6: {
     text: 'Vapaa leveys',
@@ -2626,7 +2953,8 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0
+    minValue: 0,
+    allowedAgainstTraffic: false
   },
   H7: {
     text: 'Vapaa korkeus',
@@ -2634,7 +2962,8 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0
+    minValue: 0,
+    allowedAgainstTraffic: false
   },
   H8: {
     text: 'Sähköjohdon korkeus',
@@ -2642,7 +2971,8 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0
+    minValue: 0,
+    allowedAgainstTraffic: false
   },
   'H9.1': {
     text: 'Vaikutusalue molempiin suuntiin oikealle ja vasemmalle',
@@ -2650,7 +2980,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H9.2': {
     text: 'Vaikutusalue molempiin suuntiin eteen- ja taaksepäin',
@@ -2658,7 +2989,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   H10: {
     text: 'Vaikutusalue nuolen suuntaan',
@@ -2666,7 +2998,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   H11: {
     text: 'Vaikutusalue päättyy',
@@ -2674,7 +3007,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H12.1': {
     text: 'Henkilöauto',
@@ -2682,7 +3016,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H12.2': {
     text: 'Linja-auto',
@@ -2690,7 +3025,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H12.3': {
     text: 'Kuorma-auto',
@@ -2698,7 +3034,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H12.4': {
     text: 'Pakettiauto',
@@ -2706,7 +3043,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H12.5': {
     text: 'Matkailuperävaunu',
@@ -2714,7 +3052,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H12.6': {
     text: 'Matkailuauto',
@@ -2722,7 +3061,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H12.7': {
     text: 'Invalidin ajoneuvo',
@@ -2730,7 +3070,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H12.8': {
     text: 'Moottoripyörä',
@@ -2738,7 +3079,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H12.9': {
     text: 'Mopo',
@@ -2746,7 +3088,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H12.10': {
     text: 'Polkupyörä',
@@ -2754,7 +3097,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H12.11': {
     text: 'Moottorikelkka',
@@ -2762,7 +3106,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H12.12': {
     text: 'Traktori',
@@ -2770,7 +3115,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H12.13': {
     text: 'Vähäpäästöinen ajoneuvo',
@@ -2778,7 +3124,8 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'g/km',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0
+    minValue: 0,
+    allowedAgainstTraffic: false
   },
   'H13.1': {
     text: 'Pysäköintitapa reunakiven päälle',
@@ -2786,7 +3133,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H13.2': {
     text: 'Pysäköintitapa reunakiven laitaan',
@@ -2794,7 +3142,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   H14: {
     text: 'Kielto ryhmän A vaarallisten aineiden kuljetukselle',
@@ -2802,7 +3151,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   H15: {
     text: 'Kielto ryhmän B vaarallisten aineiden kuljetukselle',
@@ -2810,7 +3160,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   H16: {
     text: 'Tunneliluokka',
@@ -2818,7 +3169,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H17.1': {
     text: 'Voimassaoloaika arkisin ma-pe',
@@ -2826,7 +3178,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H17.2': {
     text: 'Voimassaoloaika arkilauantaisin',
@@ -2834,7 +3187,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H17.3': {
     text: 'Voimassaoloaika sunnuntaisin ja pyhinä',
@@ -2842,7 +3196,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   H18: {
     text: 'Aikarajoitus',
@@ -2850,7 +3205,8 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'min',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0
+    minValue: 0,
+    allowedAgainstTraffic: false
   },
   'H19.1': {
     text: 'Pysäköintiajan alkamisen osoittamisvelvollisuus (keltainen pohja)',
@@ -2858,7 +3214,8 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'min',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0
+    minValue: 0,
+    allowedAgainstTraffic: false
   },
   'H19.2': {
     text: 'Pysäköintiajan alkamisen osoittamisvelvollisuus (sininen pohja)',
@@ -2866,7 +3223,8 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'min',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0
+    minValue: 0,
+    allowedAgainstTraffic: false
   },
   H20: {
     text: 'Maksullinen pysäköinti',
@@ -2874,7 +3232,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   H21: {
     text: 'Latauspaikka',
@@ -2882,7 +3241,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H22.1': {
     text: 'Etuajo-oikeutetun liikenteen suunta',
@@ -2890,7 +3250,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H22.2': {
     text: 'Etuajo-oikeutetun liikenteen suunta kääntyville',
@@ -2898,7 +3259,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H23.1': {
     text: 'Kaksisuuntainen pyörätie (keltainen pohja)',
@@ -2906,7 +3268,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   'H23.2': {
     text: 'Kaksisuuntainen pyörätie (sininen pohja)',
@@ -2914,7 +3277,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   H24: {
     text: 'Tekstillinen lisäkilpi',
@@ -2922,7 +3286,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   H25: {
     text: 'Huoltoajo sallittu',
@@ -2930,7 +3295,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: true,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   },
   H26: {
     text: 'Hätäpuhelin ja sammutin',
@@ -2938,7 +3304,8 @@ export const trafficSignRules: TrafficSignRules = {
     allowedOnKapy: false,
     maxValue: null,
     minValue: null,
-    unit: null
+    unit: null,
+    allowedAgainstTraffic: false
   }
 };
 
@@ -2976,4 +3343,8 @@ export const allowedAdditionalPanels = Object.keys(trafficSignRules)
  */
 export const allowedOnKapy = Object.keys(trafficSignRules)
   .filter((trafficSignCode) => trafficSignRules[trafficSignCode].allowedOnKapy)
+  .map(createTrafficSignText);
+
+export const allowedAgainstTraffic = Object.keys(trafficSignRules)
+  .filter((trafficSignCode) => trafficSignRules[trafficSignCode].allowedAgainstTraffic)
   .map(createTrafficSignText);

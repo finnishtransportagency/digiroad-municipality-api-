@@ -151,7 +151,7 @@ export const getPointQuery = (
       FROM json_array_elements($2) AS features, acceptable_roadlinks
       WHERE
         ST_BUFFER(ST_SETSRID(ST_GeomFromGeoJSON(features->>'geometry'), 3067), $4) && acceptable_roadlinks.shape
-        AND (
+        AND (                                                   -- This subquery determines which assets can go on pedestrian roads
           (features#>'{properties}'->>'TYPE') != 'TRAFFICSIGN'
           OR (features#>'{properties}'->>'LM_TYYPPI') = ANY(($3)::text[])
           OR acceptable_roadlinks.functional_class != 8

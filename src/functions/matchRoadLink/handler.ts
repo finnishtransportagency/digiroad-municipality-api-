@@ -155,7 +155,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     now: now
   };
 
-  await invokeLambda(
+  void invokeLambda(
     'reportRejectedDelta',
     'Event',
     Buffer.from(

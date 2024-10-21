@@ -173,7 +173,7 @@ const execInsert = async (
               additionalPanelQuery(
                 panel.LM_TYYPPI,
                 assetID,
-                i + 1,
+                i,
                 panel.ARVO,
                 panel.TEKSTI || undefined,
                 panel.KOKO || undefined,

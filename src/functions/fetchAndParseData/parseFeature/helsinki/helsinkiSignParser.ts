@@ -76,7 +76,9 @@ export default (
           ? numberValue
           : null,
       TEKSTI: castedFeature.txt ? castedFeature.txt.substring(0, 128) : castedFeature.txt,
-      ...(isAdditionalPanel ? {} : { LISAKILVET: panels })
+      ...(isAdditionalPanel
+        ? {}
+        : { LISAKILVET: panels.filter((panel) => panel).slice(0, 5) })
     },
     geometry: {
       type: 'Point',

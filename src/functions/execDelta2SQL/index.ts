@@ -13,7 +13,7 @@ import {
 export default {
   handler: `${handlerPath(__dirname)}/handler.main`,
   maximumRetryAttempts: 0,
-  timeout: 300,
+  timeout: 600,
   vpc: {
     securityGroupIds: [drsecuritygroupid],
     subnetIds: [drsubnetid1, drsubnetid2]
