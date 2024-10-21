@@ -1,54 +1,55 @@
 name: Build & deploy to AWS
 
 on:
-    push:
-      branches:
-        - actions-migration
+  push:
+    branches:
+      - development
 
 permissions:
-    id-token: write
-    contents: read
+  id-token: write
+  contents: read
 jobs:
-    BuildAndDeploy:
-        name: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }} deploy
-        runs-on: ubuntu-latest
-        environment:
-            name: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
-        strategy:
-            matrix:
-                node-version: [18.x]
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v3
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v3
-              with:
-                node-version: ${{ matrix.node-version }}
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v4
-              with: 
-                role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE }}
-                role-session-name: ServerlessDeployment
-                aws-region: ${{ vars.REGION }}
-            - name: Install serverless globally
-              run: npm i -g serverless@3.x
-            - name: Deploy serverless
-              run: npm run deploy:serverless
-              env:
-                STAGE_NAME: ${{ vars.STAGE_NAME }}
-                OPERATOR_EMAIL: ${{ vars.OPERATOR_EMAIL }}
-                DR_SECURITY_GROUP_ID: ${{ secrets.DR_SECURITY_GROUP_ID }}
-                DR_SUBNET_ID_1: ${{ secrets.DR_SUBNET_ID_1 }}
-                DR_SUBNET_ID_2: ${{ secrets.DR_SUBNET_ID_2 }}
-                AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                SECURITY_GROUP_ID: ${{ secrets.SECURITY_GROUP_ID }}
-                SUBNET_ID_1: ${{ secrets.SUBNET_ID_1 }}
-                SUBNET_ID_2: ${{ secrets.SUBNET_ID_2 }}
-                PGPASSWORD_SSM_KEY: ${{ secrets.PGPASSWORD_SSM_KEY }}
-                SMTP_USERNAME_SSM_KEY: ${{ secrets.SMTP_USERNAME_SSM_KEY }}
-                SMTP_PASSWORD_SSM_KEY: ${{ secrets.SMTP_PASSWORD_SSM_KEY }}
-                PGHOST: ${{ secrets.PGHOST }}
-                PGPORT: ${{ secrets.PGPORT }}
-                PGDATABASE: ${{ secrets.PGDATABASE }}
-                PGUSER: ${{ secrets.PGUSER }}
-                VPC_ID: ${{ secrets.VPC_ID }}
+  BuildAndDeploy:
+    name: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }} deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOYMENT_ROLE }}
+          role-session-name: ServerlessDeployment
+          aws-region: ${{ vars.REGION }}
+      - name: Install serverless globally
+        run: npm i -g serverless@3.x
+      - name: Deploy serverless
+        run: npm run deploy:serverless
+        env:
+          STAGE_NAME: ${{ vars.STAGE_NAME }}
+          OPERATOR_EMAIL: ${{ vars.OPERATOR_EMAIL }}
+          DR_SECURITY_GROUP_ID: ${{ secrets.DR_SECURITY_GROUP_ID }}
+          DR_SUBNET_ID_1: ${{ secrets.DR_SUBNET_ID_1 }}
+          DR_SUBNET_ID_2: ${{ secrets.DR_SUBNET_ID_2 }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          SECURITY_GROUP_ID: ${{ secrets.SECURITY_GROUP_ID }}
+          SUBNET_ID_1: ${{ secrets.SUBNET_ID_1 }}
+          SUBNET_ID_2: ${{ secrets.SUBNET_ID_2 }}
+          PGPASSWORD_SSM_KEY: ${{ secrets.PGPASSWORD_SSM_KEY }}
+          SMTP_USERNAME_SSM_KEY: ${{ secrets.SMTP_USERNAME_SSM_KEY }}
+          SMTP_PASSWORD_SSM_KEY: ${{ secrets.SMTP_PASSWORD_SSM_KEY }}
+          PGHOST: ${{ secrets.PGHOST }}
+          PGPORT: ${{ secrets.PGPORT }}
+          PGDATABASE: ${{ secrets.PGDATABASE }}
+          PGUSER: ${{ secrets.PGUSER }}
+          VPC_ID: ${{ secrets.VPC_ID }}
+          AWS_CLOUDFORMATION_ROLE: ${{ secrets.AWS_CLOUDFORMATION_ROLE }}

@@ -15,7 +15,7 @@
     "espoo-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"json\", \"municipality\": \"espoo\", \"assetTypes\": { \"trafficSigns\": \"infrao:Liikennemerkki\" }}'",
     "helsinki-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://city-infra.test.hel.ninja/v1\", \"format\": \"helsinki\", \"municipality\": \"helsinki\", \"assetTypes\": { \"trafficSigns\": \"traffic-sign-reals\" }}'",
     "clear-helsinki-signs": "node testFiles/uploadTestFile.js ./testFiles/empty.json dr-kunta-dev-bucket geojson/helsinki/trafficSigns/ .json",
-    "helsinki-prod-signs":  "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://cityinfra.api.hel.fi/v1\", \"format\": \"helsinki\", \"municipality\": \"helsinki\", \"assetTypes\": { \"trafficSigns\": \"traffic-sign-reals\" }}'"
+    "helsinki-prod-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://cityinfra.api.hel.fi/v1\", \"format\": \"helsinki\", \"municipality\": \"helsinki\", \"assetTypes\": { \"trafficSigns\": \"traffic-sign-reals\" }}'"
   },
   "engines": {
     "node": ">=18.15.0"
@@ -48,12 +48,12 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@serverless/typescript": "^3.38.0",
     "@types/aws-lambda": "^8.10.71",
     "@types/ejs": "^3.1.5",
     "@types/node": "^18.15.0",
     "@types/nodemailer": "^6.4.14",
     "@types/pg": "^8.6.5",
-    "@types/serverless": "^3.12.22",
     "@typescript-eslint/eslint-plugin": "^5.30.6",
     "@typescript-eslint/parser": "^5.30.6",
     "esbuild": "^0.14.11",
@@ -64,6 +64,7 @@
     "prettier": "^2.7.1",
     "serverless": "^3.0.0",
     "serverless-esbuild": "^1.23.3",
+    "serverless-iam-roles-per-function": "^3.2.0",
     "serverless-offline": "^9.2.0",
     "serverless-s3-local": "^0.7.1",
     "ts-node": "^10.4.0",

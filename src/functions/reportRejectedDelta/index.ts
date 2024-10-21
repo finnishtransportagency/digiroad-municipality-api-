@@ -1,7 +1,8 @@
-import { smtppassword, smtpusername } from '@functions/config';
+import { awsaccountid, smtppassword, smtpusername, stage } from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
+import { ServerlessFunction } from 'serverless';
 
-export default {
+const reportRejectedDelta: ServerlessFunction = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   maximumRetryAttempts: 0,
   timeout: 300,
@@ -10,5 +11,32 @@ export default {
     SMTP_USERNAME_SSM_KEY: smtpusername,
     SMTP_PASSWORD_SSM_KEY: smtppassword
   },
-  role: 'reportRejectedDeltaRole'
+  iamRoleStatements: [
+    {
+      Effect: 'Allow',
+      Action: [
+        's3:PutObject',
+        's3:PutObjectAcl',
+        's3:ListBucket',
+        's3:GetObject',
+        's3:DeleteObject'
+      ],
+      Resource: [`arn:aws:s3:::dr-kunta-${stage}-bucket/*`]
+    },
+    {
+      Effect: 'Allow',
+      Action: ['ssm:DescribeParameters'],
+      Resource: [`arn:aws:ssm:eu-west-1:${awsaccountid}:*`]
+    },
+    {
+      Effect: 'Allow',
+      Action: ['ssm:GetParameter', 'ssm:GetParameters'],
+      Resource: [
+        `arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/${'${self:custom.smtpUsernameSsmKey}'}`,
+        `arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/${'${self:custom.smtpPasswordSsmKey}'}`
+      ]
+    }
+  ]
 };
+
+export default reportRejectedDelta;
