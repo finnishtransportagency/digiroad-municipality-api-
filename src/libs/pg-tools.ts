@@ -16,7 +16,7 @@ import { PostgresQuery, QueryFunction } from '@customTypes/pgTypes';
 export const getPostgresClient = async () => {
   return new Client({
     host: pghost,
-    port: pgport,
+    port: parseInt(pgport),
     database: pgdatabase,
     user: pguser,
     password: offline ? pgpassword : await getParameter(pgpassword)

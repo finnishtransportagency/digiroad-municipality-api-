@@ -25,7 +25,7 @@ const getNearbyLinks: ServerlessFunction = {
     PGHOST: pghost,
     PGUSER: pguser,
     PGPASSWORD_SSM_KEY: pgpassword,
-    PGPORT: String(pgport),
+    PGPORT: pgport,
     PGDATABASE: pgdatabase
   },
   iamRoleStatements: [
