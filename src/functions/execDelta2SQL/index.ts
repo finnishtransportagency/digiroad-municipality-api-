@@ -16,7 +16,7 @@ import { ServerlessFunction } from 'serverless';
 const execDelta2SQL: ServerlessFunction = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   maximumRetryAttempts: 0,
-  timeout: 600,
+  timeout: 900,
   vpc: {
     securityGroupIds: [drsecuritygroupid],
     subnetIds: [drsubnetid1, drsubnetid2]

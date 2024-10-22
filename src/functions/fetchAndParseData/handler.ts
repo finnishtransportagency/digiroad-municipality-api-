@@ -44,7 +44,7 @@ const fetchAndParseData = async (event: unknown) => {
 
   const apiKey = offline
     ? offlineApiKey
-    : await getParameter(`/DRKunta/${stage}/${event.municipality}`);
+    : await getParameter(`/dr-kunta/${stage}/${event.municipality}`);
 
   for (const assetKey of assetTypeKeys) {
     switch (event.format) {

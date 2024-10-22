@@ -16,7 +16,7 @@ const fetchAndParseData: ServerlessFunction = {
     {
       Effect: 'Allow',
       Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-      Resource: [`arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/DRKunta/${stage}/*`]
+      Resource: [`arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/dr-kunta/${stage}/*`]
     },
     {
       Effect: 'Allow',

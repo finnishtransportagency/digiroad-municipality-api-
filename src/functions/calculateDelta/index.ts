@@ -32,8 +32,8 @@ const calculateDelta: ServerlessFunction = {
       Effect: 'Allow',
       Action: ['lambda:InvokeFunction'],
       Resource: [
-        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-matchRoadLink`,
-        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-reportRejectedDelta`
+        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:dr-kunta-${stage}-matchRoadLink`,
+        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:dr-kunta-${stage}-reportRejectedDelta`
       ]
     }
   ]

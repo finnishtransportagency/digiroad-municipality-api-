@@ -11,9 +11,9 @@ const matchRoadLink: ServerlessFunction = {
       Effect: 'Allow',
       Action: ['lambda:InvokeFunction'],
       Resource: [
-        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-reportRejectedDelta`,
-        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-getNearbyLinks`,
-        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:DRKunta-${stage}-execDelta2SQL`
+        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:dr-kunta-${stage}-reportRejectedDelta`,
+        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:dr-kunta-${stage}-getNearbyLinks`,
+        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:dr-kunta-${stage}-execDelta2SQL`
       ]
     },
     {

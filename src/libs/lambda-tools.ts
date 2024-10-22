@@ -23,7 +23,7 @@ export const invokeLambda = async (
 ): Promise<InvokeCommandOutput> =>
   await lambda.send(
     new InvokeCommand({
-      FunctionName: `DRKunta-${stage}-${FunctionName}`,
+      FunctionName: `dr-kunta-${stage}-${FunctionName}`,
       InvocationType,
       Payload
     })

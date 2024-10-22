@@ -78,34 +78,6 @@ const serverlessConfiguration: ServerlessConfiguration = {
     name: 'aws',
     runtime: offline ? 'nodejs16.x' : 'nodejs18.x',
     stage: stage,
-    apiGateway: {
-      minimumCompressionSize: 1024,
-      shouldStartNameWithService: true,
-      ...(stage === 'dev' && {
-        apiKeys: [`DRKuntaOperatorKey`]
-      }),
-      ...((stage === 'test' || stage === 'prod') && {
-        resourcePolicy: [
-          {
-            Effect: 'Allow',
-            Principal: '*',
-            Action: 'execute-api:Invoke',
-            Resource: ['execute-api:/*']
-          },
-          {
-            Effect: 'Deny',
-            Principal: '*',
-            Action: 'execute-api:Invoke',
-            Resource: ['execute-api:/*'],
-            Condition: {
-              StringNotEquals: {
-                'aws:SourceVpce': { Ref: 'drKuntaEndpoint' }
-              }
-            }
-          }
-        ]
-      })
-    },
     environment: {
       OFFLINE: String(offline),
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
@@ -125,14 +97,6 @@ const serverlessConfiguration: ServerlessConfiguration = {
       SMTP_PASSWORD_SSM_KEY: '${self:custom.smtpPasswordSsmKey}'
     },
     region: 'eu-west-1',
-    ...((stage === 'test' || stage === 'prod') && {
-      endpointType: 'private',
-      vpcEndpointIds: [{ Ref: 'drKuntaEndpoint' }],
-      vpc: {
-        securityGroupIds: ['${self:custom.securityGroupId}'],
-        subnetIds: ['${self:custom.subnetId1}', '${self:custom.subnetId2}']
-      }
-    }),
     vpc: {
       securityGroupIds: ['${self:custom.securityGroupId}'],
       subnetIds: ['${self:custom.subnetId1}', '${self:custom.subnetId2}']
@@ -149,58 +113,6 @@ const serverlessConfiguration: ServerlessConfiguration = {
   },
   resources: {
     Resources: {
-      ...((stage === 'test' || stage === 'prod') && {
-        VpceSecurityGroup: {
-          Type: 'AWS::EC2::SecurityGroup',
-          Properties: {
-            GroupDescription: `DRKunta-${stage}-vpce-security-group`,
-            GroupName: `DRKunta-${stage}-vpce-security-group`,
-            SecurityGroupEgress: [
-              {
-                CidrIp: '0.0.0.0/0',
-                Description: 'Allow all outbound traffic by default',
-                IpProtocol: '-1'
-              }
-            ],
-            SecurityGroupIngress: [
-              {
-                CidrIp: '0.0.0.0/0',
-                FromPort: 443,
-                IpProtocol: 'tcp',
-                ToPort: 443
-              },
-              {
-                CidrIpv6: '::/0',
-                FromPort: 443,
-                IpProtocol: 'tcp',
-                ToPort: 443
-              }
-            ],
-            VpcId: process.env.VPCID
-          }
-        },
-        drKuntaEndpoint: {
-          Type: 'AWS::EC2::VPCEndpoint',
-          Properties: {
-            PrivateDnsEnabled: false,
-            SecurityGroupIds: [{ Ref: 'VpceSecurityGroup' }],
-            ServiceName: 'com.amazonaws.eu-west-1.execute-api',
-            SubnetIds: [process.env.SUBNETAID, process.env.SUBNETBID],
-            VpcEndpointType: 'Interface',
-            VpcId: process.env.VPCID,
-            PolicyDocument: {
-              Statement: [
-                {
-                  Principal: '*',
-                  Action: ['execute-api:Invoke'],
-                  Effect: 'Allow',
-                  Resource: [`arn:aws:execute-api:eu-west-1:${awsaccountid}:*/*`]
-                }
-              ]
-            }
-          }
-        }
-      }),
       drKuntaBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
