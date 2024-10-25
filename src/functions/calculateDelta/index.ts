@@ -12,7 +12,7 @@ const calculateDelta: ServerlessFunction = {
       s3: {
         bucket: { Ref: 'drKuntaBucket' },
         event: 's3:ObjectCreated:*',
-        existing: true,
+        existing: false,
         rules: [{ prefix: 'geojson/' }]
       }
     }
