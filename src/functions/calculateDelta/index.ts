@@ -1,4 +1,4 @@
-import { awsaccountid, bucketName, stage } from '@functions/config';
+import { awsaccountid, stage } from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 import { ServerlessFunction } from 'serverless';
 
@@ -10,7 +10,7 @@ const calculateDelta: ServerlessFunction = {
   events: [
     {
       s3: {
-        bucket: bucketName,
+        bucket: { Ref: 'drKuntaBucket' },
         event: 's3:ObjectCreated:*',
         existing: true,
         rules: [{ prefix: 'geojson/' }]
