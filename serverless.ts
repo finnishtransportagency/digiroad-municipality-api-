@@ -105,9 +105,13 @@ const serverlessConfiguration: ServerlessConfiguration = {
     vpc: {
       securityGroupIds: ['${self:custom.securityGroupId}'],
       subnetIds: ['${self:custom.subnetId1}', '${self:custom.subnetId2}']
+    },
+    iam: {
+      // No need offline, so defined here with ${env:***}-syntax
+      deploymentRole:
+        'arn:aws:iam::${env:AWS_ACCOUNT_ID}:role/${env:AWS_CLOUDFORMATION_ROLE}'
     }
   },
-  // import the function via paths
   functions: {
     fetchAndParseData,
     calculateDelta,
