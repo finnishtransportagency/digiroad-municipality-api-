@@ -1,9 +1,6 @@
 import { handlerPath } from '@libs/handler-resolver';
 import {
   awsaccountid,
-  drsecuritygroupid,
-  drsubnetid1,
-  drsubnetid2,
   pgdatabase,
   pghost,
   pgpassword,
@@ -18,8 +15,8 @@ const execDelta2SQL: ServerlessFunction = {
   maximumRetryAttempts: 0,
   timeout: 900,
   vpc: {
-    securityGroupIds: [drsecuritygroupid],
-    subnetIds: [drsubnetid1, drsubnetid2]
+    securityGroupIds: ['${self:custom.drSecurityGroupId}'],
+    subnetIds: ['${self:custom.drSubnetId1}', '${self:custom.drSubnetId2}']
   },
   environment: {
     PGHOST: pghost,
