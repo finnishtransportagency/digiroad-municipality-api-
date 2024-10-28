@@ -12,7 +12,7 @@ import { ServerlessFunction } from 'serverless';
 const fetchAndParseData: ServerlessFunction = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   maximumRetryAttempts: 0,
-  timeout: 60,
+  timeout: 300,
   environment: {
     FETCH_SIZE: String(fetchSize)
   },
