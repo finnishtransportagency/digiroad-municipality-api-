@@ -10,7 +10,12 @@ const calculateDelta: ServerlessFunction = {
   iamRoleStatements: [
     {
       Effect: 'Allow',
-      Action: ['s3:ListBucket', 's3:GetObject', 's3:DeleteObject'],
+      Action: ['s3:ListBucket'],
+      Resource: [`arn:aws:s3:::${bucketName}`]
+    },
+    {
+      Effect: 'Allow',
+      Action: ['s3:GetObject', 's3:DeleteObject'],
       Resource: [`arn:aws:s3:::${bucketName}/geojson/*`]
     },
     {
