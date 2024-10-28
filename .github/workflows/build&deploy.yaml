@@ -35,21 +35,29 @@ jobs:
       - name: Deploy serverless
         run: npm run deploy:serverless
         env:
+          SERVICE_NAME: ${{ vars.SERVICE_NAME }}
           STAGE_NAME: ${{ vars.STAGE_NAME }}
-          OPERATOR_EMAIL: ${{ vars.OPERATOR_EMAIL }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          # Digiroad database VPC
           DR_SECURITY_GROUP_ID: ${{ secrets.DR_SECURITY_GROUP_ID }}
           DR_SUBNET_ID_1: ${{ secrets.DR_SUBNET_ID_1 }}
           DR_SUBNET_ID_2: ${{ secrets.DR_SUBNET_ID_2 }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          # dr-kunta VPC
           SECURITY_GROUP_ID: ${{ secrets.SECURITY_GROUP_ID }}
           SUBNET_ID_1: ${{ secrets.SUBNET_ID_1 }}
           SUBNET_ID_2: ${{ secrets.SUBNET_ID_2 }}
+          # Database configuration
           PGPASSWORD_SSM_KEY: ${{ secrets.PGPASSWORD_SSM_KEY }}
-          SMTP_USERNAME_SSM_KEY: ${{ secrets.SMTP_USERNAME_SSM_KEY }}
-          SMTP_PASSWORD_SSM_KEY: ${{ secrets.SMTP_PASSWORD_SSM_KEY }}
           PGHOST: ${{ secrets.PGHOST }}
           PGPORT: ${{ secrets.PGPORT }}
           PGDATABASE: ${{ secrets.PGDATABASE }}
           PGUSER: ${{ secrets.PGUSER }}
-          VPC_ID: ${{ secrets.VPC_ID }}
+          # Email configuration
+          OPERATOR_EMAIL: ${{ vars.OPERATOR_EMAIL }}
+          SMTP_USERNAME_SSM_KEY: ${{ secrets.SMTP_USERNAME_SSM_KEY }}
+          SMTP_PASSWORD_SSM_KEY: ${{ secrets.SMTP_PASSWORD_SSM_KEY }}
+          # AWS CloudFormation
           AWS_CLOUDFORMATION_ROLE: ${{ secrets.AWS_CLOUDFORMATION_ROLE }}
+          # Optional parameters
+          FETCH_SIZE: ${{ vars.FETCH_SIZE }}
+          MAX_OFFSET: ${{ vars.MAX_OFFSET }}

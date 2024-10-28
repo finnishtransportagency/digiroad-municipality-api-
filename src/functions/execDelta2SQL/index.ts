@@ -1,13 +1,5 @@
 import { handlerPath } from '@libs/handler-resolver';
-import {
-  awsaccountid,
-  bucketName,
-  pgdatabase,
-  pghost,
-  pgpassword,
-  pgport,
-  pguser
-} from '@functions/config';
+import { awsaccountid, bucketName } from '@functions/config';
 import { ServerlessFunction } from 'serverless';
 
 const execDelta2SQL: ServerlessFunction = {
@@ -19,11 +11,11 @@ const execDelta2SQL: ServerlessFunction = {
     subnetIds: ['${self:custom.drSubnetId1}', '${self:custom.drSubnetId2}']
   },
   environment: {
-    PGHOST: pghost,
-    PGUSER: pguser,
-    PGPASSWORD_SSM_KEY: pgpassword,
-    PGPORT: pgport,
-    PGDATABASE: pgdatabase
+    PGHOST: '${self:custom.pgHost}',
+    PGPORT: '${self:custom.pgPort}',
+    PGDATABASE: '${self:custom.pgDatabase}',
+    PGUSER: '${self:custom.pgUser}',
+    PGPASSWORD_SSM_KEY: '${self:custom.pgPasswordSsmKey}'
   },
   iamRoleStatements: [
     {

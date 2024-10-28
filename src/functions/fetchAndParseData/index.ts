@@ -1,4 +1,10 @@
-import { awsaccountid, bucketName, serviceName, stage } from '@functions/config';
+import {
+  awsaccountid,
+  bucketName,
+  fetchSize,
+  serviceName,
+  stage
+} from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 import { ServerlessFunction } from 'serverless';
 
@@ -7,6 +13,9 @@ const fetchAndParseData: ServerlessFunction = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   maximumRetryAttempts: 0,
   timeout: 60,
+  environment: {
+    FETCH_SIZE: String(fetchSize)
+  },
   iamRoleStatements: [
     {
       Effect: 'Allow',

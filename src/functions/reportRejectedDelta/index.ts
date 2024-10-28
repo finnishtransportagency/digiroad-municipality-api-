@@ -1,4 +1,10 @@
-import { awsaccountid, bucketName, smtppassword, smtpusername } from '@functions/config';
+import {
+  awsaccountid,
+  bucketName,
+  email,
+  smtppassword,
+  smtpusername
+} from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 import { ServerlessFunction } from 'serverless';
 
@@ -8,6 +14,7 @@ const reportRejectedDelta: ServerlessFunction = {
   timeout: 300,
   package: { include: ['src/**/*.ejs'] },
   environment: {
+    OPERATOR_EMAIL: email,
     SMTP_USERNAME_SSM_KEY: smtpusername,
     SMTP_PASSWORD_SSM_KEY: smtppassword
   },

@@ -1,12 +1,4 @@
-import {
-  awsaccountid,
-  bucketName,
-  pgdatabase,
-  pghost,
-  pgpassword,
-  pgport,
-  pguser
-} from '@functions/config';
+import { awsaccountid, bucketName, MAX_OFFSET } from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 import { ServerlessFunction } from 'serverless';
 
@@ -19,11 +11,12 @@ const getNearbyLinks: ServerlessFunction = {
     subnetIds: ['${self:custom.drSubnetId1}', '${self:custom.drSubnetId2}']
   },
   environment: {
-    PGHOST: pghost,
-    PGUSER: pguser,
-    PGPASSWORD_SSM_KEY: pgpassword,
-    PGPORT: pgport,
-    PGDATABASE: pgdatabase
+    MAX_OFFSET: String(MAX_OFFSET),
+    PGHOST: '${self:custom.pgHost}',
+    PGPORT: '${self:custom.pgPort}',
+    PGDATABASE: '${self:custom.pgDatabase}',
+    PGUSER: '${self:custom.pgUser}',
+    PGPASSWORD_SSM_KEY: '${self:custom.pgPasswordSsmKey}'
   },
   iamRoleStatements: [
     {

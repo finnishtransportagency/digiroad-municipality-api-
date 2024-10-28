@@ -21,7 +21,6 @@ export const drsubnetid2 = process.env.DR_SUBNET_ID_2 || '';
 export const subnetid1 = process.env.SUBNET_ID_1 || '';
 export const subnetid2 = process.env.SUBNET_ID_2 || '';
 export const securitygroupid = process.env.SECURITY_GROUP_ID || '';
-export const vpcid = process.env.VPC_ID || '';
 export const smtpusername = process.env.SMTP_USERNAME_SSM_KEY || '';
 export const smtppassword = process.env.SMTP_PASSWORD_SSM_KEY || '';
 export const email = process.env.OPERATOR_EMAIL || '';

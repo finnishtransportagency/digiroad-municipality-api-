@@ -1,4 +1,10 @@
-import { awsaccountid, bucketName, serviceName, stage } from '@functions/config';
+import {
+  awsaccountid,
+  bucketName,
+  MAX_OFFSET,
+  serviceName,
+  stage
+} from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 import { ServerlessFunction } from 'serverless';
 
@@ -6,6 +12,9 @@ const matchRoadLink: ServerlessFunction = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   maximumRetryAttempts: 0,
   timeout: 300,
+  environment: {
+    MAX_OFFSET: String(MAX_OFFSET)
+  },
   iamRoleStatements: [
     {
       Effect: 'Allow',
