@@ -32,7 +32,7 @@ const fetchAndParseData: ServerlessFunction = {
     {
       Effect: 'Allow',
       Action: ['s3:PutObject', 's3:PutObjectAcl'],
-      Resource: [`arn:aws:s3:::${bucketName}/infrao/*`]
+      Resource: [`arn:aws:s3:::${bucketName}/geojson/*`]
     },
     {
       Effect: 'Allow',
