@@ -181,7 +181,11 @@ const serverlessConfiguration: ServerlessConfiguration = {
             LambdaConfigurations: [
               {
                 Event: 's3:ObjectCreated:*',
-                Filter: { S3Key: { Rules: [{ prefix: 'geojson/' }] } },
+                Filter: {
+                  S3Key: {
+                    Rules: [{ Name: 'prefix', Value: 'geojson/' }]
+                  }
+                },
                 Function: { 'Fn::GetAtt': ['CalculateDeltaLambdaFunction', 'Arn'] }
               }
             ]
