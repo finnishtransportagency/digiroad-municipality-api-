@@ -43,11 +43,9 @@ const fetchAndParseData = async (event: unknown) => {
     throw new Error('No valid asset types provided');
   }
 
-  console.info('Mode:', offline ? 'Offline' : 'Online');
-  console.info('Fetching parameter:', `/${serviceName}/${stage}/${event.municipality}`);
   const apiKey = offline
     ? offlineApiKey
-    : await getParameter(`/${serviceName}/${stage}/${event.municipality}`);
+    : await getParameter(`/${serviceName}/${stage}/${event.municipality}/apiKey`);
 
   for (const assetKey of assetTypeKeys) {
     switch (event.format) {
