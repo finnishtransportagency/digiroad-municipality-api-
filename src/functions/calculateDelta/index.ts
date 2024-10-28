@@ -5,7 +5,7 @@ import { ServerlessFunction } from 'serverless';
 const calculateDelta: ServerlessFunction = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   maximumRetryAttempts: 0,
-  timeout: 300,
+  timeout: 600,
   memorySize: 4096,
   iamRoleStatements: [
     {

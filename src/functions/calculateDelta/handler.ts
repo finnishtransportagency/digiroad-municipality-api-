@@ -80,8 +80,7 @@ const calculateDelta = async (event: S3Event) => {
     `calculateDelta/${municipality}/${fileName}.json`,
     JSON.stringify(updatePayload)
   );
-  // No need to await for matchRoadLink
-  void invokeLambda(
+  await invokeLambda(
     'matchRoadLink',
     'Event',
     Buffer.from(
