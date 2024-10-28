@@ -1,4 +1,4 @@
-import { awsaccountid, stage } from '@functions/config';
+import { awsaccountid, bucketName, serviceName, stage } from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 import { ServerlessFunction } from 'serverless';
 
@@ -11,26 +11,26 @@ const matchRoadLink: ServerlessFunction = {
       Effect: 'Allow',
       Action: ['lambda:InvokeFunction'],
       Resource: [
-        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:dr-kunta-${stage}-reportRejectedDelta`,
-        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:dr-kunta-${stage}-getNearbyLinks`,
-        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:dr-kunta-${stage}-execDelta2SQL`
+        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:${serviceName}-${stage}-reportRejectedDelta`,
+        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:${serviceName}-${stage}-getNearbyLinks`,
+        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:${serviceName}-${stage}-execDelta2SQL`
       ]
     },
     {
       Effect: 'Allow',
       Action: ['s3:ListBucket', 's3:GetObject'],
       Resource: [
-        `arn:aws:s3:::dr-kunta-${stage}-bucket/calculateDelta/*`,
-        `arn:aws:s3:::dr-kunta-${stage}-bucket/getNearbyLinks/*`
+        `arn:aws:s3:::${bucketName}/calculateDelta/*`,
+        `arn:aws:s3:::${bucketName}/getNearbyLinks/*`
       ]
     },
     {
       Effect: 'Allow',
       Action: ['s3:PutObject', 's3:PutObjectAcl'],
       Resource: [
-        `arn:aws:s3:::dr-kunta-${stage}-bucket/matchRoadLink/*`,
-        `arn:aws:s3:::dr-kunta-${stage}-bucket/logs/*`,
-        `arn:aws:s3:::dr-kunta-${stage}-bucket/getNearbyLinksRequestPayload/*`
+        `arn:aws:s3:::${bucketName}/matchRoadLink/*`,
+        `arn:aws:s3:::${bucketName}/logs/*`,
+        `arn:aws:s3:::${bucketName}/getNearbyLinksRequestPayload/*`
       ]
     }
   ]

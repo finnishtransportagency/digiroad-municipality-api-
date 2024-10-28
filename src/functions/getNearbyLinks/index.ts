@@ -1,11 +1,11 @@
 import {
   awsaccountid,
+  bucketName,
   pgdatabase,
   pghost,
   pgpassword,
   pgport,
-  pguser,
-  stage
+  pguser
 } from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 import { ServerlessFunction } from 'serverless';
@@ -35,21 +35,21 @@ const getNearbyLinks: ServerlessFunction = {
       Effect: 'Allow',
       Action: ['ssm:GetParameter', 'ssm:GetParameters'],
       Resource: [
-        `arn:aws:ssm:eu-west-1:${awsaccountid}:parameter${'${self:custom.pgPasswordSsmKey}'}`
+        `arn:aws:ssm:eu-west-1:${awsaccountid}:parameter\${self:custom.pgPasswordSsmKey}`
       ]
     },
     {
       Effect: 'Allow',
       Action: ['s3:ListBucket', 's3:GetObject'],
       Resource: [
-        `arn:aws:s3:::dr-kunta-${stage}-bucket/matchRoadLink/*`,
-        `arn:aws:s3:::dr-kunta-${stage}-bucket/getNearbyLinksRequestPayload/*`
+        `arn:aws:s3:::${bucketName}/matchRoadLink/*`,
+        `arn:aws:s3:::${bucketName}/getNearbyLinksRequestPayload/*`
       ]
     },
     {
       Effect: 'Allow',
       Action: ['s3:PutObject', 's3:PutObjectAcl'],
-      Resource: [`arn:aws:s3:::dr-kunta-${stage}-bucket/getNearbyLinks/*`]
+      Resource: [`arn:aws:s3:::${bucketName}/getNearbyLinks/*`]
     }
   ]
 };

@@ -17,7 +17,8 @@ import {
   stage,
   bbox,
   bucketName,
-  helsinkiBbox
+  helsinkiBbox,
+  serviceName
 } from '@functions/config';
 import { middyfy } from '@libs/lambda-tools';
 import { uploadToS3 } from '@libs/s3-tools';
@@ -44,7 +45,7 @@ const fetchAndParseData = async (event: unknown) => {
 
   const apiKey = offline
     ? offlineApiKey
-    : await getParameter(`/dr-kunta/${stage}/${event.municipality}`);
+    : await getParameter(`/${serviceName}/${stage}/${event.municipality}`);
 
   for (const assetKey of assetTypeKeys) {
     switch (event.format) {

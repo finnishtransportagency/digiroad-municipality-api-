@@ -27,7 +27,9 @@ import {
   pghost,
   pgport,
   pgdatabase,
-  pguser
+  pguser,
+  serviceName,
+  bucketName
 } from '@functions/config';
 
 export type ServerlessFunction = Exclude<AWS['functions'], undefined>[string] & {
@@ -45,7 +47,7 @@ interface ServerlessConfiguration extends AWS {
 }
 
 const serverlessConfiguration: ServerlessConfiguration = {
-  service: 'dr-kunta',
+  service: serviceName,
   frameworkVersion: '3',
   plugins: [
     'serverless-esbuild',
@@ -122,10 +124,35 @@ const serverlessConfiguration: ServerlessConfiguration = {
   },
   resources: {
     Resources: {
+      S3CanInvokeCalculateDelta: {
+        Type: 'AWS::Lambda::Permission',
+        Properties: {
+          FunctionName: {
+            'Fn::GetAtt': ['calculateDelta', 'Arn']
+          },
+          Action: 'lambda:InvokeFunction',
+          Principal: 's3.amazonaws.com',
+          SourceArn: {
+            'Fn::Join': [
+              '',
+              [
+                'arn:',
+                {
+                  Ref: 'AWS::Partition'
+                },
+                `:s3:::\${self:service}-${stage}-bucket`
+              ]
+            ]
+          },
+          SourceAccount: {
+            Ref: 'AWS::AccountId'
+          }
+        }
+      },
       drKuntaBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
-          BucketName: `dr-kunta-${stage}-bucket`,
+          BucketName: bucketName,
           LifecycleConfiguration: {
             Rules: [
               {
@@ -145,8 +172,17 @@ const serverlessConfiguration: ServerlessConfiguration = {
               },
               {
                 ExpirationInDays: 30,
-                Prefix: '/infrao/',
+                Prefix: '/geojson/',
                 Status: 'Enabled'
+              }
+            ]
+          },
+          NotificationConfiguration: {
+            LambdaConfiguration: [
+              {
+                Event: 's3:ObjectCreated:*',
+                Filter: { S3Key: { Rules: [{ prefix: 'geojson/' }] } },
+                Function: { 'Fn::GetAtt': ['calculateDelta', 'Arn'] }
               }
             ]
           }

@@ -1,5 +1,5 @@
 import { InvokeCommand, InvokeCommandOutput, Lambda } from '@aws-sdk/client-lambda';
-import { offline, stage } from '@functions/config';
+import { offline, serviceName, stage } from '@functions/config';
 import middy from '@middy/core';
 import middyJsonBodyParser from '@middy/http-json-body-parser';
 import { Handler } from 'aws-lambda';
@@ -23,7 +23,7 @@ export const invokeLambda = async (
 ): Promise<InvokeCommandOutput> =>
   await lambda.send(
     new InvokeCommand({
-      FunctionName: `dr-kunta-${stage}-${FunctionName}`,
+      FunctionName: `${serviceName}-${stage}-${FunctionName}`,
       InvocationType,
       Payload
     })

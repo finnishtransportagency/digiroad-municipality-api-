@@ -1,4 +1,4 @@
-import { awsaccountid, stage } from '@functions/config';
+import { awsaccountid, bucketName, serviceName, stage } from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 import { ServerlessFunction } from 'serverless';
 
@@ -16,17 +16,19 @@ const fetchAndParseData: ServerlessFunction = {
     {
       Effect: 'Allow',
       Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-      Resource: [`arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/dr-kunta/${stage}/*`]
+      Resource: [
+        `arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/${serviceName}/${stage}/*`
+      ]
     },
     {
       Effect: 'Allow',
       Action: ['s3:PutObject', 's3:PutObjectAcl'],
-      Resource: [`arn:aws:s3:::dr-kunta-${stage}-bucket/infrao/*`]
+      Resource: [`arn:aws:s3:::${bucketName}/infrao/*`]
     },
     {
       Effect: 'Allow',
       Action: ['s3:ListBucket'],
-      Resource: [`arn:aws:s3:::dr-kunta-${stage}-bucket`]
+      Resource: [`arn:aws:s3:::${bucketName}`]
     }
   ]
 };

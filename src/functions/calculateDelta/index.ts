@@ -1,4 +1,4 @@
-import { awsaccountid, stage } from '@functions/config';
+import { awsaccountid, bucketName, serviceName, stage } from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 import { ServerlessFunction } from 'serverless';
 
@@ -7,33 +7,23 @@ const calculateDelta: ServerlessFunction = {
   maximumRetryAttempts: 0,
   timeout: 300,
   memorySize: 4096,
-  events: [
-    {
-      s3: {
-        bucket: { Ref: 'drKuntaBucket' },
-        event: 's3:ObjectCreated:*',
-        existing: false,
-        rules: [{ prefix: 'geojson/' }]
-      }
-    }
-  ],
   iamRoleStatements: [
     {
       Effect: 'Allow',
       Action: ['s3:ListBucket', 's3:GetObject', 's3:DeleteObject'],
-      Resource: [`arn:aws:s3:::dr-kunta-${stage}-bucket/geojson/*`]
+      Resource: [`arn:aws:s3:::${bucketName}/geojson/*`]
     },
     {
       Effect: 'Allow',
       Action: ['s3:PutObject', 's3:PutObjectAcl'],
-      Resource: [`arn:aws:s3:::dr-kunta-${stage}-bucket/calculateDelta/*`]
+      Resource: [`arn:aws:s3:::${bucketName}/calculateDelta/*`]
     },
     {
       Effect: 'Allow',
       Action: ['lambda:InvokeFunction'],
       Resource: [
-        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:dr-kunta-${stage}-matchRoadLink`,
-        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:dr-kunta-${stage}-reportRejectedDelta`
+        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:${serviceName}-${stage}-matchRoadLink`,
+        `arn:aws:lambda:eu-west-1:${awsaccountid}:function:${serviceName}-${stage}-reportRejectedDelta`
       ]
     }
   ]

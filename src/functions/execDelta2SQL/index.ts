@@ -1,12 +1,12 @@
 import { handlerPath } from '@libs/handler-resolver';
 import {
   awsaccountid,
+  bucketName,
   pgdatabase,
   pghost,
   pgpassword,
   pgport,
-  pguser,
-  stage
+  pguser
 } from '@functions/config';
 import { ServerlessFunction } from 'serverless';
 
@@ -42,8 +42,8 @@ const execDelta2SQL: ServerlessFunction = {
       Effect: 'Allow',
       Action: ['s3:ListBucket', 's3:GetObject'],
       Resource: [
-        `arn:aws:s3:::dr-kunta-${stage}-bucket/matchRoadLink/*`,
-        `arn:aws:s3:::dr-kunta-${stage}-bucket/getNearbyLinksRequestPayload/*`
+        `arn:aws:s3:::${bucketName}/matchRoadLink/*`,
+        `arn:aws:s3:::${bucketName}/getNearbyLinksRequestPayload/*`
       ]
     }
   ]

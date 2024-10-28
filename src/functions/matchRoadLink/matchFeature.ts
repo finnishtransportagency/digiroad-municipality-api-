@@ -71,6 +71,7 @@ const matchFeature = (
 
       return closest.distance > distance ? similarLink : closest;
     },
+    // initial value for nearbyLinks.reduce function
     {
       link: undefined,
       distance: Number.MAX_VALUE,

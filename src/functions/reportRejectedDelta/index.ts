@@ -1,4 +1,4 @@
-import { awsaccountid, smtppassword, smtpusername, stage } from '@functions/config';
+import { awsaccountid, bucketName, smtppassword, smtpusername } from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 import { ServerlessFunction } from 'serverless';
 
@@ -21,7 +21,7 @@ const reportRejectedDelta: ServerlessFunction = {
         's3:GetObject',
         's3:DeleteObject'
       ],
-      Resource: [`arn:aws:s3:::dr-kunta-${stage}-bucket/*`]
+      Resource: [`arn:aws:s3:::${bucketName}/*`]
     },
     {
       Effect: 'Allow',
