@@ -178,7 +178,7 @@ const serverlessConfiguration: ServerlessConfiguration = {
             ]
           },
           NotificationConfiguration: {
-            LambdaConfiguration: [
+            LambdaConfigurations: [
               {
                 Event: 's3:ObjectCreated:*',
                 Filter: { S3Key: { Rules: [{ prefix: 'geojson/' }] } },
