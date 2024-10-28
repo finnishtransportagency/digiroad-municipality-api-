@@ -128,7 +128,7 @@ const serverlessConfiguration: ServerlessConfiguration = {
         Type: 'AWS::Lambda::Permission',
         Properties: {
           FunctionName: {
-            'Fn::GetAtt': ['calculateDelta', 'Arn']
+            'Fn::GetAtt': ['CalculateDeltaLambdaFunction', 'Arn']
           },
           Action: 'lambda:InvokeFunction',
           Principal: 's3.amazonaws.com',
@@ -182,7 +182,7 @@ const serverlessConfiguration: ServerlessConfiguration = {
               {
                 Event: 's3:ObjectCreated:*',
                 Filter: { S3Key: { Rules: [{ prefix: 'geojson/' }] } },
-                Function: { 'Fn::GetAtt': ['calculateDelta', 'Arn'] }
+                Function: { 'Fn::GetAtt': ['CalculateDeltaLambdaFunction', 'Arn'] }
               }
             ]
           }
