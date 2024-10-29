@@ -30,9 +30,13 @@ export const getPostgresClient = async () => {
  */
 export const executeSingleQuery = async (query: PostgresQuery) => {
   const client = await getPostgresClient();
+  console.info('Connecting to database...');
   await client.connect();
+  console.info('Exectuing query:', query);
   const response = await client.query(query);
+  console.info('Query response:', response);
   await client.end();
+  console.info('Connection closed.');
   return response;
 };
 
