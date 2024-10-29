@@ -44,10 +44,21 @@ const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
     })
     .filter((row) => row !== 'INVALID');
 
+  console.info(
+    `Query result roadlinks: ${JSON.stringify(
+      queryResultRows.map((row) => row.roadlinks)
+    )}`
+  );
+
   const S3ObjectKey = `getNearbyLinks/${payload.municipality}/${new Date()
     .toISOString()
     .slice(0, 19)}.json`;
+
+  console.info(`Uploading to S3: ${S3ObjectKey}`);
+
   await uploadToS3(bucketName, S3ObjectKey, JSON.stringify(queryResultRows));
+
+  console.info('Upload complete');
 
   return { key: S3ObjectKey };
 };
