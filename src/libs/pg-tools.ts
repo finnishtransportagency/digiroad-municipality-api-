@@ -128,7 +128,7 @@ export const getPointQuery = (
               )
               THEN (
                 SELECT traffic_direction
-                FROM traffic_direction, kgv_roadlink
+                FROM traffic_direction
                 WHERE link_id = linkid
               )
               ELSE directiontype
