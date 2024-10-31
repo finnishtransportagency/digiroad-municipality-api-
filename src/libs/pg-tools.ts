@@ -128,15 +128,15 @@ export const getPointQuery = (
           LEFT JOIN traffic_direction td ON td.link_id = kr.linkid
           JOIN functional_class fc ON kr.linkid = fc.link_id
           WHERE
-            kgv_roadlink.municipalitycode = municipality_.id
-            AND kgv_roadlink.linkid = functional_class.link_id
+            kr.municipalitycode = municipality_.id
+            AND kr.linkid = functional_class.link_id
             AND not EXISTS(
               SELECT 1
               FROM administrative_class
-              WHERE administrative_class.link_id = kgv_roadlink.linkid AND administrative_class.administrative_class = 1
+              WHERE administrative_class.link_id = kr.linkid AND administrative_class.administrative_class = 1
             )
-            AND (kgv_roadlink.adminclass != 1 OR kgv_roadlink.adminclass IS NULL)
-            AND kgv_roadlink.expired_date is null
+            AND (kr.adminclass != 1 OR kr.adminclass IS NULL)
+            AND kr.expired_date is null
         )
       SELECT
         (value#>'{properties}'->>'ID')::TEXT AS ID,
