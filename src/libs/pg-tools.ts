@@ -124,7 +124,7 @@ export const getPointQuery = (
             COALESCE(td.traffic_direction, kr.directiontype) AS directiontype,
             functional_class,
             roadname_fi
-          FROM municipality, kgv_roadlink kr
+          FROM municipality_, kgv_roadlink kr
           LEFT JOIN traffic_direction td ON td.link_id = kr.linkid
           JOIN functional_class fc ON kr.linkid = fc.link_id
           WHERE
