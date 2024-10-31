@@ -1481,7 +1481,7 @@ export const trafficSignRules: TrafficSignRules = {
     allowedAgainstTraffic: false
   },
   E30: {
-    text: 'Ajokaistojen yhdistyminen',
+    text: 'Ajokaistojen yhdistymien', // Typo in database
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
     maxValue: null,
@@ -1976,7 +1976,7 @@ export const trafficSignRules: TrafficSignRules = {
     allowedAgainstTraffic: false
   },
   F35: {
-    text: 'Opastus merkin tarkoittamalle tielle',
+    text: 'Opastus numeron tarkoittamalle tielle',
     maxValue: 100000,
     type: 'TRAFFICSIGN',
     allowedOnKapy: false,
@@ -2282,7 +2282,7 @@ export const trafficSignRules: TrafficSignRules = {
     allowedAgainstTraffic: true
   },
   'F55.4': {
-    text: 'Pyörätuoliramppii ylös',
+    text: 'Pyörätuoliramppi ylös',
     type: 'TRAFFICSIGN',
     allowedOnKapy: true,
     maxValue: null,

@@ -32,7 +32,7 @@ export const executeSingleQuery = async (query: PostgresQuery) => {
   const client = await getPostgresClient();
   console.info('Connecting to database...');
   await client.connect();
-  console.info('Exectuing query:', query);
+  console.info('Executing query:', query);
   const response = await client.query(query);
   console.info('Query response:', response);
   await client.end();
@@ -121,21 +121,12 @@ export const getPointQuery = (
           SELECT
             linkid,
             shape,
-            CASE
-              WHEN linkid IN (
-                SELECT link_id
-                FROM traffic_direction
-              )
-              THEN (
-                SELECT traffic_direction
-                FROM traffic_direction
-                WHERE link_id = linkid
-              )
-              ELSE directiontype
-            END AS directiontype,
+            COALESCE(td.traffic_direction, kr.directiontype) AS directiontype
             functional_class,
             roadname_fi
-          FROM kgv_roadlink, municipality_, functional_class
+          FROM kgv_roadlink
+          LEFT JOIN traffic_direction td ON td.link_id = kr.linkid
+          JOIN functional_class fc ON kr.linkid = fc.link_id
           WHERE
             kgv_roadlink.municipalitycode = municipality_.id
             AND kgv_roadlink.linkid = functional_class.link_id
@@ -147,7 +138,6 @@ export const getPointQuery = (
             AND (kgv_roadlink.adminclass != 1 OR kgv_roadlink.adminclass IS NULL)
             AND kgv_roadlink.expired_date is null
         )
-
       SELECT
         (value#>'{properties}'->>'ID')::TEXT AS ID,
         (value#>'{properties}'->>'TYPE')::TEXT AS TYPE,
@@ -378,7 +368,6 @@ export const insertSingleChoiceQuery = (
           }=($2)
           ${limit ? `LIMIT ${limit}` : ''}
         )
-
       INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
       VALUES ($3, (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', $4)
     `,
