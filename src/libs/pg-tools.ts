@@ -121,7 +121,7 @@ export const getPointQuery = (
           SELECT
             linkid,
             shape,
-            COALESCE(td.traffic_direction, kr.directiontype) AS directiontype
+            COALESCE(td.traffic_direction, kr.directiontype) AS directiontype,
             functional_class,
             roadname_fi
           FROM kgv_roadlink
