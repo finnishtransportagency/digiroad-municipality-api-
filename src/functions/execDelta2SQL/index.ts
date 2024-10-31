@@ -6,6 +6,8 @@ const execDelta2SQL: ServerlessFunction = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   maximumRetryAttempts: 0,
   timeout: 900,
+  memorySize: 2048,
+  ephemeralStorageSize: 1024,
   vpc: {
     securityGroupIds: ['${self:custom.drSecurityGroupId}'],
     subnetIds: ['${self:custom.drSubnetId1}', '${self:custom.drSubnetId2}']
