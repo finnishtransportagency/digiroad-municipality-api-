@@ -2,7 +2,11 @@ import { middyfy } from '@libs/lambda-tools';
 import { Geometry, LineString } from 'wkx';
 import { bucketName } from '@functions/config';
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
-import { isGetNearbyLinksPayload, S3KeyObject } from '@customTypes/eventTypes';
+import {
+  isGetNearbyLinksPayload,
+  S3KeyObject,
+  SupportedMunicipality
+} from '@customTypes/eventTypes';
 import { gnlPayloadSchema } from '@schemas/getNearbyLinksSchema';
 import { getPointQuery, executeSingleQuery } from '@libs/pg-tools';
 import { pointQueryResultSchema } from '@schemas/sqlResultSchemas';
@@ -21,9 +25,7 @@ const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
       )}`
     );
 
-  type Municipality = keyof typeof municipalityCodeMap | undefined;
-
-  const municipality = payload.municipality as Municipality;
+  const municipality: SupportedMunicipality = payload.municipality;
   const municipalityCode = municipality ? municipalityCodeMap[municipality] : undefined;
 
   if (!municipalityCode)

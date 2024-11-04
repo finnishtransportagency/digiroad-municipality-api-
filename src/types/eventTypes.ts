@@ -4,7 +4,7 @@ import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
 import { gnlPayloadSchema } from '@schemas/getNearbyLinksSchema';
 import { supportedMunicipalities } from '@functions/config';
 
-type SupportedMunicipality = (typeof supportedMunicipalities)[number];
+export type SupportedMunicipality = (typeof supportedMunicipalities)[number];
 export const isSupportedMunicipality = (
   municipality: string
 ): municipality is SupportedMunicipality =>
