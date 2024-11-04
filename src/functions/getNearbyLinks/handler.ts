@@ -6,6 +6,7 @@ import { isGetNearbyLinksPayload, S3KeyObject } from '@customTypes/eventTypes';
 import { gnlPayloadSchema } from '@schemas/getNearbyLinksSchema';
 import { getPointQuery, executeSingleQuery } from '@libs/pg-tools';
 import { pointQueryResultSchema } from '@schemas/sqlResultSchemas';
+import { municipalityCodeMap } from '@schemas/dbIdMapping';
 
 const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
   const s3Response = JSON.parse(await getFromS3(bucketName, event.key)) as unknown;
@@ -20,8 +21,16 @@ const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
       )}`
     );
 
+  type Municipality = keyof typeof municipalityCodeMap | undefined;
+
+  const municipality = payload.municipality as Municipality;
+  const municipalityCode = municipality ? municipalityCodeMap[municipality] : undefined;
+
+  if (!municipalityCode)
+    throw new Error(`Municipality ${payload.municipality} is not supported`);
+
   const queryResultRows = (
-    await executeSingleQuery(getPointQuery(payload.municipality, payload.features))
+    await executeSingleQuery(getPointQuery(municipalityCode, payload.features))
   ).rows
     .map((row) => {
       try {

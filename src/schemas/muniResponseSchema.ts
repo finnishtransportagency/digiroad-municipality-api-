@@ -34,6 +34,16 @@ const infraoObstacleSchema = object({
   }).required()
 }).required();
 
+const mapSignCode = (fullCode: string) => {
+  const splitType = fullCode.trim().split(' '); // e.g. ['A10'] or ['141.a', 'Töyssyjä']
+  const codeNumber = splitType[0];
+  if (Object.keys(trafficSignRules).includes(codeNumber)) return codeNumber;
+  const mapping = oldTrafficSignMapping[codeNumber.split('.')[0]]; // This split might not work for all cases
+  if (!mapping) return 'INVALID_CODE';
+  if (mapping.hasSubCode) return mapping.code[splitType[1]] ?? 'INVALID_CODE';
+  return mapping.code.default ?? 'INVALID_CODE';
+};
+
 const infraoTrafficSignSchema = object({
   type: string().oneOf(['Feature']).required(),
   id: string()
@@ -49,26 +59,11 @@ const infraoTrafficSignSchema = object({
     teksti: string().notRequired(),
     liikennemerkkityyppi: string()
       .default('INVALID_CODE')
-      .when('liikennemerkkityyppi2020', {
-        is: 'INVALID_CODE',
-        then: (schema) =>
-          schema
-            .transform((code: string) => {
-              const splitType = code.trim().split(' '); // e.g. ['A10'] or ['141.a', 'Töyssyjä']
-              const code2020 = splitType[0];
-              if (Object.keys(trafficSignRules).includes(code2020)) return code2020;
-              const mapping = oldTrafficSignMapping[code2020.split('.')[0]]; // This split might not work for all cases
-              if (!mapping) return 'INVALID_CODE';
-              if (mapping.hasSubCode) return mapping.code[splitType[1]] ?? 'INVALID_CODE';
-              return mapping.code.default ?? 'INVALID_CODE';
-            })
-            .required(),
-        otherwise: (schema) => schema.notRequired()
-      }),
+      .transform(mapSignCode)
+      .required(),
     liikennemerkkityyppi2020: string()
-      .transform((code: string) =>
-        Object.keys(trafficSignRules).includes(code) ? code : 'INVALID_CODE'
-      )
+      .default('INVALID_CODE')
+      .transform(mapSignCode)
       .required()
   }).required()
 }).required();

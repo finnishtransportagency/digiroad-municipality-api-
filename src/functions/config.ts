@@ -30,4 +30,4 @@ export const awsaccountid = process.env.AWS_ACCOUNT_ID || '';
  * Maximum offset from the middle of the linestring when matching obstacles and traffic signs
  */
 export const MAX_OFFSET = Number(process.env.MAX_OFFSET) || 15;
-export const supportedMunicipalities = ['espoo', 'helsinki'] as const;
+export const supportedMunicipalities = ['espoo', 'helsinki', 'jyvaskyla'] as const;
