@@ -12,5 +12,6 @@ export const assetTypeIdMap = {
  */
 export const municipalityCodeMap = {
   espoo: 49,
-  helsinki: 91
+  helsinki: 91,
+  jyvaskyla: 179
 };

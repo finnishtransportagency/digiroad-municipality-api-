@@ -16,7 +16,9 @@
     "espoo-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://kartat.espoo.fi/trimbleogcapi\", \"format\": \"json\", \"municipality\": \"espoo\", \"assetTypes\": { \"trafficSigns\": \"infrao:Liikennemerkki\" }}'",
     "helsinki-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://city-infra.test.hel.ninja/v1\", \"format\": \"helsinki\", \"municipality\": \"helsinki\", \"assetTypes\": { \"trafficSigns\": \"traffic-sign-reals\" }}'",
     "clear-helsinki-signs": "node testFiles/uploadTestFile.js ./testFiles/empty.json dr-kunta-dev-bucket geojson/helsinki/trafficSigns/ .json",
-    "helsinki-prod-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://cityinfra.api.hel.fi/v1\", \"format\": \"helsinki\", \"municipality\": \"helsinki\", \"assetTypes\": { \"trafficSigns\": \"traffic-sign-reals\" }}'"
+    "helsinki-prod-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://cityinfra.api.hel.fi/v1\", \"format\": \"helsinki\", \"municipality\": \"helsinki\", \"assetTypes\": { \"trafficSigns\": \"traffic-sign-reals\" }}'",
+    "jkl-signs": "sls invoke local --function fetchAndParseData -e OFFLINE=true --data '{ \"url\": \"https://kartta.jkl.fi/trimbleogcapi\", \"format\": \"json\", \"municipality\": \"jyvaskyla\", \"assetTypes\": { \"trafficSigns\": \"infrao:Liikennemerkki\" }}'",
+    "clear-jkl-signs": "node testFiles/uploadTestFile.js ./testFiles/empty.json dr-kunta-dev-bucket geojson/jyvaskyla/trafficSigns/ .json"
   },
   "engines": {
     "node": ">=18.15.0"

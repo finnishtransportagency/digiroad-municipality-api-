@@ -1,4 +1,4 @@
-import { awsaccountid, bucketName, serviceName, stage } from '@functions/config';
+import { awsaccountid, bucketName, offline, serviceName, stage } from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 import { ServerlessFunction } from 'serverless';
 
@@ -7,6 +7,18 @@ const calculateDelta: ServerlessFunction = {
   maximumRetryAttempts: 0,
   timeout: 600,
   memorySize: 4096,
+  ...(offline && {
+    events: [
+      {
+        s3: {
+          bucket: bucketName,
+          event: 's3:ObjectCreated:*',
+          existing: true,
+          rules: [{ prefix: 'geojson/' }]
+        }
+      }
+    ]
+  }),
   iamRoleStatements: [
     {
       Effect: 'Allow',

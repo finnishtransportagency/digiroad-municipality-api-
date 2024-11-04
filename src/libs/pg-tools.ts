@@ -105,18 +105,13 @@ const getPropertySubquery = (
  * }
  */
 export const getPointQuery = (
-  municipality: string,
+  municipalityCode: number,
   features: Array<ValidFeature>
 ): PostgresQuery => {
   const searchRadius = String(MAX_OFFSET + 3);
   return {
     text: `
       WITH
-        municipality_ AS (
-          SELECT id
-          FROM municipality
-          WHERE LOWER(name_fi) = LOWER($1)
-        ),
         acceptable_roadlinks AS (
           SELECT
             linkid,
@@ -124,11 +119,11 @@ export const getPointQuery = (
             COALESCE(td.traffic_direction, kr.directiontype) AS directiontype,
             functional_class,
             roadname_fi
-          FROM municipality_, kgv_roadlink kr
+          FROM kgv_roadlink kr
           LEFT JOIN traffic_direction td ON td.link_id = kr.linkid
           JOIN functional_class fc ON kr.linkid = fc.link_id
           WHERE
-            kr.municipalitycode = municipality_.id
+            kr.municipalitycode = ($1)
             AND kr.linkid = fc.link_id
             AND not EXISTS(
               SELECT 1
@@ -152,7 +147,12 @@ export const getPointQuery = (
         )
       GROUP BY ID,TYPE
     `,
-    values: [municipality, JSON.stringify(features), allowedOnKapy, searchRadius]
+    values: [
+      String(municipalityCode),
+      JSON.stringify(features),
+      allowedOnKapy,
+      searchRadius
+    ]
   };
 };
 
