@@ -38,9 +38,10 @@ const mapSignCode = (fullCode: string) => {
   const splitType = fullCode.trim().split(' '); // e.g. ['A10'] or ['141.a', 'Töyssyjä']
   const codeNumber = splitType[0];
   if (Object.keys(trafficSignRules).includes(codeNumber)) return codeNumber;
-  const mapping = oldTrafficSignMapping[codeNumber.split('.')[0]]; // This split might not work for all cases
+  const pointSplit = fullCode.trim().split(/[\s.]/);
+  const mapping = oldTrafficSignMapping[pointSplit[0]];
   if (!mapping) return 'INVALID_CODE';
-  if (mapping.hasSubCode) return mapping.code[splitType[1]] ?? 'INVALID_CODE';
+  if (mapping.hasSubCode) return mapping.code[pointSplit[1]] ?? mapping.code.default;
   return mapping.code.default ?? 'INVALID_CODE';
 };
 
