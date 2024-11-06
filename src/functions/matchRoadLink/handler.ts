@@ -106,14 +106,24 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     }
   };
 
+  const rejectedCreated = createdFeatures.filter((feature) => feature.type === 'Invalid');
+  const rejectedUpdated = updatedFeatures.filter((feature) => feature.type === 'Invalid');
+  const acceptedCreated = createdFeatures.filter((feature) => feature.type === 'Feature');
+  const acceptedUpdated = updatedFeatures.filter((feature) => feature.type === 'Feature');
+
   const logsBody = {
     Rejected: {
-      Created: createdFeatures.filter((feature) => feature.type === 'Invalid'),
-      Updated: updatedFeatures.filter((feature) => feature.type === 'Invalid')
+      createdSum: rejectedCreated.length,
+      updatedSum: rejectedUpdated.length,
+      Created: rejectedCreated,
+      Updated: rejectedUpdated
     },
     Accepted: {
-      Created: createdFeatures.filter((feature) => feature.type === 'Feature'),
-      Updated: updatedFeatures.filter((feature) => feature.type === 'Feature'),
+      createdSum: acceptedCreated.length,
+      updatedSum: acceptedUpdated.length,
+      deletedSum: updatePayload.Deleted.length,
+      Created: acceptedCreated,
+      Updated: acceptedUpdated,
       Deleted: updatePayload.Deleted
     },
     invalidInfrao: updatePayload.invalidInfrao,

@@ -165,7 +165,13 @@ const pushUpdatesToPayload = (
   });
 
   referenceFeatures.forEach((referenceFeature) => {
-    if (!updateFeatures.find((f) => isEqual(f, referenceFeature)))
+    if (
+      !updateFeatures.find(
+        (f) =>
+          f.properties.ID === referenceFeature.properties.ID &&
+          f.properties.TYPE === referenceFeature.properties.TYPE
+      )
+    )
       payloadObject.Deleted.push(referenceFeature);
   });
 };
