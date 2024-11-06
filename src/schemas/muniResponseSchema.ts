@@ -73,7 +73,7 @@ const helsinkiSignSchema = object({
   id: string().required(),
   location: pointGeometrySchema.required(),
   device_type: string().required(),
-  lifecycle: number().oneOf([3, 4, 5, 6]).notRequired(),
+  lifecycle: number().oneOf([3, 4, 5, 6]).required(),
   condition: number().oneOf([1, 2, 3, 4, 5]).notRequired(),
   road_name: string().notRequired(),
   lane_type: number()
@@ -162,6 +162,7 @@ const helsinkiAdditionalPanelSchema = object({
   id: string().required(),
   location: pointGeometrySchema.required(),
   device_type: string().notRequired(),
+  lifecycle: number().oneOf([3, 4, 5, 6]).required(),
   value: ref<string>('content_s.limit'),
   content_s: object({
     unit: string().notRequired(),
