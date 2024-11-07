@@ -23,7 +23,9 @@ export default (feature: unknown): Feature => {
       'Invalid liikennemerkkityyppi & liikennemerkkityyppi2020'
     );
 
-  const value = parseInt(properties.teksti ?? '');
+  const text = properties.teksti;
+  const numbers = text ? text.match(/\b[1-9]\d*/) : '';
+  const value = parseInt(numbers ? numbers[0] : '');
 
   return trafficSignFeatureSchema.cast({
     type: 'Feature',
@@ -37,7 +39,7 @@ export default (feature: unknown): Feature => {
       SUUNTIMA: Math.round(properties.suunta ? properties.suunta * (180 / Math.PI) : 0), // MAYBE SHOULD RETURN InvalidFeature in case of no bearing.
       LM_TYYPPI: createTrafficSignText(trafficSignCode),
       ARVO: isNaN(value) ? undefined : value,
-      TEKSTI: properties.teksti ? properties.teksti.substring(0, 128) : properties.teksti,
+      TEKSTI: text ? text.substring(0, 128) : text,
       ...(!(trafficSignCode[0] === 'H') && {
         LISAKILVET: []
       })

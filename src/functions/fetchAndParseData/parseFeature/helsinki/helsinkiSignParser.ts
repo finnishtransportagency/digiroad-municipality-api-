@@ -28,6 +28,8 @@ export default (
     ? helsinkiAdditionalPanelSchema
     : helsinkiSignSchema;
   const castedFeature = castSchema.cast(feature);
+  if (![3, 4].includes(castedFeature.lifecycle))
+    return invalidFeature(feature, `Lifecycle not active: ${castedFeature.lifecycle}`);
   const id = castedFeature.id;
   const deviceTypeId = castedFeature.device_type;
   const sign = signMap.find((item) => item.id === deviceTypeId);
