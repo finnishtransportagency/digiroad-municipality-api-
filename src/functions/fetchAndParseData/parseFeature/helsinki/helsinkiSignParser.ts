@@ -63,6 +63,14 @@ export default (
   const direction = castedFeature.direction;
   const correctedDirection = direction ? oppositeBearing(direction) : direction;
 
+  const textMatch = castedFeature.txt
+    ? castedFeature.txt.match(/text:([^;]*)/)
+    : undefined;
+  const text = textMatch ? textMatch[1].trim() : undefined;
+  const numbers = text ? text.match(/\b[1-9]\d*/) : '';
+  const value = parseInt(numbers ? numbers[0] : '');
+  const txt = isAdditionalPanel ? text : castedFeature.txt;
+
   const geoJsonFeature = {
     type: 'Feature',
     id,
@@ -74,10 +82,12 @@ export default (
       SUUNTIMA: correctedDirection,
       LM_TYYPPI: createTrafficSignText(finalCode),
       ARVO:
-        Object.keys(trafficSignRules).includes(finalCode) && !isNaN(numberValue)
+        isAdditionalPanel && !isNaN(value)
+          ? value
+          : Object.keys(trafficSignRules).includes(finalCode) && !isNaN(numberValue)
           ? numberValue
           : null,
-      TEKSTI: castedFeature.txt ? castedFeature.txt.substring(0, 128) : castedFeature.txt,
+      TEKSTI: txt ? txt.substring(0, 128) : txt,
       ...(isAdditionalPanel
         ? {}
         : { LISAKILVET: panels.filter((panel) => panel).slice(0, 5) })
