@@ -203,7 +203,8 @@ const helsinkiAdditionalPanelSchema = object({
       }
     })
     .notRequired(),
-  txt: ref<string>('content_s.unit')
+  txt: ref<string>('additional_information'),
+  additional_information: string().notRequired()
 });
 
 export {
