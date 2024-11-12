@@ -2,7 +2,7 @@ import { Feature } from '@customTypes/featureTypes';
 import { invalidFeature } from '@libs/schema-tools';
 import { GeoJsonFeatureType, trafficSignFeatureSchema } from '@schemas/geoJsonSchema';
 import { infraoTrafficSignSchema } from '@schemas/muniResponseSchema';
-import { createTrafficSignText } from '@schemas/trafficSignTypes';
+import { createTrafficSignText, trafficSignRules } from '@schemas/trafficSignTypes';
 
 export default (feature: unknown): Feature => {
   const castedFeature = infraoTrafficSignSchema.cast(feature);
@@ -26,6 +26,9 @@ export default (feature: unknown): Feature => {
   const text = properties.teksti;
   const numbers = text ? text.match(/\b[1-9]\d*/) : '';
   const value = parseInt(numbers ? numbers[0] : '');
+  const isValueSign =
+    Object.keys(trafficSignRules).includes(trafficSignCode) &&
+    trafficSignRules[trafficSignCode].unit;
 
   return trafficSignFeatureSchema.cast({
     type: 'Feature',
@@ -38,7 +41,7 @@ export default (feature: unknown): Feature => {
       ID: String(id),
       SUUNTIMA: Math.round(properties.suunta ? properties.suunta * (180 / Math.PI) : 0), // MAYBE SHOULD RETURN InvalidFeature in case of no bearing.
       LM_TYYPPI: createTrafficSignText(trafficSignCode),
-      ARVO: isNaN(value) ? undefined : value,
+      ARVO: !isNaN(value) && isValueSign ? value : undefined,
       TEKSTI: text ? text.substring(0, 128) : text,
       ...(!(trafficSignCode[0] === 'H') && {
         LISAKILVET: []

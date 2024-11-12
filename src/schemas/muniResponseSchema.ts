@@ -69,22 +69,13 @@ const infraoTrafficSignSchema = object({
   }).required()
 }).required();
 
-const helsinkiSignSchema = object({
+const helsinkiCommonValuesSchema = object({
   id: string().required(),
   location: pointGeometrySchema.required(),
   device_type: string().required(),
   lifecycle: number().oneOf([3, 4, 5, 6]).required(),
   condition: number().oneOf([1, 2, 3, 4, 5]).notRequired(),
-  road_name: string().notRequired(),
-  lane_type: number()
-    .oneOf([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 20, 21, 22])
-    .notRequired(),
-  lane_number: string()
-    .oneOf(['11', '21', '31', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9'])
-    .notRequired(),
-  direction: number().required().max(360).min(0),
   height: number().notRequired().min(0),
-  value: string().notRequired(),
   size: number()
     .oneOf([1, 2, 3])
     .transform((code: string) => {
@@ -114,9 +105,22 @@ const helsinkiSignSchema = object({
           break;
       }
     })
+    .notRequired()
+});
+
+const helsinkiSignSchema = helsinkiCommonValuesSchema.shape({
+  direction: number().required().max(360).min(0),
+  road_name: string().notRequired(),
+  lane_type: number()
+    .oneOf([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 20, 21, 22])
+    .notRequired(),
+  lane_number: string()
+    .oneOf(['11', '21', '31', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'X8', 'X9'])
     .notRequired(),
   txt: string().notRequired(),
-  location_specifier: string().notRequired()
+  value: string().notRequired(),
+  location_specifier: string().notRequired(),
+  mount_real: string().notRequired()
 });
 
 const helsinkiTrafficSignMapSchema = object({
@@ -158,11 +162,7 @@ const helsinkiTrafficSignMapSchema = object({
     .required()
 }).required();
 
-const helsinkiAdditionalPanelSchema = object({
-  id: string().required(),
-  location: pointGeometrySchema.required(),
-  device_type: string().notRequired(),
-  lifecycle: number().oneOf([3, 4, 5, 6]).required(),
+const helsinkiAdditionalPanelSchema = helsinkiCommonValuesSchema.shape({
   value: ref<string>('content_s.limit'),
   content_s: object({
     unit: string().notRequired(),
@@ -172,36 +172,6 @@ const helsinkiAdditionalPanelSchema = object({
     .transform((value) => (value >= 0 ? value % 360 : 360 + (value % 360)))
     .max(360)
     .min(0)
-    .notRequired(),
-  size: number()
-    .oneOf([1, 2, 3])
-    .transform((code: string) => {
-      switch (code) {
-        case 'S':
-          return 1;
-        case 'M':
-          return 2;
-        case 'L':
-          return 3;
-        default:
-          break;
-      }
-    })
-    .notRequired(),
-  reflection_class: number()
-    .oneOf([1, 2, 3])
-    .transform((code: string) => {
-      switch (code) {
-        case 'R1':
-          return 1;
-        case 'R2':
-          return 2;
-        case 'R3':
-          return 3;
-        default:
-          break;
-      }
-    })
     .notRequired(),
   txt: ref<string>('additional_information'),
   additional_information: string().notRequired()

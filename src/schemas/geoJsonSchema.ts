@@ -69,8 +69,10 @@ const trafficSignPropertiesSchema = object({
   TEKSTI: string().max(128).notRequired(),
   LISATIETO: string().notRequired(),
   RAKENNE: number().oneOf([1, 2, 3, 4, 5, 6]).notRequired(),
+  KALVON_TYYPPI: number().oneOf([1, 2, 3]).notRequired(),
   KUNTO: number().oneOf([1, 2, 3, 4, 5]).notRequired(),
   KOKO: number().oneOf([1, 2, 3]).notRequired(),
+  KORKEUS: number().notRequired(),
   LISAKILVET: array()
     .of(additionalPanelPropertiesSchema)
     .when('LM_TYYPPI', {

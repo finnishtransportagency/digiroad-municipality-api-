@@ -166,6 +166,16 @@ const execInsert = async (
           insertSingleChoiceQuery('size', featureProperties.KOKO, assetID, dbmodifier)
         );
       }
+      if (featureProperties.KALVON_TYYPPI) {
+        await client.query(
+          insertSingleChoiceQuery(
+            'coating_type',
+            featureProperties.KALVON_TYYPPI,
+            assetID,
+            dbmodifier
+          )
+        );
+      }
       if (featureProperties.LISAKILVET.length > 0) {
         await Promise.all(
           featureProperties.LISAKILVET.slice(0, 5).map(async (panel, i: number) => {
