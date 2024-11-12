@@ -344,7 +344,13 @@ export const insertTextQuery = (
  * @param dbmodifier "municipality-api-{name of municipality}"
  */
 export const insertSingleChoiceQuery = (
-  publicId: 'trafficSigns_type' | 'structure' | 'condition' | 'size' | 'esterakennelma',
+  publicId:
+    | 'trafficSigns_type'
+    | 'structure'
+    | 'condition'
+    | 'size'
+    | 'esterakennelma'
+    | 'coating_type',
   enumeratedValue: number | string | undefined,
   assetId: number,
   dbmodifier: string,

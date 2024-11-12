@@ -63,6 +63,9 @@ export default (
   const direction = castedFeature.direction;
   const correctedDirection = direction ? oppositeBearing(direction) : direction;
 
+  /**
+   * Extracting text and values from txt field.
+   */
   const textMatch = castedFeature.txt
     ? castedFeature.txt.match(/text:([^;]*)/)
     : undefined;
@@ -70,6 +73,11 @@ export default (
   const numbers = text ? text.match(/\b[1-9]\d*/) : '';
   const value = parseInt(numbers ? numbers[0] : '');
   const txt = isAdditionalPanel ? text : castedFeature.txt;
+
+  const isValueSign =
+    Object.keys(trafficSignRules).includes(finalCode) && trafficSignRules[finalCode].unit;
+  const hasValidValue = isValueSign && isAdditionalPanel && !isNaN(value);
+  const hasValidNumberValue = isValueSign && !isNaN(numberValue);
 
   const geoJsonFeature = {
     type: 'Feature',
@@ -81,16 +89,15 @@ export default (
       ID: id,
       SUUNTIMA: correctedDirection,
       LM_TYYPPI: createTrafficSignText(finalCode),
-      ARVO:
-        isAdditionalPanel && !isNaN(value)
-          ? value
-          : Object.keys(trafficSignRules).includes(finalCode) && !isNaN(numberValue)
-          ? numberValue
-          : null,
+      ARVO: hasValidValue ? value : hasValidNumberValue ? numberValue : undefined,
       TEKSTI: txt ? txt.substring(0, 128) : txt,
       ...(isAdditionalPanel
         ? {}
-        : { LISAKILVET: panels.filter((panel) => panel).slice(0, 5) })
+        : { LISAKILVET: panels.filter((panel) => panel).slice(0, 5) }),
+      KALVON_TYYPPI: castedFeature.reflection_class,
+      KUNTO: castedFeature.condition,
+      KOKO: castedFeature.size,
+      KORKEUS: castedFeature.height
     },
     geometry: {
       type: 'Point',
