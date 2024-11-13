@@ -107,11 +107,11 @@ const getFeatureCollection = async (
         } object(s) found in geojson/${municipality}/${assetType}/`,
         object: null
       };
-    const foundObject = Contents.sort((a, b) => {
-      const dateA = a.LastModified ? a.LastModified.getTime() : 0;
-      const dateB = b.LastModified ? b.LastModified.getTime() : 0;
-      return dateB - dateA;
-    })[index];
+    const foundObject = Contents.sort((a, b) =>
+      a.LastModified && b.LastModified
+        ? b.LastModified.getTime() - a.LastModified.getTime()
+        : 0
+    )[index];
 
     if (!foundObject || !foundObject.Key)
       return { error: `No object found in index: ${index}`, object: null };
