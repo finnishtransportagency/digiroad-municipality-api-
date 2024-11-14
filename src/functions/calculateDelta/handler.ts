@@ -16,11 +16,6 @@ import {
 } from '@schemas/geoJsonSchema';
 import { FeatureCollection, ValidFeature } from '@customTypes/featureTypes';
 
-enum FeatureObjectType {
-  UPDATE = 0,
-  REFERENCE = 1
-}
-
 interface FeatureCollectionResult {
   error: string | null;
   object: FeatureCollection | null;
@@ -36,21 +31,20 @@ const calculateDelta = async (event: S3Event) => {
   const assetType: string = updateObjectKey.split('/')[2];
   if (!isAssetTypeKey(assetType)) throw new Error('Invalid assetType');
 
-  const updateCollectionResult: FeatureCollectionResult = await getFeatureCollection(
-    municipality,
-    assetType,
-    FeatureObjectType.UPDATE
+  const updateObject: FeatureCollection = geoJsonSchema.cast(
+    JSON.parse(await getFromS3(bucketName, updateObjectKey))
   );
-  if (!updateCollectionResult.object) {
-    await reportUpdateObjectError(
-      updateCollectionResult.error || 'Unknown error',
-      updateObjectKey
-    );
+  if (!updateObject) {
+    await reportUpdateObjectError(updateObjectKey);
     throw new Error(`Error while retrieving update object: ${updateObjectKey}`);
   }
-  const updateObject: FeatureCollection = updateCollectionResult.object;
+
   const referenceObject: FeatureCollection | null = (
-    await getFeatureCollection(municipality, assetType, FeatureObjectType.REFERENCE)
+    await getFeatureCollection(
+      municipality,
+      assetType,
+      updateObjectKey === `geojson/${municipality}/${assetType}/empty.json` ? 0 : 1
+    )
   ).object;
 
   const updateFeatures: Array<ValidFeature> = updateObject.features.filter((f) =>
@@ -92,7 +86,7 @@ const calculateDelta = async (event: S3Event) => {
 const getFeatureCollection = async (
   municipality: string,
   assetType: AssetTypeKey,
-  index: FeatureObjectType
+  index: 0 | 1
 ): Promise<FeatureCollectionResult> => {
   try {
     const { Contents } = await listS3Objects(
@@ -107,13 +101,11 @@ const getFeatureCollection = async (
         } object(s) found in geojson/${municipality}/${assetType}/`,
         object: null
       };
-    console.log('BEFORE SORT:', Contents);
     const sortedObject = Contents.sort((a, b) =>
       a.LastModified && b.LastModified
         ? b.LastModified.getTime() - a.LastModified.getTime()
         : 0
     );
-    console.log('AFTER SORT:', Contents);
     const foundObject = sortedObject[index];
 
     if (!foundObject || !foundObject.Key)
@@ -130,9 +122,9 @@ const getFeatureCollection = async (
   }
 };
 
-const reportUpdateObjectError = async (error: string, updateObjectKey: string) => {
+const reportUpdateObjectError = async (updateObjectKey: string) => {
   await deleteFromS3(bucketName, updateObjectKey);
-  console.error(`${updateObjectKey} deleted because of invalid data: ${error}`);
+  console.error(`${updateObjectKey} deleted because of invalid data`);
 };
 
 const validateFeatureAssetType = (
