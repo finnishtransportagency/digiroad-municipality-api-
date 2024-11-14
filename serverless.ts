@@ -24,8 +24,6 @@ import {
   pgport,
   pgdatabase,
   pguser,
-  smtpusername,
-  smtppassword,
   bucketName
 } from '@functions/config';
 
@@ -73,9 +71,7 @@ const serverlessConfiguration: ServerlessConfiguration = {
     pgPort: offline ? pgport : `\${ssm:${pgport}}`,
     pgDatabase: offline ? pgdatabase : `\${ssm:${pgdatabase}}`,
     pgUser: offline ? pguser : `\${ssm:${pguser}}`,
-    pgPasswordSsmKey: offline ? pgpassword : `\${ssm:${pgpassword}}`,
-    smtpUsernameSsmKey: offline ? smtpusername : `\${ssm:${smtpusername}}`,
-    smtpPasswordSsmKey: offline ? smtppassword : `\${ssm:${smtppassword}}`
+    pgPasswordSsmKey: offline ? pgpassword : `\${ssm:${pgpassword}}`
   },
   provider: {
     name: 'aws',
