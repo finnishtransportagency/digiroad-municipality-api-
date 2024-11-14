@@ -107,11 +107,14 @@ const getFeatureCollection = async (
         } object(s) found in geojson/${municipality}/${assetType}/`,
         object: null
       };
-    const foundObject = Contents.sort((a, b) =>
+    console.log('BEFORE SORT:', Contents);
+    const sortedObject = Contents.sort((a, b) =>
       a.LastModified && b.LastModified
         ? b.LastModified.getTime() - a.LastModified.getTime()
         : 0
-    )[index];
+    );
+    console.log('AFTER SORT:', Contents);
+    const foundObject = sortedObject[index];
 
     if (!foundObject || !foundObject.Key)
       return { error: `No object found in index: ${index}`, object: null };
