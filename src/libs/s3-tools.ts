@@ -38,7 +38,7 @@ export const uploadToS3 = async (
       Bucket: bucketName,
       Key: fileName,
       Body: fileContent,
-      Tagging: 'expireIn30=true'
+      Tagging: 'ExpireIn30=true'
     }
   }).done();
 };

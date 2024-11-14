@@ -139,7 +139,7 @@ const serverlessConfiguration: ServerlessConfiguration = {
               {
                 ExpirationInDays: 30,
                 Status: 'Enabled',
-                TagFilters: [{ Key: 'expireIn30', value: 'true' }]
+                TagFilters: [{ Key: 'ExpireIn30', value: 'true' }]
               }
             ]
           },
