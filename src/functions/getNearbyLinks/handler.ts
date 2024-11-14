@@ -1,7 +1,7 @@
 import { middyfy } from '@libs/lambda-tools';
 import { Geometry, LineString } from 'wkx';
 import { bucketName } from '@functions/config';
-import { getFromS3, uploadToS3 } from '@libs/s3-tools';
+import { getFromS3, now, uploadToS3 } from '@libs/s3-tools';
 import {
   isGetNearbyLinksPayload,
   S3KeyObject,
@@ -55,9 +55,7 @@ const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
     })
     .filter((row) => row !== 'INVALID');
 
-  const S3ObjectKey = `getNearbyLinks/${payload.municipality}/${new Date()
-    .toISOString()
-    .slice(0, 19)}.json`;
+  const S3ObjectKey = `getNearbyLinks/${payload.municipality}/${now()}.json`;
 
   console.info(`Uploading to S3: ${S3ObjectKey}`);
 

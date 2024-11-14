@@ -15,9 +15,8 @@ import { featureNearbyLinksSchema } from '@schemas/featureNearbyLinksSchema';
 import matchFeature from './matchFeature';
 import { invalidFeature } from '@libs/schema-tools';
 
-const now = new Date().toISOString().slice(0, 19);
-
 const matchRoadLinks = async (event: S3KeyObject) => {
+  const fileName = event.key.split('/')[2].split('.')[0];
   const s3Response = JSON.parse(await getFromS3(bucketName, event.key)) as unknown;
   const updatePayload = updatePayloadSchema.cast(s3Response);
   if (!isMatchedPayload(updatePayload))
@@ -35,7 +34,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
 
   await uploadToS3(
     bucketName,
-    `getNearbyLinksRequestPayload/${updatePayload.metadata.municipality}/${now}.json`,
+    `getNearbyLinksRequestPayload/${updatePayload.metadata.municipality}/${fileName}.json`,
     JSON.stringify(getNearbyLinksPayload)
   );
 
@@ -46,7 +45,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
         'RequestResponse',
         Buffer.from(
           JSON.stringify({
-            key: `getNearbyLinksRequestPayload/${updatePayload.metadata.municipality}/${now}.json`
+            key: `getNearbyLinksRequestPayload/${updatePayload.metadata.municipality}/${fileName}.json`
           })
         )
       )
@@ -136,13 +135,13 @@ const matchRoadLinks = async (event: S3KeyObject) => {
 
   await uploadToS3(
     bucketName,
-    `matchRoadLink/${updatePayload.metadata.municipality}/${now}.json`,
+    `matchRoadLink/${updatePayload.metadata.municipality}/${fileName}.json`,
     JSON.stringify(execDelta2SQLBody)
   );
 
   await uploadToS3(
     bucketName,
-    `logs/${updatePayload.metadata.municipality}/${now}.json`,
+    `logs/${updatePayload.metadata.municipality}/${fileName}.json`,
     JSON.stringify(logsBody)
   );
 
@@ -151,7 +150,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     'Event',
     Buffer.from(
       JSON.stringify({
-        key: `matchRoadLink/${updatePayload.metadata.municipality}/${now}.json`
+        key: `matchRoadLink/${updatePayload.metadata.municipality}/${fileName}.json`
       })
     )
   );
@@ -162,7 +161,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     assetsAmount: updatePayload.Created.length + updatePayload.Updated.length,
     deletesAmount: updatePayload.Deleted.length,
     invalidInfrao: updatePayload.invalidInfrao,
-    now: now
+    now: fileName
   };
 
   void invokeLambda(
@@ -176,7 +175,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
             : 'matchedSuccessfully',
         Municipality: updatePayload.metadata.municipality,
         Body: reportRejectedDeltabody,
-        S3Key: `logs/${updatePayload.metadata.municipality}/${now}.json`
+        S3Key: `logs/${updatePayload.metadata.municipality}/${fileName}.json`
       })
     )
   );

@@ -21,7 +21,7 @@ import {
   serviceName
 } from '@functions/config';
 import { middyfy } from '@libs/lambda-tools';
-import { uploadToS3 } from '@libs/s3-tools';
+import { now, uploadToS3 } from '@libs/s3-tools';
 import { getParameter } from '@libs/ssm-tools';
 import { infraoJsonSchema, helsinkiJsonSchema } from '@schemas/muniResponseSchema';
 import axios from 'axios';
@@ -58,9 +58,7 @@ const fetchAndParseData = async (event: unknown) => {
         );
         await uploadToS3(
           bucketName,
-          `geojson/${event.municipality}/${assetKey}/${new Date()
-            .toISOString()
-            .slice(0, 19)}.json`,
+          `geojson/${event.municipality}/${assetKey}/${now()}.json`,
           JSON.stringify(geoJson)
         );
         break;
@@ -87,7 +85,10 @@ const fetchAndParseData = async (event: unknown) => {
         );
         await uploadToS3(
           bucketName,
-          `geojson/helsinki/${assetKey}/${new Date().toISOString().slice(0, 19)}.json`,
+          `geojson/helsinki/${assetKey}/${new Date()
+            .toISOString()
+            .slice(0, 19)
+            .replaceAll(':', '_')}.json`,
           JSON.stringify(geoJson)
         );
         break;

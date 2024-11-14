@@ -9,6 +9,11 @@ import {
 import { Upload } from '@aws-sdk/lib-storage';
 import { offline } from '@functions/config';
 
+/**
+ * @example '2024-10-10T10_42_24'
+ */
+export const now = () => new Date().toISOString().slice(0, 19).replaceAll(':', '_');
+
 const s3 = new S3(
   offline
     ? {
@@ -32,7 +37,8 @@ export const uploadToS3 = async (
     params: {
       Bucket: bucketName,
       Key: fileName,
-      Body: fileContent
+      Body: fileContent,
+      Tagging: 'expireIn30=true'
     }
   }).done();
 };

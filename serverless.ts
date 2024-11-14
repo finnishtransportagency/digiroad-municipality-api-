@@ -138,23 +138,8 @@ const serverlessConfiguration: ServerlessConfiguration = {
             Rules: [
               {
                 ExpirationInDays: 30,
-                Prefix: '/matchRoadLink/',
-                Status: 'Enabled'
-              },
-              {
-                ExpirationInDays: 30,
-                Prefix: '/getNearbyLinks/',
-                Status: 'Enabled'
-              },
-              {
-                ExpirationInDays: 30,
-                Prefix: '/calculateDelta/',
-                Status: 'Enabled'
-              },
-              {
-                ExpirationInDays: 30,
-                Prefix: '/geojson/',
-                Status: 'Enabled'
+                Status: 'Enabled',
+                TagFilters: [{ Key: 'expireIn30', value: 'true' }]
               }
             ]
           },
