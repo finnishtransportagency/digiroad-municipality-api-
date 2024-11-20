@@ -97,7 +97,8 @@ export default (
       KALVON_TYYPPI: castedFeature.reflection_class,
       KUNTO: castedFeature.condition,
       KOKO: castedFeature.size,
-      KORKEUS: castedFeature.height
+      KORKEUS: castedFeature.height,
+      TILA: castedFeature.lifecycle
     },
     geometry: {
       type: 'Point',

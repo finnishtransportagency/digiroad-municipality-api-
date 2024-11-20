@@ -141,41 +141,54 @@ const execInsert = async (
           )
         );
       }
-      if (featureProperties.RAKENNE) {
-        await client.query(
-          insertSingleChoiceQuery(
-            'structure',
-            featureProperties.RAKENNE,
-            assetID,
-            dbmodifier
-          )
-        );
-      }
-      if (featureProperties.KUNTO) {
-        await client.query(
-          insertSingleChoiceQuery(
-            'condition',
-            featureProperties.KUNTO,
-            assetID,
-            dbmodifier
-          )
-        );
-      }
-      if (featureProperties.KOKO) {
-        await client.query(
-          insertSingleChoiceQuery('size', featureProperties.KOKO, assetID, dbmodifier)
-        );
-      }
-      if (featureProperties.KALVON_TYYPPI) {
-        await client.query(
-          insertSingleChoiceQuery(
-            'coating_type',
-            featureProperties.KALVON_TYYPPI,
-            assetID,
-            dbmodifier
-          )
-        );
-      }
+      await client.query(
+        insertSingleChoiceQuery(
+          'structure',
+          featureProperties.RAKENNE ?? 99,
+          assetID,
+          dbmodifier
+        )
+      );
+      await client.query(
+        insertSingleChoiceQuery(
+          'condition',
+          featureProperties.KUNTO ?? 99,
+          assetID,
+          dbmodifier
+        )
+      );
+      await client.query(
+        insertSingleChoiceQuery('size', featureProperties.KOKO ?? 99, assetID, dbmodifier)
+      );
+      await client.query(
+        insertSingleChoiceQuery(
+          'coating_type',
+          featureProperties.KALVON_TYYPPI ?? 99,
+          assetID,
+          dbmodifier
+        )
+      );
+      await client.query(
+        insertSingleChoiceQuery(
+          'life_cycle',
+          featureProperties.TILA ?? 3,
+          assetID,
+          dbmodifier
+        )
+      );
+      await client.query(insertSingleChoiceQuery('lane_type', 99, assetID, dbmodifier));
+      await client.query(
+        insertSingleChoiceQuery('type_of_damage', 99, assetID, dbmodifier)
+      );
+      await client.query(
+        insertSingleChoiceQuery('urgency_of_repair', 99, assetID, dbmodifier)
+      );
+      await client.query(
+        insertSingleChoiceQuery('location_specifier', 99, assetID, dbmodifier)
+      );
+      await client.query(
+        insertSingleChoiceQuery('sign_material', 99, assetID, dbmodifier)
+      );
       if (featureProperties.LISAKILVET.length > 0) {
         await Promise.all(
           featureProperties.LISAKILVET.slice(0, 5).map(async (panel, i: number) => {

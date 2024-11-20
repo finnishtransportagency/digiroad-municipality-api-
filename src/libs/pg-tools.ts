@@ -350,7 +350,13 @@ export const insertSingleChoiceQuery = (
     | 'condition'
     | 'size'
     | 'esterakennelma'
-    | 'coating_type',
+    | 'coating_type'
+    | 'lane_type'
+    | 'life_cycle'
+    | 'type_of_damage'
+    | 'urgency_of_repair'
+    | 'location_specifier'
+    | 'sign_material',
   enumeratedValue: number | string | undefined,
   assetId: number,
   dbmodifier: string,

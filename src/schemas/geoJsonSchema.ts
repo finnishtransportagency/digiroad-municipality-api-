@@ -73,6 +73,7 @@ const trafficSignPropertiesSchema = object({
   KUNTO: number().oneOf([1, 2, 3, 4, 5]).notRequired(),
   KOKO: number().oneOf([1, 2, 3]).notRequired(),
   KORKEUS: number().notRequired(),
+  TILA: number().oneOf([1, 2, 3, 4, 5, 6]).notRequired(),
   LISAKILVET: array()
     .of(additionalPanelPropertiesSchema)
     .when('LM_TYYPPI', {
