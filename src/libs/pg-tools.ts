@@ -356,11 +356,13 @@ export const insertSingleChoiceQuery = (
     | 'type_of_damage'
     | 'urgency_of_repair'
     | 'location_specifier'
-    | 'sign_material',
+    | 'sign_material'
+    | 'old_traffic_code',
   enumeratedValue: number | string | undefined,
   assetId: number,
   dbmodifier: string,
-  limit?: number
+  limit?: number,
+  multiple = false
 ): PostgresQuery => {
   if (
     publicId === 'trafficSigns_type' &&
@@ -380,8 +382,14 @@ export const insertSingleChoiceQuery = (
           }=($2)
           ${limit ? `LIMIT ${limit}` : ''}
         )
-      INSERT INTO single_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by)
-      VALUES ($3, (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', $4)
+      INSERT INTO ${
+        multiple ? 'multiple' : 'single'
+      }_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by${
+      multiple ? ', id' : ''
+    })
+      VALUES ($3, (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', $4${
+        multiple ? ", nextval('PRIMARY_KEY_SEQ')" : ''
+      })
     `,
     values: [publicId, String(enumeratedValue ?? 99), String(assetId), dbmodifier] // 99 = 'ei tiedossa' for all properties except trafficSigns_type
   };

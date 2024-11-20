@@ -189,6 +189,16 @@ const execInsert = async (
       await client.query(
         insertSingleChoiceQuery('sign_material', 99, assetID, dbmodifier)
       );
+      await client.query(
+        insertSingleChoiceQuery(
+          'old_traffic_code',
+          0,
+          assetID,
+          dbmodifier,
+          undefined,
+          true
+        )
+      );
       if (featureProperties.LISAKILVET.length > 0) {
         await Promise.all(
           featureProperties.LISAKILVET.slice(0, 5).map(async (panel, i: number) => {
