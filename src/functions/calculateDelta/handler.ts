@@ -40,11 +40,7 @@ const calculateDelta = async (event: S3Event) => {
   }
 
   const referenceObject: FeatureCollection | null = (
-    await getFeatureCollection(
-      municipality,
-      assetType,
-      updateObjectKey === `geojson/${municipality}/${assetType}/empty.json` ? 0 : 1
-    )
+    await getFeatureCollection(municipality, assetType, 1)
   ).object;
 
   const updateFeatures: Array<ValidFeature> = updateObject.features.filter((f) =>
