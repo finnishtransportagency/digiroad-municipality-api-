@@ -61,3 +61,4 @@ jobs:
           # Optional parameters
           FETCH_SIZE: ${{ vars.FETCH_SIZE }}
           MAX_OFFSET: ${{ vars.MAX_OFFSET }}
+          ADMINISTRATOR: ${{ vars.ADMINISTRATOR }}
