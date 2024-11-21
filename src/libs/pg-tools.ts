@@ -439,9 +439,9 @@ export const additionalPanelQuery = (
       String(value ?? '') || null,
       String(position + 1),
       String(text ?? '') || null,
-      String(size ?? '') || null,
-      String(filmType ?? '') || null,
-      String(color ?? '') || null
+      String(size ?? 99),
+      String(filmType ?? 99),
+      String(color ?? 99)
     ]
   };
 };

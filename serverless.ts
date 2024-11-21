@@ -41,6 +41,21 @@ interface ServerlessConfiguration extends AWS {
   };
 }
 
+const tags = [
+  {
+    Key: 'Name',
+    Value: serviceName
+  },
+  {
+    Key: 'Environment',
+    Value: stage
+  },
+  {
+    Key: 'Administrator',
+    Value: '${env:ADMINISTRATOR}'
+  }
+];
+
 const serverlessConfiguration: ServerlessConfiguration = {
   service: serviceName,
   frameworkVersion: '3',
@@ -93,6 +108,16 @@ const serverlessConfiguration: ServerlessConfiguration = {
       // No need offline, so defined here with ${env:***}-syntax
       deploymentRole:
         'arn:aws:iam::${env:AWS_ACCOUNT_ID}:role/${env:AWS_CLOUDFORMATION_ROLE}'
+    },
+    stackTags: {
+      Name: serviceName,
+      Environment: stage,
+      Administrator: '${env:ADMINISTRATOR}'
+    },
+    tags: {
+      Name: serviceName,
+      Environment: stage,
+      Administrator: '${env:ADMINISTRATOR}'
     }
   },
   functions: {
@@ -105,6 +130,48 @@ const serverlessConfiguration: ServerlessConfiguration = {
   },
   resources: {
     Resources: {
+      FetchAndParseDataLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+          RetentionInDays: 180,
+          Tags: tags
+        }
+      },
+      CalculateDeltaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+          RetentionInDays: 180,
+          Tags: tags
+        }
+      },
+      MatchRoadLinkLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+          RetentionInDays: 180,
+          Tags: tags
+        }
+      },
+      ReportRejectedDeltaLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+          RetentionInDays: 180,
+          Tags: tags
+        }
+      },
+      GetNearbyLinksLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+          RetentionInDays: 180,
+          Tags: tags
+        }
+      },
+      ExecDelta2SQLLogGroup: {
+        Type: 'AWS::Logs::LogGroup',
+        Properties: {
+          RetentionInDays: 180,
+          Tags: tags
+        }
+      },
       S3CanInvokeCalculateDelta: {
         Type: 'AWS::Lambda::Permission',
         Properties: {
@@ -155,7 +222,8 @@ const serverlessConfiguration: ServerlessConfiguration = {
                 Function: { 'Fn::GetAtt': ['CalculateDeltaLambdaFunction', 'Arn'] }
               }
             ]
-          }
+          },
+          Tags: tags
         }
       }
     }
