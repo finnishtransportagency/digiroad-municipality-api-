@@ -13,7 +13,7 @@ import {
 import { assetTypeIdMap } from '@schemas/dbIdMapping';
 import { expireResultSchema, insertAssetResultSchema } from '@schemas/dbSchemas';
 import { GeoJsonFeatureType } from '@schemas/geoJsonSchema';
-import { Client } from 'pg';
+import { Client, QueryResult } from 'pg';
 
 const execInsert = async (
   feature: MatchedFeature,
@@ -81,122 +81,140 @@ const execInsert = async (
 
   await client.query(insertAssetLinkQuery(assetID, positionId));
 
+  const queries: Array<Promise<QueryResult>> = [];
+
   switch (featureProperties.TYPE) {
     case GeoJsonFeatureType.Obstacle:
-      await client.query(
-        insertSingleChoiceQuery(
-          'esterakennelma',
-          featureProperties.EST_TYYPPI,
-          assetID,
-          dbmodifier
+      queries.push(
+        client.query(
+          insertSingleChoiceQuery(
+            'esterakennelma',
+            featureProperties.EST_TYYPPI,
+            assetID,
+            dbmodifier
+          )
         )
       );
       break;
     case GeoJsonFeatureType.TrafficSign:
       if (featureProperties.ARVO) {
-        await client.query(
-          insertTextQuery(
-            'trafficSigns_value',
-            assetID,
-            featureProperties.ARVO,
-            dbmodifier
+        queries.push(
+          client.query(
+            insertTextQuery(
+              'trafficSigns_value',
+              assetID,
+              featureProperties.ARVO,
+              dbmodifier
+            )
           )
         );
       }
-      await client.query(
-        insertNumberQuery(
-          'terrain_coordinates_x',
-          assetID,
-          feature.geometry.coordinates[0]
-        )
-      );
-      await client.query(
-        insertNumberQuery(
-          'terrain_coordinates_y',
-          assetID,
-          feature.geometry.coordinates[1]
-        )
-      );
-      await client.query(
-        insertSingleChoiceQuery(
-          'trafficSigns_type',
-          featureProperties.LM_TYYPPI,
-          assetID,
-          dbmodifier,
-          1
-        )
-      );
       if (featureProperties.TEKSTI) {
-        await client.query(
-          insertTextQuery('main_sign_text', assetID, featureProperties.TEKSTI, dbmodifier)
+        queries.push(
+          client.query(
+            insertTextQuery(
+              'main_sign_text',
+              assetID,
+              featureProperties.TEKSTI,
+              dbmodifier
+            )
+          )
         );
       }
       if (featureProperties.LISATIETO) {
-        await client.query(
-          insertTextQuery(
-            'trafficSigns_info',
-            assetID,
-            featureProperties.LISATIETO,
-            dbmodifier
+        queries.push(
+          client.query(
+            insertTextQuery(
+              'trafficSigns_info',
+              assetID,
+              featureProperties.LISATIETO,
+              dbmodifier
+            )
           )
         );
       }
-      await client.query(
-        insertSingleChoiceQuery(
-          'structure',
-          featureProperties.RAKENNE ?? 99,
-          assetID,
-          dbmodifier
-        )
-      );
-      await client.query(
-        insertSingleChoiceQuery(
-          'condition',
-          featureProperties.KUNTO ?? 99,
-          assetID,
-          dbmodifier
-        )
-      );
-      await client.query(
-        insertSingleChoiceQuery('size', featureProperties.KOKO ?? 99, assetID, dbmodifier)
-      );
-      await client.query(
-        insertSingleChoiceQuery(
-          'coating_type',
-          featureProperties.KALVON_TYYPPI ?? 99,
-          assetID,
-          dbmodifier
-        )
-      );
-      await client.query(
-        insertSingleChoiceQuery(
-          'life_cycle',
-          featureProperties.TILA ?? 3,
-          assetID,
-          dbmodifier
-        )
-      );
-      await client.query(insertSingleChoiceQuery('lane_type', 99, assetID, dbmodifier));
-      await client.query(
-        insertSingleChoiceQuery('type_of_damage', 99, assetID, dbmodifier)
-      );
-      await client.query(
-        insertSingleChoiceQuery('urgency_of_repair', 99, assetID, dbmodifier)
-      );
-      await client.query(
-        insertSingleChoiceQuery('location_specifier', 99, assetID, dbmodifier)
-      );
-      await client.query(
-        insertSingleChoiceQuery('sign_material', 99, assetID, dbmodifier)
-      );
-      await client.query(
-        insertSingleChoiceQuery(
-          'old_traffic_code',
-          0,
-          assetID,
-          dbmodifier,
-          undefined,
-          true
+      queries.push(
+        client.query(
+          insertNumberQuery(
+            'terrain_coordinates_x',
+            assetID,
+            feature.geometry.coordinates[0]
+          )
+        ),
+        client.query(
+          insertNumberQuery(
+            'terrain_coordinates_y',
+            assetID,
+            feature.geometry.coordinates[1]
+          )
+        ),
+        client.query(
+          insertSingleChoiceQuery(
+            'trafficSigns_type',
+            featureProperties.LM_TYYPPI,
+            assetID,
+            dbmodifier,
+            1
+          )
+        ),
+        client.query(
+          insertSingleChoiceQuery(
+            'structure',
+            featureProperties.RAKENNE ?? 99,
+            assetID,
+            dbmodifier
+          )
+        ),
+        client.query(
+          insertSingleChoiceQuery(
+            'condition',
+            featureProperties.KUNTO ?? 99,
+            assetID,
+            dbmodifier
+          )
+        ),
+        client.query(
+          insertSingleChoiceQuery(
+            'size',
+            featureProperties.KOKO ?? 99,
+            assetID,
+            dbmodifier
+          )
+        ),
+        client.query(
+          insertSingleChoiceQuery(
+            'coating_type',
+            featureProperties.KALVON_TYYPPI ?? 99,
+            assetID,
+            dbmodifier
+          )
+        ),
+        client.query(
+          insertSingleChoiceQuery(
+            'life_cycle',
+            featureProperties.TILA ?? 3,
+            assetID,
+            dbmodifier
+          )
+        ),
+        client.query(insertSingleChoiceQuery('lane_type', 99, assetID, dbmodifier)),
+        client.query(insertSingleChoiceQuery('type_of_damage', 99, assetID, dbmodifier)),
+        client.query(
+          insertSingleChoiceQuery('urgency_of_repair', 99, assetID, dbmodifier)
+        ),
+        client.query(
+          insertSingleChoiceQuery('location_specifier', 99, assetID, dbmodifier)
+        ),
+        client.query(insertSingleChoiceQuery('sign_material', 99, assetID, dbmodifier)),
+        client.query(
+          insertSingleChoiceQuery(
+            'old_traffic_code',
+            0,
+            assetID,
+            dbmodifier,
+            undefined,
+            true
+          )
         )
       );
       if (featureProperties.LISAKILVET.length > 0) {
@@ -222,6 +240,7 @@ const execInsert = async (
       console.warn(`ExecSQL: FeatureType not supported.`);
       break;
   }
+  await Promise.all(queries);
 };
 
 const returnBearing = (featureProperties: ValidFeature['properties']) => {

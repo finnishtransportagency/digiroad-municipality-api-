@@ -40,9 +40,6 @@ export const executeSingleQuery = async (query: PostgresQuery) => {
   return response;
 };
 
-export const createQueryFunction = (query: PostgresQuery) => (client: Client) =>
-  client.query(query);
-
 export const executeTransaction = async (
   queryFunctions: Array<QueryFunction>,
   errorHandler: (e: Error) => void // TODO: maybe return list of all responses ??
