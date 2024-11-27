@@ -5,6 +5,7 @@ import {
   expireQuery,
   insertAssetLinkQuery,
   insertAssetQuery,
+  insertAssetSingleChoiceValuesQuery,
   insertLrmPositionQuery,
   insertNumberQuery,
   insertSingleChoiceQuery,
@@ -135,6 +136,16 @@ const execInsert = async (
       }
       queries.push(
         client.query(
+          insertSingleChoiceQuery(
+            'old_traffic_code',
+            0,
+            assetID,
+            dbmodifier,
+            undefined,
+            true
+          )
+        ),
+        client.query(
           insertNumberQuery(
             'terrain_coordinates_x',
             assetID,
@@ -156,71 +167,12 @@ const execInsert = async (
             dbmodifier,
             1
           )
-        ),
-        client.query(
-          insertSingleChoiceQuery(
-            'structure',
-            featureProperties.RAKENNE ?? 99,
-            assetID,
-            dbmodifier
-          )
-        ),
-        client.query(
-          insertSingleChoiceQuery(
-            'condition',
-            featureProperties.KUNTO ?? 99,
-            assetID,
-            dbmodifier
-          )
-        ),
-        client.query(
-          insertSingleChoiceQuery(
-            'size',
-            featureProperties.KOKO ?? 99,
-            assetID,
-            dbmodifier
-          )
-        ),
-        client.query(
-          insertSingleChoiceQuery(
-            'coating_type',
-            featureProperties.KALVON_TYYPPI ?? 99,
-            assetID,
-            dbmodifier
-          )
-        ),
-        client.query(
-          insertSingleChoiceQuery(
-            'life_cycle',
-            featureProperties.TILA ?? 3,
-            assetID,
-            dbmodifier
-          )
-        ),
-        client.query(insertSingleChoiceQuery('lane_type', 99, assetID, dbmodifier)),
-        client.query(insertSingleChoiceQuery('type_of_damage', 99, assetID, dbmodifier)),
-        client.query(
-          insertSingleChoiceQuery('urgency_of_repair', 99, assetID, dbmodifier)
-        ),
-        client.query(
-          insertSingleChoiceQuery('location_specifier', 99, assetID, dbmodifier)
-        ),
-        client.query(insertSingleChoiceQuery('sign_material', 99, assetID, dbmodifier)),
-        client.query(
-          insertSingleChoiceQuery(
-            'old_traffic_code',
-            0,
-            assetID,
-            dbmodifier,
-            undefined,
-            true
-          )
         )
       );
       if (featureProperties.LISAKILVET.length > 0) {
-        await Promise.all(
-          featureProperties.LISAKILVET.slice(0, 5).map(async (panel, i: number) => {
-            await client.query(
+        queries.push(
+          ...featureProperties.LISAKILVET.slice(0, 5).map((panel, i: number) => {
+            return client.query(
               additionalPanelQuery(
                 panel.LM_TYYPPI,
                 assetID,
@@ -235,6 +187,27 @@ const execInsert = async (
           })
         );
       }
+      queries.push(
+        client.query(
+          insertAssetSingleChoiceValuesQuery(
+            [
+              featureProperties.RAKENNE ?? 99,
+              featureProperties.KUNTO ?? 99,
+              featureProperties.KOKO ?? 99,
+              featureProperties.KALVON_TYYPPI ?? 99,
+              featureProperties.TILA ?? 3,
+              99,
+              99,
+              99,
+              99,
+              99
+            ],
+            assetID,
+            dbmodifier
+          )
+        )
+      );
+
       break;
     default:
       console.warn(`ExecSQL: FeatureType not supported.`);

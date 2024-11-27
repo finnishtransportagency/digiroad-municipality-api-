@@ -67,15 +67,14 @@ export const executeTransaction = async (
  * @param subqueryName Name of psql CTE. Default: _property
  * @param parameterIndex Index of public_id in values array. Default: 1
  */
-const getPropertySubquery = (
+export const getPropertySubquery = (
   subqueryName = '_property',
   parameterIndex = 1
 ) => `${subqueryName} AS (
-        SELECT id
-        FROM property
-        WHERE public_id=($${parameterIndex}
-      )
-    )`;
+          SELECT id
+          FROM property
+          WHERE public_id=($${parameterIndex})
+        )`;
 
 /**
  * Fetches roadlinks with admin class not 1 (checks for overwrites in administrative_class table) from municipality in question
@@ -389,6 +388,79 @@ export const insertSingleChoiceQuery = (
       })
     `,
     values: [publicId, String(enumeratedValue ?? 99), String(assetId), dbmodifier] // 99 = 'ei tiedossa' for all properties except trafficSigns_type
+  };
+};
+
+export const insertAssetSingleChoiceValuesQuery = (
+  enumValues: [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+  ],
+  assetID: number,
+  dbmodifier: string
+) => {
+  return {
+    text: `
+        WITH input_data AS (
+          SELECT 
+            UNNEST(ARRAY[
+              'structure',
+              'condition',
+              'size',
+              'coating_type',
+              'life_cycle',
+              'lane_type',
+              'type_of_damage',
+              'urgency_of_repair',
+              'location_specifier',
+              'sign_material'
+            ]) AS public_id,
+            UNNEST(ARRAY[${enumValues.toString()}]) AS value
+        ),
+        cte_properties AS (
+          SELECT 
+            i.public_id,
+            p.id AS property_id,
+            i.value
+          FROM input_data i
+          JOIN property p ON p.public_id = i.public_id
+        ),
+        cte_enumerated_values AS (
+          SELECT 
+            p.property_id,
+            ev.id AS enumerated_value_id
+          FROM cte_properties p
+          JOIN enumerated_value ev 
+            ON ev.property_id = p.property_id AND ev.value = p.value
+        ),
+        cte_combined AS (
+          SELECT 
+            p.property_id,
+            ${assetID} AS asset_id,
+            ev.enumerated_value_id,
+            CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki' AS modified_date,
+            $1 AS modified_by
+          FROM cte_properties p
+          JOIN cte_enumerated_values ev ON ev.property_id = p.property_id
+        )
+        INSERT INTO single_choice_value (property_id, asset_id, enumerated_value_id, modified_date, modified_by)
+        SELECT 
+          property_id, 
+          asset_id, 
+          enumerated_value_id, 
+          modified_date, 
+          modified_by
+        FROM cte_combined;
+        `,
+    values: [dbmodifier]
   };
 };
 
