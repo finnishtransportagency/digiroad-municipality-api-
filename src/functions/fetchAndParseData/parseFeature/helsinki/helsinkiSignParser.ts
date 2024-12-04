@@ -5,7 +5,7 @@ import {
   TrafficSignType
 } from '@customTypes/featureTypes';
 import { SignMap } from '@customTypes/mapTypes';
-import { invalidFeature } from '@libs/schema-tools';
+import { invalidFeature, transformValueToUnit } from '@libs/schema-tools';
 import { helsinkiCoordTransform, oppositeBearing } from '@libs/spatial-tools';
 import {
   additionalPanelFeatureSchema,
@@ -64,20 +64,36 @@ export default (
   const correctedDirection = direction ? oppositeBearing(direction) : direction;
 
   /**
-   * Extracting text and values from txt field.
+   * Extracting additional panel text and values from txt field.
    */
   const textMatch = castedFeature.txt
     ? castedFeature.txt.match(/text:([^;]*)/)
     : undefined;
   const text = textMatch ? textMatch[1].trim() : undefined;
-  const numbers = text ? text.match(/\b[1-9]\d*/) : '';
-  const value = parseInt(numbers ? numbers[0] : '');
   const txt = isAdditionalPanel ? text : castedFeature.txt;
+  const numbers = txt ? txt.match(/\b(\d+(?:[.,]\d+)?)\s*(h|min|cm|m|km|kg|t)?\b/i) : '';
+  const panelValue = parseFloat(numbers ? numbers[1] : '');
+  const unit = numbers ? numbers[2]?.toLowerCase() : null;
 
   const isValueSign =
     Object.keys(trafficSignRules).includes(finalCode) && trafficSignRules[finalCode].unit;
-  const hasValidValue = isValueSign && isAdditionalPanel && !isNaN(value);
-  const hasValidNumberValue = isValueSign && !isNaN(numberValue);
+  const assumedUnit = isValueSign ? trafficSignRules[finalCode].unit : undefined;
+
+  const rawValue = isAdditionalPanel ? panelValue : numberValue;
+
+  const value = (() => {
+    if (isNaN(rawValue)) return rawValue;
+    if (assumedUnit && unit) {
+      return transformValueToUnit(rawValue, assumedUnit, unit);
+    }
+    if (assumedUnit === 'kg' && rawValue < 100) {
+      return rawValue * 1000;
+    }
+    if (assumedUnit === 'min' && rawValue < 25 && ![5, 10, 15, 20].includes(rawValue)) {
+      return rawValue * 60;
+    }
+    return rawValue;
+  })();
 
   const geoJsonFeature = {
     type: 'Feature',
@@ -89,7 +105,7 @@ export default (
       ID: id,
       SUUNTIMA: correctedDirection,
       LM_TYYPPI: createTrafficSignText(finalCode),
-      ARVO: hasValidValue ? value : hasValidNumberValue ? numberValue : undefined,
+      ARVO: !isNaN(value) && isValueSign ? value : undefined,
       TEKSTI: txt ? txt.substring(0, 128) : txt,
       ...(isAdditionalPanel
         ? {}

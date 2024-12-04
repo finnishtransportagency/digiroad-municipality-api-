@@ -33,3 +33,23 @@ export const invalidFeature = (feature: unknown, reason: string): InvalidFeature
     }
   };
 };
+
+export const transformValueToUnit = (
+  value: number,
+  assumedUnit: string,
+  readUnit: string
+): number => {
+  const conversionFactors: Record<string, Record<string, number>> = {
+    cm: { cm: 1, m: 100, km: 100000 },
+    m: { cm: 0.01, m: 1, km: 1000 },
+    km: { cm: 0.00001, m: 0.001, km: 1 },
+    kg: { t: 1000 },
+    min: { h: 60 },
+    h: { min: Math.round((1 / 60) * 1000) / 1000 }
+  };
+
+  const factor = conversionFactors[assumedUnit]?.[readUnit];
+  const result = factor !== undefined ? value * factor : NaN;
+
+  return !isNaN(result) ? Math.round(result * 1000) / 1000 : NaN;
+};

@@ -2908,7 +2908,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'km',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0,
+    minValue: 0.001,
     allowedAgainstTraffic: false
   },
   'H2.3': {
@@ -2917,7 +2917,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'km',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0,
+    minValue: 0.001,
     allowedAgainstTraffic: false
   },
   H3: {
@@ -2926,7 +2926,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'km',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0,
+    minValue: 0.001,
     allowedAgainstTraffic: false
   },
   H4: {
@@ -2935,7 +2935,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0,
+    minValue: 1,
     allowedAgainstTraffic: false
   },
   H5: {
@@ -2944,7 +2944,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0,
+    minValue: 1,
     allowedAgainstTraffic: false
   },
   H6: {
@@ -2953,7 +2953,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0,
+    minValue: 1,
     allowedAgainstTraffic: false
   },
   H7: {
@@ -2962,7 +2962,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0,
+    minValue: 1,
     allowedAgainstTraffic: false
   },
   H8: {
@@ -2971,7 +2971,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'm',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0,
+    minValue: 1,
     allowedAgainstTraffic: false
   },
   'H9.1': {
@@ -3124,7 +3124,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'g/km',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0,
+    minValue: 0.001,
     allowedAgainstTraffic: false
   },
   'H13.1': {
@@ -3205,7 +3205,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'min',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0,
+    minValue: 1,
     allowedAgainstTraffic: false
   },
   'H19.1': {
@@ -3214,7 +3214,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'min',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0,
+    minValue: 1,
     allowedAgainstTraffic: false
   },
   'H19.2': {
@@ -3223,7 +3223,7 @@ export const trafficSignRules: TrafficSignRules = {
     unit: 'min',
     type: 'ADDITIONALPANEL',
     allowedOnKapy: false,
-    minValue: 0,
+    minValue: 1,
     allowedAgainstTraffic: false
   },
   H20: {
