@@ -5,7 +5,7 @@ import {
   ValidFeature
 } from '@customTypes/featureTypes';
 import { getDistance2D, similarBearing } from '@libs/spatial-tools';
-import { GeoJsonFeatureType } from '@schemas/geoJsonSchema';
+import { additionalPanelFeatureSchema, GeoJsonFeatureType } from '@schemas/geoJsonSchema';
 
 /**
  * Goes through all traffic signs and adds additional panels to the main signs LISAKILVET array
@@ -21,11 +21,15 @@ export default (features: Array<Feature | AdditionalPanelType>): Array<ValidFeat
     (f): f is AdditionalPanelType =>
       f.properties.TYPE === GeoJsonFeatureType.AdditionalPanel
   );
+
+  const validAdditionalPanels = additionalPanels.filter((f) =>
+    additionalPanelFeatureSchema.isValidSync(f)
+  );
   const mainPanels = validFeatures.filter(
     (f): f is TrafficSignType => f.properties.TYPE === GeoJsonFeatureType.TrafficSign
   );
   const rejectedAdditionalPanels: Array<AdditionalPanelType> = [];
-  for (const additionalPanel of additionalPanels) {
+  for (const additionalPanel of validAdditionalPanels) {
     let matched = false;
     for (const mainPanel of mainPanels) {
       if (mainPanel.properties.LISAKILVET.length >= 5) continue;
