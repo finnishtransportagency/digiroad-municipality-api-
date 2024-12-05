@@ -5,7 +5,7 @@ import {
   TrafficSignType
 } from '@customTypes/featureTypes';
 import { SignMap } from '@customTypes/mapTypes';
-import { invalidFeature, transformValueToUnit } from '@libs/schema-tools';
+import { convertUnit, invalidFeature } from '@libs/schema-tools';
 import { helsinkiCoordTransform, oppositeBearing } from '@libs/spatial-tools';
 import {
   additionalPanelFeatureSchema,
@@ -75,25 +75,9 @@ export default (
   const panelValue = parseFloat(numbers ? numbers[1] : '');
   const unit = numbers ? numbers[2]?.toLowerCase() : null;
 
-  const isValueSign =
-    Object.keys(trafficSignRules).includes(finalCode) && trafficSignRules[finalCode].unit;
-  const assumedUnit = isValueSign ? trafficSignRules[finalCode].unit : undefined;
-
   const rawValue = isAdditionalPanel ? panelValue : numberValue;
 
-  const value = (() => {
-    if (isNaN(rawValue)) return rawValue;
-    if (assumedUnit && unit) {
-      return transformValueToUnit(rawValue, assumedUnit, unit);
-    }
-    if (assumedUnit === 'kg' && rawValue < 100) {
-      return rawValue * 1000;
-    }
-    if (assumedUnit === 'min' && rawValue < 25 && ![5, 10, 15, 20].includes(rawValue)) {
-      return rawValue * 60;
-    }
-    return rawValue;
-  })();
+  const value = convertUnit(finalCode, rawValue, unit, true);
 
   const geoJsonFeature = {
     type: 'Feature',
@@ -105,7 +89,7 @@ export default (
       ID: id,
       SUUNTIMA: correctedDirection,
       LM_TYYPPI: createTrafficSignText(finalCode),
-      ARVO: !isNaN(value) && isValueSign ? value : undefined,
+      ARVO: !isNaN(value) && trafficSignRules[finalCode].unit ? value : undefined,
       TEKSTI: txt ? txt.substring(0, 128) : txt,
       ...(isAdditionalPanel
         ? {}

@@ -5,6 +5,7 @@ import {
   obstacleFeatureSchema,
   trafficSignFeatureSchema
 } from '@schemas/geoJsonSchema';
+import { trafficSignRules } from '@schemas/trafficSignTypes';
 import { array } from 'yup';
 
 export const arrayOfValidFeature = (assetTypeField: string, report = false) => {
@@ -45,11 +46,38 @@ export const transformValueToUnit = (
     km: { cm: 0.00001, m: 0.001, km: 1 },
     kg: { t: 1000 },
     min: { h: 60 },
-    h: { min: Math.round((1 / 60) * 1000) / 1000 }
+    h: { min: 1 / 60 }
   };
 
   const factor = conversionFactors[assumedUnit]?.[readUnit];
   const result = factor !== undefined ? value * factor : NaN;
 
-  return !isNaN(result) ? Math.round(result * 1000) / 1000 : NaN;
+  return !isNaN(result) ? parseFloat(result.toFixed(3)) : NaN;
+};
+
+export const convertUnit = (
+  trafficSignCode: string,
+  rawValue: number,
+  unit: string | null,
+  isHelsinki = false
+) => {
+  const assumedUnit = trafficSignRules[trafficSignCode].unit
+    ? trafficSignRules[trafficSignCode].unit
+    : undefined;
+  if (isNaN(rawValue)) return rawValue;
+  if (assumedUnit && unit) {
+    return transformValueToUnit(rawValue, assumedUnit, unit);
+  }
+  // If Digiroad unit of traffic sign is kg, and raw value read
+  // from municipality is under 100, assumes raw value is in tons.
+  if (assumedUnit === 'kg' && rawValue < 100) {
+    return rawValue * 1000;
+  }
+  // If Digiroad unit of traffic sign is min, and raw value read from municipality
+  // is under 25 and not 5, 10 ,15, 20, assumes raw value is in hours.
+  if (assumedUnit === 'min' && rawValue < 25 && ![5, 10, 15, 20].includes(rawValue)) {
+    return rawValue * 60;
+  }
+  if (isHelsinki && assumedUnit === 'cm') return rawValue * 100;
+  return rawValue;
 };

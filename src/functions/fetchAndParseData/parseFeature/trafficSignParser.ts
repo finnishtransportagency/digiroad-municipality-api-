@@ -1,5 +1,5 @@
 import { Feature } from '@customTypes/featureTypes';
-import { invalidFeature, transformValueToUnit } from '@libs/schema-tools';
+import { convertUnit, invalidFeature } from '@libs/schema-tools';
 import { GeoJsonFeatureType, trafficSignFeatureSchema } from '@schemas/geoJsonSchema';
 import { infraoTrafficSignSchema } from '@schemas/muniResponseSchema';
 import { createTrafficSignText, trafficSignRules } from '@schemas/trafficSignTypes';
@@ -27,28 +27,10 @@ export default (feature: unknown): Feature => {
   const match = text
     ? text.match(/\b(\d+(?:[.,]\d+)?)\s*(h|min|cm|m|km|kg|t)?\b/i)
     : null;
-  const rawValue = match
-    ? Math.round(parseFloat(match[1].replace(',', '.')) * 1000) / 1000
-    : NaN;
-  const unit = match ? match[2]?.toLowerCase() : null;
-  const isValueSign =
-    Object.keys(trafficSignRules).includes(trafficSignCode) &&
-    trafficSignRules[trafficSignCode].unit;
-  const assumedUnit = isValueSign ? trafficSignRules[trafficSignCode].unit : undefined;
+  const rawValue = match ? parseFloat(match[1].replace(',', '.')) : NaN;
+  const unit = match && match[2] ? match[2].toLowerCase() : null;
 
-  const value = (() => {
-    if (isNaN(rawValue)) return rawValue;
-    if (assumedUnit && unit) {
-      return transformValueToUnit(rawValue, assumedUnit, unit);
-    }
-    if (assumedUnit === 'kg' && rawValue < 100) {
-      return rawValue * 1000;
-    }
-    if (assumedUnit === 'min' && rawValue < 25 && ![5, 10, 15, 20].includes(rawValue)) {
-      return rawValue * 60;
-    }
-    return rawValue;
-  })();
+  const value = convertUnit(trafficSignCode, rawValue, unit);
 
   return trafficSignFeatureSchema.cast({
     type: 'Feature',
@@ -61,7 +43,7 @@ export default (feature: unknown): Feature => {
       ID: String(id),
       SUUNTIMA: Math.round(properties.suunta ? properties.suunta * (180 / Math.PI) : 0), // MAYBE SHOULD RETURN InvalidFeature in case of no bearing.
       LM_TYYPPI: createTrafficSignText(trafficSignCode),
-      ARVO: !isNaN(value) && isValueSign ? value : undefined,
+      ARVO: !isNaN(value) && trafficSignRules[trafficSignCode].unit ? value : undefined,
       TEKSTI: text ? text.substring(0, 128) : text,
       ...(!(trafficSignCode[0] === 'H') && {
         LISAKILVET: []
