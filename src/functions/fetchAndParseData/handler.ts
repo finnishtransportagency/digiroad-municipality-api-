@@ -226,7 +226,16 @@ const fetchAdditionalPanelsHelsinki = async (
                 invalidFeature(value, 'Additionalpanel missing parent field')
               ]
             };
-          const parsedFeature = helsinkiSignParser(value, signMap, true);
+          const parsedFeature = (() => {
+            try {
+              return helsinkiSignParser(value, signMap, true);
+            } catch (error) {
+              return invalidFeature(
+                value,
+                `Parser error: ${error instanceof Error ? error.message : String(error)}`
+              );
+            }
+          })();
           if (!additionalPanelFeatureSchema.isValidSync(parsedFeature))
             return {
               additionalPanels: acc.additionalPanels,
