@@ -44,9 +44,9 @@ export const transformValueToUnit = (
     cm: { cm: 1, m: 100, km: 100000 },
     m: { cm: 0.01, m: 1, km: 1000 },
     km: { cm: 0.00001, m: 0.001, km: 1 },
-    kg: { t: 1000 },
-    min: { h: 60 },
-    h: { min: 1 / 60 }
+    kg: { t: 1000, kg: 1 },
+    min: { h: 60, min: 1 },
+    h: { min: 1 / 60, h: 1 }
   };
 
   const factor = conversionFactors[assumedUnit]?.[readUnit];
@@ -65,9 +65,8 @@ export const convertUnit = (
     ? trafficSignRules[trafficSignCode].unit
     : undefined;
   if (isNaN(rawValue)) return rawValue;
-  if (assumedUnit && unit) {
-    return transformValueToUnit(rawValue, assumedUnit, unit);
-  }
+  if (assumedUnit && unit) return transformValueToUnit(rawValue, assumedUnit, unit);
+
   // If Digiroad unit of traffic sign is kg, and raw value read
   // from municipality is under 100, assumes raw value is in tons.
   if (assumedUnit === 'kg' && rawValue < 100) {
