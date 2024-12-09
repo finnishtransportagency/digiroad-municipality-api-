@@ -27,7 +27,7 @@ export default (
       case 'traffic-sign-reals':
         if (signMap) return helsinkiSignParser(feature, signMap, false, additionalPanels);
         console.warn('Could not fetch singMap');
-        break;
+        return invalidFeature(feature, 'Could not fetch singMap');
 
       default:
         console.warn('Asset type not supported by parseFeature:', assetType);
