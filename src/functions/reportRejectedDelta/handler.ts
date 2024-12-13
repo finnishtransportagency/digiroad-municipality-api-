@@ -91,6 +91,8 @@ const reportRejectedDelta = async (event: ReportRejectedDeltaEvent) => {
       pass: await getParameter(smtppassword)
     }
   });
+  console.log(smtpusername);
+  console.log(smtppassword);
   let templateName: string;
   let emailSubject: string;
 
