@@ -1,7 +1,7 @@
 import { invokeLambda, middyfy } from '@libs/lambda-tools';
 
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
-import { bucketName, MAX_OFFSET } from '@functions/config';
+import { bucketName, MAX_OFFSET, stage } from '@functions/config';
 import {
   GetNearbyLinksPayload,
   isS3KeyObject,
@@ -26,15 +26,18 @@ const matchRoadLinks = async (event: S3KeyObject) => {
       ).slice(0, 1000)}`
     );
 
+  const municipality = updatePayload.metadata.municipality;
+  const assetType = updatePayload.metadata.assetType;
+
   const getNearbyLinksPayload: GetNearbyLinksPayload = {
     features: updatePayload.Created.concat(updatePayload.Updated),
-    municipality: updatePayload.metadata.municipality,
-    assetType: updatePayload.metadata.assetType
+    municipality,
+    assetType
   };
 
   await uploadToS3(
     bucketName,
-    `getNearbyLinksRequestPayload/${updatePayload.metadata.municipality}/${fileName}.json`,
+    `getNearbyLinksRequestPayload/${municipality}/${fileName}.json`,
     JSON.stringify(getNearbyLinksPayload)
   );
 
@@ -45,7 +48,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
         'RequestResponse',
         Buffer.from(
           JSON.stringify({
-            key: `getNearbyLinksRequestPayload/${updatePayload.metadata.municipality}/${fileName}.json`
+            key: `getNearbyLinksRequestPayload/${municipality}/${fileName}.json`
           })
         )
       )
@@ -100,8 +103,8 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     Deleted: updatePayload.Deleted,
     invalidInfrao: updatePayload.invalidInfrao,
     metadata: {
-      municipality: updatePayload.metadata.municipality,
-      assetType: updatePayload.metadata.assetType
+      municipality,
+      assetType
     }
   };
 
@@ -128,20 +131,20 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     invalidInfrao: updatePayload.invalidInfrao,
     metadata: {
       OFFSET_LIMIT: MAX_OFFSET,
-      municipality: updatePayload.metadata.municipality,
-      assetType: updatePayload.metadata.assetType
+      municipality,
+      assetType
     }
   };
 
   await uploadToS3(
     bucketName,
-    `matchRoadLink/${updatePayload.metadata.municipality}/${fileName}.json`,
+    `matchRoadLink/${municipality}/${fileName}.json`,
     JSON.stringify(execDelta2SQLBody)
   );
 
   await uploadToS3(
     bucketName,
-    `logs/${updatePayload.metadata.municipality}/${fileName}.json`,
+    `logs/${municipality}/${fileName}.json`,
     JSON.stringify(logsBody)
   );
 
@@ -150,19 +153,10 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     'Event',
     Buffer.from(
       JSON.stringify({
-        key: `matchRoadLink/${updatePayload.metadata.municipality}/${fileName}.json`
+        key: `matchRoadLink/${municipality}/${fileName}.json`
       })
     )
   );
-
-  const reportRejectedDeltabody = {
-    assetType: updatePayload.metadata.assetType,
-    rejectsAmount: rejectsAmount,
-    assetsAmount: updatePayload.Created.length + updatePayload.Updated.length,
-    deletesAmount: updatePayload.Deleted.length,
-    invalidInfrao: updatePayload.invalidInfrao,
-    now: fileName
-  };
 
   void invokeLambda(
     'reportRejectedDelta',
@@ -173,9 +167,13 @@ const matchRoadLinks = async (event: S3KeyObject) => {
           rejectsAmount > 0 || updatePayload.invalidInfrao.sum > 0
             ? 'matchedWithFailures'
             : 'matchedSuccessfully',
-        Municipality: updatePayload.metadata.municipality,
-        Body: reportRejectedDeltabody,
-        S3Key: `logs/${updatePayload.metadata.municipality}/${fileName}.json`
+        Municipality: municipality,
+        Body: {
+          now: fileName,
+          stage: stage,
+          link: `https://s3.console.aws.amazon.com/s3/object/${bucketName}?region=eu-west-1&prefix=logs/${municipality}/${fileName}.json`
+        },
+        S3Key: `logs/${municipality}/${fileName}.json`
       })
     )
   );

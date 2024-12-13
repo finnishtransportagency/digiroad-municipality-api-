@@ -77,6 +77,7 @@ export const convertUnit = (
   if (assumedUnit === 'min' && rawValue < 25 && ![5, 10, 15, 20].includes(rawValue)) {
     return rawValue * 60;
   }
+  // Helsinki length values come in metres
   if (isHelsinki && assumedUnit === 'cm') return rawValue * 100;
   return rawValue;
 };
