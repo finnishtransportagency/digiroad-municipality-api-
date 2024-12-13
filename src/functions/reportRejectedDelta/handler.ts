@@ -22,6 +22,11 @@ interface ReportRejectedDeltaEvent {
     now: string;
     stage: string;
     link: string;
+    rejectsAmount: number;
+    assetsAmount: number;
+    deletesAmount: number;
+    invalidInfraoSum: number;
+    assetType: string;
     Message?: string;
   };
   S3Key: string;

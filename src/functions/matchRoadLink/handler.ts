@@ -169,6 +169,11 @@ const matchRoadLinks = async (event: S3KeyObject) => {
             : 'matchedSuccessfully',
         Municipality: municipality,
         Body: {
+          assetType,
+          rejectsAmount,
+          assetsAmount: updatePayload.Created.length + updatePayload.Updated.length,
+          deletesAmount: updatePayload.Deleted.length,
+          invalidInfraoSum: updatePayload.invalidInfrao.sum,
           now: fileName,
           stage: stage,
           link: `https://s3.console.aws.amazon.com/s3/object/${bucketName}?region=eu-west-1&prefix=logs/${municipality}/${fileName}.json`
