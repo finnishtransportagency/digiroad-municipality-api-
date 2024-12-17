@@ -32,6 +32,30 @@ interface ReportRejectedDeltaEvent {
   S3Key: string;
 }
 
+const sendEmail = async (municipality: string) => {
+  const transporter = createTransport({
+    host: 'email-smtp.eu-west-1.amazonaws.com',
+    port: 587,
+    auth: {
+      user: await getParameter(smtpusername),
+      pass: await getParameter(smtppassword)
+    }
+  });
+  const recipients = email.split(',');
+  /* const municipalityEmail = await ejs.renderFile(
+    path.resolve(__dirname, './templates/rejectedFeatures.ejs'),
+    event
+  ); */
+  const response = await transporter.sendMail({
+    from: 'noreply.digiroad@vaylapilvi.fi',
+    bcc: recipients,
+    subject: `${stage} Digiroad kuntarajapinta: joitain kohteita ei voitu päivittää / Digiroad municipality API: some features could not be updated (${municipality})`,
+    html: '<p>Hello world!</p>',
+    text: 'Hello world!'
+  });
+  console.log('SMTP response:\n' + response.response);
+};
+
 const initializeGeojson = (name: string, municipality: string) => {
   return {
     type: 'FeatureCollection',
@@ -83,46 +107,7 @@ const reportRejectedDelta = async (event: ReportRejectedDeltaEvent) => {
     JSON.stringify(invalidInfrao)
   );
   if (offline) return;
-  const transporter = createTransport({
-    host: 'email-smtp.eu-west-1.amazonaws.com',
-    port: 587,
-    auth: {
-      user: await getParameter(smtpusername),
-      pass: await getParameter(smtppassword)
-    }
-  });
-  let templateName: string;
-  let emailSubject: string;
-
-  let subjectHeader = '';
-  if (stage === 'dev') subjectHeader = '[DEV]';
-  if (stage === 'test') subjectHeader = '[TEST]';
-
-  switch (event.ReportType) {
-    case 'invalidData':
-      templateName = 'invalidData.ejs';
-      emailSubject = `${subjectHeader} Digiroad kuntarajapinta: lähetys hylätty / Digiroad municipality API: upload rejected`;
-      break;
-    case 'matchedWithFailures':
-      templateName = 'rejectedFeatures.ejs';
-      emailSubject = `${subjectHeader} Digiroad kuntarajapinta: joitain kohteita ei voitu päivittää / Digiroad municipality API: some features could not be updated`;
-      break;
-    case 'matchedSuccessfully':
-      return;
-  }
-
-  const recipients = email.split(',');
-  const municipalityEmail = await ejs.renderFile(
-    path.resolve(__dirname, './templates/' + templateName),
-    event
-  );
-  const response = await transporter.sendMail({
-    from: 'noreply.digiroad@vaylapilvi.fi',
-    bcc: recipients,
-    subject: emailSubject + ` (${event.Municipality})`,
-    html: municipalityEmail
-  });
-  console.log('SMTP response:\n' + response.response);
+  await sendEmail(event.Municipality);
 };
 
 export const main = middyfy(reportRejectedDelta);
