@@ -143,7 +143,7 @@ const reportRejectedDelta = async (event: ReportRejectedDeltaEvent) => {
     JSON.stringify(invalidInfrao)
   );
   if (offline) return;
-  await sendEmail(event);
+  if (event.Body.invalidInfraoSum || event.Body.rejectsAmount) await sendEmail(event);
 };
 
 export const main = middyfy(reportRejectedDelta);
