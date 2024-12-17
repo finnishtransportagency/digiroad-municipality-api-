@@ -116,12 +116,13 @@ const reportRejectedDelta = async (event: ReportRejectedDeltaEvent) => {
     path.resolve(__dirname, './templates/' + templateName),
     event
   );
-  await transporter.sendMail({
+  const response = await transporter.sendMail({
     from: 'noreply.digiroad@vaylapilvi.fi',
     bcc: recipients,
     subject: emailSubject + ` (${event.Municipality})`,
     html: municipalityEmail
   });
+  console.log('SMTP response:\n' + response.response);
 };
 
 export const main = middyfy(reportRejectedDelta);

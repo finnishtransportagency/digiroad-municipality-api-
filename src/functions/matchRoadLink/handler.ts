@@ -136,6 +136,9 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     }
   };
 
+  console.info('Assets rejected by matchRoadLink:', rejectsAmount);
+  console.info('invalidInfrao sum:', updatePayload.invalidInfrao.sum);
+
   await uploadToS3(
     bucketName,
     `matchRoadLink/${municipality}/${fileName}.json`,
@@ -158,7 +161,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     )
   );
 
-  void invokeLambda(
+  await invokeLambda(
     'reportRejectedDelta',
     'Event',
     Buffer.from(
