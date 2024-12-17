@@ -166,10 +166,6 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     'Event',
     Buffer.from(
       JSON.stringify({
-        ReportType:
-          rejectsAmount > 0 || updatePayload.invalidInfrao.sum > 0
-            ? 'matchedWithFailures'
-            : 'matchedSuccessfully',
         Municipality: municipality,
         Body: {
           assetType,

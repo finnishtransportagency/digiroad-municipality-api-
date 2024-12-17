@@ -32,7 +32,15 @@ interface ReportRejectedDeltaEvent {
   S3Key: string;
 }
 
-const sendEmail = async (municipality: string) => {
+const renderEmailContents = (municipality: string) => {
+  const html = `
+    <h1>Kuntarajapinta: ${municipality}</h1>
+  `;
+  const text = `Kuntarajapinta: ${municipality}`;
+  return { html, text };
+};
+
+const sendEmail = async (event: ReportRejectedDeltaEvent) => {
   const transporter = createTransport({
     host: 'email-smtp.eu-west-1.amazonaws.com',
     port: 587,
@@ -46,12 +54,13 @@ const sendEmail = async (municipality: string) => {
     path.resolve(__dirname, './templates/rejectedFeatures.ejs'),
     event
   ); */
+  const emailContents = renderEmailContents(event.Municipality);
   const response = await transporter.sendMail({
     from: 'noreply.digiroad@vaylapilvi.fi',
     bcc: recipients,
-    subject: `${stage} Digiroad kuntarajapinta: joitain kohteita ei voitu päivittää / Digiroad municipality API: some features could not be updated (${municipality})`,
-    html: '<p>Hello world!</p>',
-    text: 'Hello world!'
+    subject: `${stage} Digiroad kuntarajapinta: joitain kohteita ei voitu päivittää / Digiroad municipality API: some features could not be updated (${event.Municipality})`,
+    html: emailContents.html,
+    text: emailContents.text
   });
   console.log('SMTP response:\n' + response.response);
 };
@@ -107,7 +116,7 @@ const reportRejectedDelta = async (event: ReportRejectedDeltaEvent) => {
     JSON.stringify(invalidInfrao)
   );
   if (offline) return;
-  await sendEmail(event.Municipality);
+  await sendEmail(event);
 };
 
 export const main = middyfy(reportRejectedDelta);
