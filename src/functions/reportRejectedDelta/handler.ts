@@ -1,7 +1,5 @@
 import { middyfy } from '@libs/lambda-tools';
 import { createTransport } from 'nodemailer';
-import * as ejs from 'ejs';
-import * as path from 'path';
 import {
   bucketName,
   email,
@@ -16,7 +14,6 @@ import { logsSchema } from '@schemas/updatePayloadSchema';
 import { AnyObject } from 'yup';
 
 interface ReportRejectedDeltaEvent {
-  ReportType: 'invalidData' | 'matchedWithFailures' | 'matchedSuccessfully';
   Municipality: string;
   Body: {
     now: string;
@@ -32,11 +29,36 @@ interface ReportRejectedDeltaEvent {
   S3Key: string;
 }
 
-const renderEmailContents = (municipality: string) => {
+const renderEmailContents = (
+  municipality: string,
+  assetType: string,
+  rejectsAmount: number,
+  assetsAmount: number,
+  invalidInfraoSum: number,
+  deletesAmount: number,
+  link: string,
+  now: string
+) => {
   const html = `
     <h1>Kuntarajapinta: ${municipality}</h1>
+    <br/>
+    <p>Tietolajin tyyppi: ${assetType}</p>
+    <p>${rejectsAmount}/${assetsAmount} kohdetta hylätty sijainnin takia. (Uudet sekä päivitetyt)</p>
+    <p>${invalidInfraoSum} kohdetta hylätty kohteen ominaisuustietojen perusteella</p>
+    <p>${deletesAmount} kohdetta poistettu (mukaan lukien ennestään hylätyt kohteet)</p>
+    <p><a href="${link}">Tarkista lokit s3:sesta</a></p>
+    <p>Bucket: dr-kunta-${stage}-bucket</p>
+    <p>Kansio/tiedosto: logs/${municipality}/${now}</p>
   `;
-  const text = `Kuntarajapinta: ${municipality}`;
+  const text = `Kuntarajapinta: ${municipality} \n
+    Tietolajin tyyppi: ${assetType}\n
+    ${rejectsAmount}/${assetsAmount} kohdetta hylätty sijainnin takia. (Uudet sekä päivitetyt)\n
+    ${invalidInfraoSum} kohdetta hylätty kohteen ominaisuustietojen perusteella\n
+    ${deletesAmount} kohdetta poistettu (mukaan lukien ennestään hylätyt kohteet)\n
+    Tarkista lokit s3:sesta: ${link}\n
+    Bucket: dr-kunta-${stage}-bucket\n
+    Kansio/tiedosto: logs/${municipality}/${now}
+  `;
   return { html, text };
 };
 
@@ -50,15 +72,20 @@ const sendEmail = async (event: ReportRejectedDeltaEvent) => {
     }
   });
   const recipients = email.split(',');
-  /* const municipalityEmail = await ejs.renderFile(
-    path.resolve(__dirname, './templates/rejectedFeatures.ejs'),
-    event
-  ); */
-  const emailContents = renderEmailContents(event.Municipality);
+  const emailContents = renderEmailContents(
+    event.Municipality,
+    event.Body.assetType,
+    event.Body.rejectsAmount,
+    event.Body.assetsAmount,
+    event.Body.invalidInfraoSum,
+    event.Body.deletesAmount,
+    event.Body.link,
+    event.Body.now
+  );
   const response = await transporter.sendMail({
     from: 'noreply.digiroad@vaylapilvi.fi',
     bcc: recipients,
-    subject: `${stage} Digiroad kuntarajapinta: joitain kohteita ei voitu päivittää / Digiroad municipality API: some features could not be updated (${event.Municipality})`,
+    subject: `(${stage}) Digiroad kuntarajapinta: joitain kohteita ei voitu päivittää (${event.Municipality})`,
     html: emailContents.html,
     text: emailContents.text
   });
