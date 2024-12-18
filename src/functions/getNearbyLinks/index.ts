@@ -1,4 +1,9 @@
-import { awsaccountid, bucketName, MAX_OFFSET } from '@functions/config';
+import {
+  awsaccountid,
+  bucketName,
+  MAX_OFFSET_OBSTACLES,
+  MAX_OFFSET_SIGNS
+} from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 import { ServerlessFunction } from 'serverless';
 
@@ -13,7 +18,8 @@ const getNearbyLinks: ServerlessFunction = {
     subnetIds: ['${self:custom.drSubnetId1}', '${self:custom.drSubnetId2}']
   },
   environment: {
-    MAX_OFFSET: String(MAX_OFFSET),
+    MAX_OFFSET_SIGNS: String(MAX_OFFSET_SIGNS),
+    MAX_OFFSET_OBSTACLES: String(MAX_OFFSET_OBSTACLES),
     PGHOST: '${self:custom.pgHost}',
     PGPORT: '${self:custom.pgPort}',
     PGDATABASE: '${self:custom.pgDatabase}',

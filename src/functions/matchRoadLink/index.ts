@@ -1,7 +1,8 @@
 import {
   awsaccountid,
   bucketName,
-  MAX_OFFSET,
+  MAX_OFFSET_SIGNS,
+  MAX_OFFSET_OBSTACLES,
   serviceName,
   stage
 } from '@functions/config';
@@ -13,7 +14,8 @@ const matchRoadLink: ServerlessFunction = {
   maximumRetryAttempts: 0,
   timeout: 300,
   environment: {
-    MAX_OFFSET: String(MAX_OFFSET)
+    MAX_OFFSET_SIGNS: String(MAX_OFFSET_SIGNS),
+    MAX_OFFSET_OBSTACLES: String(MAX_OFFSET_OBSTACLES)
   },
   iamRoleStatements: [
     {

@@ -1,7 +1,12 @@
 import { invokeLambda, middyfy } from '@libs/lambda-tools';
 
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
-import { bucketName, MAX_OFFSET, stage } from '@functions/config';
+import {
+  bucketName,
+  MAX_OFFSET_OBSTACLES,
+  MAX_OFFSET_SIGNS,
+  stage
+} from '@functions/config';
 import {
   GetNearbyLinksPayload,
   isS3KeyObject,
@@ -130,7 +135,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     },
     invalidInfrao: updatePayload.invalidInfrao,
     metadata: {
-      OFFSET_LIMIT: MAX_OFFSET,
+      OFFSET_LIMIT: { signs: MAX_OFFSET_SIGNS, obstacles: MAX_OFFSET_OBSTACLES },
       municipality,
       assetType
     }

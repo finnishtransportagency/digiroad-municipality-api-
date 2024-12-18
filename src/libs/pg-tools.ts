@@ -1,5 +1,6 @@
 import {
-  MAX_OFFSET,
+  MAX_OFFSET_OBSTACLES,
+  MAX_OFFSET_SIGNS,
   offline,
   pgdatabase,
   pghost,
@@ -104,7 +105,8 @@ export const getPointQuery = (
   municipalityCode: number,
   features: Array<ValidFeature>
 ): PostgresQuery => {
-  const searchRadius = String(MAX_OFFSET + 3);
+  const max_offset = Math.max(MAX_OFFSET_SIGNS, MAX_OFFSET_OBSTACLES);
+  const searchRadius = String(max_offset + 3);
   return {
     text: `
       WITH
