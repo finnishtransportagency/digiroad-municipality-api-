@@ -5,7 +5,7 @@ import {
   ValidFeature
 } from '@customTypes/featureTypes';
 import { FeatureNearbyLinks } from '@customTypes/roadLinkTypes';
-import { MAX_OFFSET } from '@functions/config';
+import { MAX_OFFSET_OBSTACLES, MAX_OFFSET_SIGNS } from '@functions/config';
 import { invalidFeature } from '@libs/schema-tools';
 import { similarBearing, similarSegmentBearing } from '@libs/spatial-tools';
 import { GeoJsonFeatureType } from '@schemas/geoJsonSchema';
@@ -21,6 +21,11 @@ const matchFeature = (
     feature.properties.TYPE !== GeoJsonFeatureType.Obstacle
   )
     return invalidFeature(feature, `AssetType not supported by matchFeature.`);
+
+  const max_offset =
+    feature.properties.TYPE === GeoJsonFeatureType.TrafficSign
+      ? MAX_OFFSET_SIGNS
+      : MAX_OFFSET_OBSTACLES;
 
   const featureCoords = feature.geometry.coordinates;
   const closestLink = nearbyLinks.reduce(
@@ -102,10 +107,10 @@ const matchFeature = (
       }) ${closestLink.segmentBearing}, feature direction ${feature.properties.SUUNTIMA}`
     );
 
-  if (closestLink.distance > MAX_OFFSET)
+  if (closestLink.distance > max_offset)
     return invalidFeature(
       feature,
-      `No same direction links within ${MAX_OFFSET}m distance: closest link (${
+      `No same direction links within ${max_offset}m distance: closest link (${
         closestLink.link ? closestLink.link.linkId : 'undefined'
       })`
     );

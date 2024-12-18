@@ -60,5 +60,6 @@ jobs:
           AWS_CLOUDFORMATION_ROLE: ${{ secrets.AWS_CLOUDFORMATION_ROLE }}
           # Optional parameters
           FETCH_SIZE: ${{ vars.FETCH_SIZE }}
-          MAX_OFFSET: ${{ vars.MAX_OFFSET }}
+          MAX_OFFSET_SIGNS: ${{ vars.MAX_OFFSET_SIGNS }}
+          MAX_OFFSET_OBSTACLES: ${{ vars.MAX_OFFSET_OBSTACLES }}
           ADMINISTRATOR: ${{ vars.ADMINISTRATOR }}

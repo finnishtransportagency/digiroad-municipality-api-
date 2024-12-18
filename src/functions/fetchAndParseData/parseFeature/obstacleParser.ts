@@ -18,7 +18,7 @@ export default (feature: unknown): Feature => {
     properties: {
       TYPE: GeoJsonFeatureType.Obstacle,
       ID: String(id),
-      EST_TYYPPI: properties.malli === 'Pollari' ? 1 : 2
+      EST_TYYPPI: ['pollari', 'betoniporsas'].includes(properties.malli) ? 1 : 2
     },
     geometry: {
       type: 'Point',

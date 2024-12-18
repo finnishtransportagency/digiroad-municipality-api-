@@ -19,6 +19,11 @@ const helsinkiJsonSchema = object({
   next: string().notRequired()
 }).required();
 
+const createModel = (fullModel: string) => {
+  const allowedModels = ['pollari', 'puomi', 'betoniporsas', 'sulkuportti'];
+  return allowedModels.find((keyword) => fullModel.toLowerCase().includes(keyword));
+};
+
 const infraoObstacleSchema = object({
   type: string().oneOf(['Feature']).required(),
   id: string()
@@ -29,7 +34,10 @@ const infraoObstacleSchema = object({
     yksilointitieto: string().required(),
     alkuHetki: date().required(),
     loppuHetki: date().min(new Date()).notRequired(),
-    malli: string().oneOf(['Pollari', 'Puomi']).required(),
+    malli: string()
+      .transform(createModel)
+      .oneOf(['pollari', 'puomi', 'betoniporsas', 'sulkuportti'])
+      .required(),
     rakenne: string().oneOf(['kulkuesteet (pollarit, puomit)']).required()
   }).required()
 }).required();
