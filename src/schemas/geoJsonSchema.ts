@@ -158,11 +158,7 @@ const geoJsonSchema = object({
       name: string().oneOf(['urn:ogc:def:crs:EPSG::3067']).required()
     }).required()
   }).required(),
-  features: array().required(), // Content in not checked
-  invalidInfrao: object({
-    sum: number().required(),
-    IDs: array().default([]).of(invalidFeatureSchema.required()).min(0).required()
-  }).required()
+  features: array().required() // Content in not checked
 }).required();
 
 export {

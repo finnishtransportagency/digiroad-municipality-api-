@@ -1,6 +1,10 @@
 import { Feature } from '@customTypes/featureTypes';
 import { convertUnit, invalidFeature } from '@libs/schema-tools';
-import { GeoJsonFeatureType, trafficSignFeatureSchema } from '@schemas/geoJsonSchema';
+import {
+  additionalPanelFeatureSchema,
+  GeoJsonFeatureType,
+  trafficSignFeatureSchema
+} from '@schemas/geoJsonSchema';
 import { infraoTrafficSignSchema } from '@schemas/muniResponseSchema';
 import { createTrafficSignText, trafficSignRules } from '@schemas/trafficSignTypes';
 
@@ -32,7 +36,7 @@ export default (feature: unknown): Feature => {
 
   const value = convertUnit(trafficSignCode, rawValue, unit);
 
-  return trafficSignFeatureSchema.cast({
+  const castedTrafficSign = trafficSignFeatureSchema.cast({
     type: 'Feature',
     id: castedFeature.id,
     properties: {
@@ -54,4 +58,18 @@ export default (feature: unknown): Feature => {
       coordinates: castedFeature.geometry.coordinates
     }
   });
+
+  /**
+   * This works, because each sign type can only be either traffic signs or additional panels.
+   */
+  if (
+    !trafficSignFeatureSchema.isValidSync(castedTrafficSign) &&
+    !additionalPanelFeatureSchema.isValidSync(castedTrafficSign)
+  )
+    return invalidFeature(
+      feature,
+      'Does not match trafficSignFeatureSchema or additionalPanelFeatureSchema'
+    );
+
+  return castedTrafficSign;
 };

@@ -7,9 +7,5 @@
       "name": "urn:ogc:def:crs:EPSG::3067"
     }
   },
-  "features": [],
-  "invalidInfrao": {
-    "sum": 0,
-    "IDs": []
-  }
+  "features": []
 }

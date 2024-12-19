@@ -32,6 +32,7 @@ import helsinkiSignMapParser from './parseFeature/helsinki/helsinkiSignMapParser
 import { additionalPanelFeatureSchema } from '@schemas/geoJsonSchema';
 import helsinkiSignParser from './parseFeature/helsinki/helsinkiSignParser';
 import { invalidFeature } from '@libs/schema-tools';
+import { initializeFeatureCollection } from '@libs/spatial-tools';
 
 const fetchAndParseData = async (event: unknown) => {
   if (!isScheduleEvent(event)) {
@@ -50,7 +51,7 @@ const fetchAndParseData = async (event: unknown) => {
   for (const assetKey of assetTypeKeys) {
     switch (event.format) {
       case 'json': {
-        const geoJson: FeatureCollection = await fetchJsonData(
+        const geoJson: [FeatureCollection, FeatureCollection] = await fetchJsonData(
           event.assetTypes[assetKey],
           event.municipality,
           event.url,
@@ -59,7 +60,12 @@ const fetchAndParseData = async (event: unknown) => {
         await uploadToS3(
           bucketName,
           `geojson/${event.municipality}/${assetKey}/${now()}.json`,
-          JSON.stringify(geoJson)
+          JSON.stringify(geoJson[0])
+        );
+        await uploadToS3(
+          bucketName,
+          `invalidInfrao/${event.municipality}/${assetKey}/${now()}.json`,
+          JSON.stringify(geoJson[1])
         );
         break;
       }
@@ -78,7 +84,7 @@ const fetchAndParseData = async (event: unknown) => {
         break;
       }
       case 'helsinki': {
-        const geoJson: FeatureCollection = await fetchHelsinkiData(
+        const geoJson = await fetchHelsinkiData(
           event.assetTypes[assetKey],
           event.municipality,
           event.url
@@ -89,7 +95,15 @@ const fetchAndParseData = async (event: unknown) => {
             .toISOString()
             .slice(0, 19)
             .replaceAll(':', '_')}.json`,
-          JSON.stringify(geoJson)
+          JSON.stringify(geoJson[0])
+        );
+        await uploadToS3(
+          bucketName,
+          `invalidInfrao/helsinki/${assetKey}/${new Date()
+            .toISOString()
+            .slice(0, 19)
+            .replaceAll(':', '_')}.json`,
+          JSON.stringify(geoJson[1])
         );
         break;
       }
@@ -109,23 +123,15 @@ const fetchJsonData = async (
   municipality: string,
   baseUrl: string,
   apiKey: string
-): Promise<FeatureCollection> => {
+): Promise<[FeatureCollection, FeatureCollection]> => {
   let page = 0;
-  const geoJson: FeatureCollection = {
-    type: 'FeatureCollection',
-    name: `${municipality}-Kuntarajapinta`,
-    crs: {
-      type: 'name',
-      properties: {
-        name: 'urn:ogc:def:crs:EPSG::3067'
-      }
-    },
-    features: [],
-    invalidInfrao: {
-      sum: 0,
-      IDs: []
-    }
-  };
+  const geoJson = initializeFeatureCollection(municipality, assetType, 'geoJson');
+
+  const invalidInfrao = initializeFeatureCollection(
+    municipality,
+    assetType,
+    'invalidInfrao'
+  );
 
   while (true) {
     console.info('Fetching page:', page);
@@ -154,8 +160,7 @@ const fetchJsonData = async (
     );
 
     geoJson.features.push(...validFeatures);
-    geoJson.invalidInfrao.sum += invalidFeatures.length;
-    geoJson.invalidInfrao.IDs.push(...invalidFeatures);
+    invalidInfrao.features.push(...invalidFeatures);
 
     if (infraoFeatureCollection.numberReturned < fetchSize) break;
     page++;
@@ -166,7 +171,7 @@ const fetchJsonData = async (
     geoJson.features = matchedPanels;
   }
 
-  return geoJson;
+  return [geoJson, invalidInfrao];
 };
 
 const fetchXmlData = async (
@@ -298,23 +303,14 @@ const fetchHelsinkiData = async (
   assetType: AssetTypeString,
   municipality: string,
   baseUrl: string
-): Promise<FeatureCollection> => {
+): Promise<[FeatureCollection, FeatureCollection]> => {
   let page = 0;
-  const geoJson: FeatureCollection = {
-    type: 'FeatureCollection',
-    name: `${municipality}-Kuntarajapinta`,
-    crs: {
-      type: 'name',
-      properties: {
-        name: 'urn:ogc:def:crs:EPSG::3067'
-      }
-    },
-    features: [],
-    invalidInfrao: {
-      sum: 0,
-      IDs: []
-    }
-  };
+  const geoJson = initializeFeatureCollection(municipality, assetType, 'geoJson');
+  const invalidInfrao = initializeFeatureCollection(
+    municipality,
+    assetType,
+    'invalidInfrao'
+  );
   const isTrafficSign = assetType === 'traffic-sign-reals';
   const parsedSignMap = isTrafficSign
     ? await fetchSignMap(baseUrl, 'traffic_sign')
@@ -347,14 +343,13 @@ const fetchHelsinkiData = async (
     );
 
     geoJson.features.push(...validFeatures);
-    geoJson.invalidInfrao.sum += invalidFeatures.length;
-    geoJson.invalidInfrao.IDs.push(...invalidFeatures);
+    invalidInfrao.features.push(...invalidFeatures);
 
     if (!helsinkiFeatureCollection.next) break;
     page++;
   }
 
-  return geoJson;
+  return [geoJson, invalidInfrao];
 };
 
 export const main = middyfy(fetchAndParseData);

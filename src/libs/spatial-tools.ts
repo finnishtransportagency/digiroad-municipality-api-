@@ -1,4 +1,5 @@
-import { TrafficSignType } from '@customTypes/featureTypes';
+import { AssetTypeString } from '@customTypes/eventTypes';
+import { FeatureCollection, TrafficSignType } from '@customTypes/featureTypes';
 import { FeatureCoordinates, PointCoordinates } from '@customTypes/geometryTypes';
 import { FeatureNearbyLinks } from '@customTypes/roadLinkTypes';
 import { allowedAgainstTraffic } from '@schemas/trafficSignTypes';
@@ -165,4 +166,22 @@ export const pointOnLine = (
     coordinates: pointCoordinates
   };
   return booleanPointOnLine(point, lineString, { epsilon: 5e-7 });
+};
+
+export const initializeFeatureCollection = (
+  municipality: string,
+  assetType: AssetTypeString,
+  collectionType: string
+): FeatureCollection => {
+  return {
+    type: 'FeatureCollection',
+    name: `${municipality}-${String(assetType)}-${collectionType}`,
+    crs: {
+      type: 'name',
+      properties: {
+        name: 'urn:ogc:def:crs:EPSG::3067'
+      }
+    },
+    features: []
+  };
 };

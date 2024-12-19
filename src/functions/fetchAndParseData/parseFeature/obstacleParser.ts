@@ -1,6 +1,6 @@
 import { Feature } from '@customTypes/featureTypes';
 import { invalidFeature } from '@libs/schema-tools';
-import { GeoJsonFeatureType } from '@schemas/geoJsonSchema';
+import { GeoJsonFeatureType, obstacleFeatureSchema } from '@schemas/geoJsonSchema';
 import { infraoObstacleSchema } from '@schemas/muniResponseSchema';
 
 export default (feature: unknown): Feature => {
@@ -12,7 +12,7 @@ export default (feature: unknown): Feature => {
   if (!infraoObstacleSchema.isValidSync(castedFeature))
     return invalidFeature(feature, 'Does not match infraoObstacleSchema');
 
-  return {
+  const castedObstacle = obstacleFeatureSchema.cast({
     type: 'Feature',
     id: castedFeature.id,
     properties: {
@@ -24,5 +24,10 @@ export default (feature: unknown): Feature => {
       type: 'Point',
       coordinates
     }
-  };
+  });
+
+  if (!obstacleFeatureSchema.isValidSync(castedObstacle))
+    return invalidFeature(feature, 'Does not match obstacleFeatureSchema');
+
+  return castedObstacle;
 };

@@ -25,7 +25,7 @@ type InvalidFeature = InferType<typeof invalidFeatureSchema>;
 type Feature = ValidFeature | InvalidFeature;
 
 type FeatureCollection = Omit<InferType<typeof geoJsonSchema>, 'features'> & {
-  features: Array<ValidFeature>;
+  features: Array<Feature>;
 };
 
 interface AdditionalPanelParseObject {
