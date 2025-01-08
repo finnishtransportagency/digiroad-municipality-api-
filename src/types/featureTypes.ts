@@ -20,12 +20,20 @@ type MatchedObstacleType = InferType<typeof matchedObstacleSchema>;
 
 type MatchedFeature = MatchedTrafficSignType | MatchedObstacleType;
 
-type InvalidFeature = InferType<typeof invalidFeatureSchema>;
-
 type Feature = ValidFeature | InvalidFeature;
 
 type FeatureCollection = Omit<InferType<typeof geoJsonSchema>, 'features'> & {
   features: Array<Feature>;
+};
+
+type InvalidFeature = Omit<InferType<typeof invalidFeatureSchema>, 'properties'> & {
+  properties: Omit<InferType<typeof invalidFeatureSchema>['properties'], 'feature'> & {
+    feature: unknown;
+  };
+};
+
+const isInvalidFeature = (value: unknown): value is InvalidFeature => {
+  return invalidFeatureSchema.isValidSync(value);
 };
 
 interface AdditionalPanelParseObject {
@@ -39,6 +47,7 @@ export {
   AdditionalPanelType,
   ValidFeature,
   InvalidFeature,
+  isInvalidFeature,
   Feature,
   FeatureCollection,
   AdditionalPanelParseObject,

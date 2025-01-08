@@ -136,12 +136,14 @@ const matchedObstacleSchema = geoJsonFeatureSchema.shape({
 });
 
 const invalidFeatureSchema = object({
-  type: string().oneOf(['Invalid']).required(),
+  type: string().oneOf(['Feature']).required(),
   id: string().required(),
   properties: object({
+    invalid: string().oneOf(['Invalid']).required(),
     reason: string().required(),
     feature: mixed((i): i is NonNullable<unknown> => true).required()
-  }).required()
+  }).required(),
+  geometry: pointGeometrySchema.required()
 });
 // ^------------------------------------------^ //
 

@@ -12,6 +12,7 @@ import { getParameter } from '@libs/ssm-tools';
 import { getFromS3, uploadToS3 } from '@libs/s3-tools';
 import { logsSchema } from '@schemas/updatePayloadSchema';
 import { AnyObject } from 'yup';
+import { geoJsonSchema } from '@schemas/geoJsonSchema';
 
 interface ReportRejectedDeltaEvent {
   Municipality: string;
@@ -22,7 +23,6 @@ interface ReportRejectedDeltaEvent {
     rejectsAmount: number;
     assetsAmount: number;
     deletesAmount: number;
-    invalidInfraoSum: number;
     assetType: string;
     Message?: string;
   };
@@ -62,7 +62,7 @@ const renderEmailContents = (
   return { html, text };
 };
 
-const sendEmail = async (event: ReportRejectedDeltaEvent) => {
+const sendEmail = async (event: ReportRejectedDeltaEvent, invalidInfraoSum: number) => {
   const transporter = createTransport({
     host: 'email-smtp.eu-west-1.amazonaws.com',
     port: 587,
@@ -77,7 +77,7 @@ const sendEmail = async (event: ReportRejectedDeltaEvent) => {
     event.Body.assetType,
     event.Body.rejectsAmount,
     event.Body.assetsAmount,
-    event.Body.invalidInfraoSum,
+    invalidInfraoSum,
     event.Body.deletesAmount,
     event.Body.link,
     event.Body.now
@@ -109,18 +109,7 @@ const initializeGeojson = (name: string, municipality: string) => {
 const reportRejectedDelta = async (event: ReportRejectedDeltaEvent) => {
   const logs = JSON.parse(await getFromS3(bucketName, event.S3Key)) as AnyObject;
   const castedLogs = logsSchema.cast(logs, { context: logs });
-  const rejectedFeatures = castedLogs.Rejected.Created.concat(
-    castedLogs.Rejected.Updated
-  ).map((f) => {
-    const { reason, feature } = f.properties as {
-      reason: string;
-      feature: { properties: { [k: string]: unknown } };
-    };
-    return {
-      ...feature,
-      properties: { ...feature.properties, reason }
-    };
-  });
+  const rejectedFeatures = castedLogs.RejectedByLocation.rejected;
   const rejected = initializeGeojson('rejected', event.Municipality);
   rejected.features.push(...rejectedFeatures);
   await uploadToS3(
@@ -129,21 +118,21 @@ const reportRejectedDelta = async (event: ReportRejectedDeltaEvent) => {
     JSON.stringify(rejected)
   );
 
-  const invalidInfrao = {
-    reasons: castedLogs.invalidInfrao.IDs.reduce((reasons, f) => {
-      const reason = f.properties.reason;
-      reasons[reason] = reasons[reason] ? reasons[reason] + 1 : 1;
-      return reasons;
-    }, {} as { [k: string]: number }),
-    features: castedLogs.invalidInfrao.IDs.map((f) => f.properties)
-  };
-  await uploadToS3(
-    bucketName,
-    `logs/invalidInfrao/${event.Municipality}/${event.Body.now}.json`,
-    JSON.stringify(invalidInfrao)
-  );
   if (offline) return;
-  if (event.Body.invalidInfraoSum || event.Body.rejectsAmount) await sendEmail(event);
+  const invalidInfrao = JSON.parse(
+    await getFromS3(
+      bucketName,
+      `invalidInfrao/${event.Municipality}/${event.Body.now}.json`
+    )
+  ) as AnyObject;
+  const castedInvalidInfrao = geoJsonSchema.cast(invalidInfrao);
+  if (!geoJsonSchema.isValidSync(castedInvalidInfrao)) {
+    console.error('Invalid logging for invalidInfrao');
+    return;
+  }
+  const invalidInfraoSum = castedInvalidInfrao.features.length;
+  if (invalidInfraoSum || event.Body.rejectsAmount)
+    await sendEmail(event, invalidInfraoSum);
 };
 
 export const main = middyfy(reportRejectedDelta);

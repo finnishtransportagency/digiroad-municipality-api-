@@ -48,6 +48,8 @@ const fetchAndParseData = async (event: unknown) => {
     ? offlineApiKey
     : await getParameter(`/${serviceName}/${stage}/${event.municipality}/apiKey`);
 
+  const timeNow = now();
+
   for (const assetKey of assetTypeKeys) {
     switch (event.format) {
       case 'json': {
@@ -59,12 +61,13 @@ const fetchAndParseData = async (event: unknown) => {
         );
         await uploadToS3(
           bucketName,
-          `geojson/${event.municipality}/${assetKey}/${now()}.json`,
+          `geojson/${event.municipality}/${assetKey}/${timeNow}.json`,
           JSON.stringify(geoJson[0])
         );
+        console.log(geoJson[1]);
         await uploadToS3(
           bucketName,
-          `invalidInfrao/${event.municipality}/${assetKey}/${now()}.json`,
+          `invalidInfrao/${event.municipality}/${assetKey}/${timeNow}.json`,
           JSON.stringify(geoJson[1])
         );
         break;
@@ -91,18 +94,12 @@ const fetchAndParseData = async (event: unknown) => {
         );
         await uploadToS3(
           bucketName,
-          `geojson/helsinki/${assetKey}/${new Date()
-            .toISOString()
-            .slice(0, 19)
-            .replaceAll(':', '_')}.json`,
+          `geojson/helsinki/${assetKey}/${timeNow}.json`,
           JSON.stringify(geoJson[0])
         );
         await uploadToS3(
           bucketName,
-          `invalidInfrao/helsinki/${assetKey}/${new Date()
-            .toISOString()
-            .slice(0, 19)
-            .replaceAll(':', '_')}.json`,
+          `invalidInfrao/helsinki/${assetKey}/${timeNow}.json`,
           JSON.stringify(geoJson[1])
         );
         break;
@@ -153,10 +150,13 @@ const fetchJsonData = async (
     );
 
     const validFeatures = parsedFeatures.filter(
-      (f): f is ValidFeature => f.type === 'Feature'
+      (f): f is ValidFeature => !('invalid' in f.properties)
     );
+
     const invalidFeatures = parsedFeatures.filter(
-      (f): f is InvalidFeature => f.type === 'Invalid'
+      // Double check in case feature has actual "invalid" field
+      (f): f is InvalidFeature =>
+        'invalid' in f.properties && f.properties.invalid === 'Invalid'
     );
 
     geoJson.features.push(...validFeatures);
@@ -246,9 +246,7 @@ const fetchAdditionalPanelsHelsinki = async (
               additionalPanels: acc.additionalPanels,
               rejected: [
                 ...acc.rejected,
-                parsedFeature.type === 'Invalid'
-                  ? parsedFeature
-                  : invalidFeature(value, 'Feature is not valid additional panel')
+                invalidFeature(value, 'Feature is not valid additional panel')
               ]
             };
 
@@ -336,10 +334,13 @@ const fetchHelsinkiData = async (
         )
     );
     const validFeatures = parsedFeatures.filter(
-      (f): f is ValidFeature => f.type === 'Feature'
+      (f): f is ValidFeature => !('invalid' in f.properties)
     );
+
     const invalidFeatures = parsedFeatures.filter(
-      (f): f is InvalidFeature => f.type === 'Invalid'
+      // Double check in case feature has actual "invalid" field
+      (f): f is InvalidFeature =>
+        'invalid' in f.properties && f.properties.invalid === 'Invalid'
     );
 
     geoJson.features.push(...validFeatures);

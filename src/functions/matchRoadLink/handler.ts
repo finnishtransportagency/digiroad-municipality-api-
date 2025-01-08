@@ -14,7 +14,12 @@ import {
   S3KeyObject,
   MatchedPayload
 } from '@customTypes/eventTypes';
-import { InvalidFeature, MatchedFeature, ValidFeature } from '@customTypes/featureTypes';
+import {
+  InvalidFeature,
+  isInvalidFeature,
+  MatchedFeature,
+  ValidFeature
+} from '@customTypes/featureTypes';
 import { updatePayloadSchema } from '@schemas/updatePayloadSchema';
 import { featureNearbyLinksSchema } from '@schemas/featureNearbyLinksSchema';
 import matchFeature from './matchFeature';
@@ -78,7 +83,6 @@ const matchRoadLinks = async (event: S3KeyObject) => {
       `S3 object ${allRoadLinksS3Key} is not valid Array<FeatureRoadlinkMap>`
     );
   const nearbyLinksList = allRoadLinks.map((link) => featureNearbyLinksSchema.cast(link));
-  let rejectsAmount = 0;
 
   /**
    * Matches closest road link for each feature. Used in Array.prototype.map().
@@ -91,49 +95,44 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     );
     if (!nearbyLinks) return invalidFeature(feature, 'No links close enough to asset.');
 
-    const match = matchFeature(feature, nearbyLinks.roadlinks);
-    if (!match || (match && match.type === 'Invalid')) rejectsAmount++;
-    return match;
+    return matchFeature(feature, nearbyLinks.roadlinks);
   };
-  const createdFeatures = updatePayload.Created.map(mapMatches);
-  const updatedFeatures = updatePayload.Updated.map(mapMatches);
+  const mappedCreated = updatePayload.Created.map(mapMatches);
+  const mappedUpdated = updatePayload.Updated.map(mapMatches);
+  const createdFeatures = mappedCreated.filter(
+    (f): f is MatchedFeature => !isInvalidFeature(f)
+  );
+  const updatedFeatures = mappedUpdated.filter(
+    (f): f is MatchedFeature => !isInvalidFeature(f)
+  );
+
+  const rejectedFeatures: Array<InvalidFeature> = mappedCreated
+    .concat(mappedUpdated)
+    .filter(isInvalidFeature);
 
   const execDelta2SQLBody: MatchedPayload = {
-    Created: createdFeatures.filter(
-      (feature): feature is MatchedFeature => feature.type === 'Feature'
-    ),
-    Updated: updatedFeatures.filter(
-      (feature): feature is MatchedFeature => feature.type === 'Feature'
-    ),
+    Created: createdFeatures,
+    Updated: updatedFeatures,
     Deleted: updatePayload.Deleted,
-    invalidInfrao: updatePayload.invalidInfrao,
     metadata: {
       municipality,
       assetType
     }
   };
 
-  const rejectedCreated = createdFeatures.filter((feature) => feature.type === 'Invalid');
-  const rejectedUpdated = updatedFeatures.filter((feature) => feature.type === 'Invalid');
-  const acceptedCreated = createdFeatures.filter((feature) => feature.type === 'Feature');
-  const acceptedUpdated = updatedFeatures.filter((feature) => feature.type === 'Feature');
-
   const logsBody = {
-    Rejected: {
-      createdSum: rejectedCreated.length,
-      updatedSum: rejectedUpdated.length,
-      Created: rejectedCreated,
-      Updated: rejectedUpdated
+    RejectedByLocation: {
+      sum: rejectedFeatures.length,
+      rejected: rejectedFeatures
     },
     Accepted: {
-      createdSum: acceptedCreated.length,
-      updatedSum: acceptedUpdated.length,
+      createdSum: createdFeatures.length,
+      updatedSum: updatedFeatures.length,
       deletedSum: updatePayload.Deleted.length,
-      Created: acceptedCreated,
-      Updated: acceptedUpdated,
+      Created: createdFeatures,
+      Updated: updatedFeatures,
       Deleted: updatePayload.Deleted
     },
-    invalidInfrao: updatePayload.invalidInfrao,
     metadata: {
       OFFSET_LIMIT: { signs: MAX_OFFSET_SIGNS, obstacles: MAX_OFFSET_OBSTACLES },
       municipality,
@@ -141,8 +140,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
     }
   };
 
-  console.info('Assets rejected by matchRoadLink:', rejectsAmount);
-  console.info('invalidInfrao sum:', updatePayload.invalidInfrao.sum);
+  console.info('Assets rejected by matchRoadLink:', rejectedFeatures.length);
 
   await uploadToS3(
     bucketName,
@@ -174,10 +172,9 @@ const matchRoadLinks = async (event: S3KeyObject) => {
         Municipality: municipality,
         Body: {
           assetType,
-          rejectsAmount,
+          rejectsAmount: rejectedFeatures.length,
           assetsAmount: updatePayload.Created.length + updatePayload.Updated.length,
           deletesAmount: updatePayload.Deleted.length,
-          invalidInfraoSum: updatePayload.invalidInfrao.sum,
           now: fileName,
           stage: stage,
           link: `https://s3.console.aws.amazon.com/s3/object/${bucketName}?region=eu-west-1&prefix=logs/${municipality}/${fileName}.json`
