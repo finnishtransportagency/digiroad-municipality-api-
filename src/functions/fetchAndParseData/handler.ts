@@ -64,7 +64,6 @@ const fetchAndParseData = async (event: unknown) => {
           `geojson/${event.municipality}/${assetKey}/${timeNow}.json`,
           JSON.stringify(geoJson[0])
         );
-        console.log(geoJson[1]);
         await uploadToS3(
           bucketName,
           `invalidInfrao/${event.municipality}/${assetKey}/${timeNow}.json`,

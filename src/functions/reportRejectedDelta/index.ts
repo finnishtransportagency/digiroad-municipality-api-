@@ -24,12 +24,16 @@ const reportRejectedDelta: ServerlessFunction = {
       Action: [
         's3:PutObject',
         's3:PutObjectAcl',
-        's3:ListBucket',
         's3:GetObject',
         's3:DeleteObject',
         's3:PutObjectTagging'
       ],
       Resource: [`arn:aws:s3:::${bucketName}/*`]
+    },
+    {
+      Effect: 'Allow',
+      Action: ['s3:ListBucket'],
+      Resource: [`arn:aws:s3:::${bucketName}`]
     },
     {
       Effect: 'Allow',
