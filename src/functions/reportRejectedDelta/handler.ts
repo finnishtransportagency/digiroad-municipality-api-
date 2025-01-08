@@ -122,7 +122,7 @@ const reportRejectedDelta = async (event: ReportRejectedDeltaEvent) => {
   const invalidInfrao = JSON.parse(
     await getFromS3(
       bucketName,
-      `invalidInfrao/${event.Municipality}/${event.Body.now}.json`
+      `invalidInfrao/${event.Municipality}/${event.Body.assetType}/${event.Body.now}.json`
     )
   ) as AnyObject;
   const castedInvalidInfrao = geoJsonSchema.cast(invalidInfrao);
