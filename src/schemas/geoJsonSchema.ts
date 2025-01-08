@@ -136,12 +136,14 @@ const matchedObstacleSchema = geoJsonFeatureSchema.shape({
 });
 
 const invalidFeatureSchema = object({
-  type: string().oneOf(['Invalid']).required(),
+  type: string().oneOf(['Feature']).required(),
   id: string().required(),
   properties: object({
+    invalid: string().oneOf(['Invalid']).required(),
     reason: string().required(),
     feature: mixed((i): i is NonNullable<unknown> => true).required()
-  }).required()
+  }).required(),
+  geometry: pointGeometrySchema.required()
 });
 // ^------------------------------------------^ //
 
@@ -158,11 +160,7 @@ const geoJsonSchema = object({
       name: string().oneOf(['urn:ogc:def:crs:EPSG::3067']).required()
     }).required()
   }).required(),
-  features: array().required(), // Content in not checked
-  invalidInfrao: object({
-    sum: number().required(),
-    IDs: array().default([]).of(invalidFeatureSchema.required()).min(0).required()
-  }).required()
+  features: array().required() // Content in not checked
 }).required();
 
 export {

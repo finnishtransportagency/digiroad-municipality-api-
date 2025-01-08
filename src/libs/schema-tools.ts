@@ -7,6 +7,7 @@ import {
 } from '@schemas/geoJsonSchema';
 import { trafficSignRules } from '@schemas/trafficSignTypes';
 import { array } from 'yup';
+import { isValidPointGeometry } from '@customTypes/geometryTypes';
 
 export const arrayOfValidFeature = (assetTypeField: string, report = false) => {
   return array().when(report ? `$${assetTypeField}` : assetTypeField, {
@@ -25,13 +26,23 @@ export const arrayOfMatchedFeature = (assetTypeField: string) => {
 };
 
 export const invalidFeature = (feature: unknown, reason: string): InvalidFeature => {
+  const featureWithId = (feature as { id?: unknown })?.id;
+  const featureGeometry = (feature as { geometry?: unknown })?.geometry;
+
   return {
-    type: 'Invalid',
-    id: '-1',
+    type: 'Feature',
+    id: typeof featureWithId === 'string' ? featureWithId : '-1',
     properties: {
+      invalid: 'Invalid',
       reason,
-      feature: feature as Record<string, unknown>
-    }
+      feature
+    },
+    geometry: isValidPointGeometry(featureGeometry)
+      ? featureGeometry
+      : {
+          type: 'Point',
+          coordinates: [0, 0, 0]
+        }
   };
 };
 

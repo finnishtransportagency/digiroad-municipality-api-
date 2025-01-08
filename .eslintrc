@@ -20,5 +20,5 @@
     "@typescript-eslint/consistent-type-definitions": "error",
     "no-constant-condition": 0
   },
-  "ignorePatterns": ["dist/", "node_modules/", "testFiles/"]
+  "ignorePatterns": ["dist/", "node_modules/", "testFiles/", "debugging/"]
 }

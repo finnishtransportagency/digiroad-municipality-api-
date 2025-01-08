@@ -51,10 +51,7 @@ export const isScheduleEvent = (event: unknown): event is ScheduleEvent => {
 /**
  * Update payload saved to S3
  */
-export type UpdatePayload = Pick<
-  InferType<typeof updatePayloadSchema>,
-  'metadata' | 'invalidInfrao'
-> & {
+export type UpdatePayload = Pick<InferType<typeof updatePayloadSchema>, 'metadata'> & {
   Created: Array<ValidFeature>;
   Updated: Array<ValidFeature>;
   Deleted: Array<ValidFeature>;
@@ -66,10 +63,7 @@ export const isUpdatePayload = (payload: unknown): payload is UpdatePayload => {
 /**
  * Payload saved to S3 by calculateDelta
  */
-export type MatchedPayload = Pick<
-  InferType<typeof updatePayloadSchema>,
-  'metadata' | 'invalidInfrao'
-> & {
+export type MatchedPayload = Pick<InferType<typeof updatePayloadSchema>, 'metadata'> & {
   Created: Array<MatchedFeature>;
   Updated: Array<MatchedFeature>;
   Deleted: Array<MatchedFeature>;

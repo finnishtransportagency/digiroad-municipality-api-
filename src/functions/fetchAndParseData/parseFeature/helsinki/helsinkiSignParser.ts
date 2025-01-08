@@ -109,5 +109,10 @@ export default (
   if (castedFeature.direction === null || castedFeature.direction === undefined)
     return invalidFeature(geoJsonFeature, 'Missing direction for traffic sign');
 
-  return schema.cast(geoJsonFeature);
+  const castedSign = schema.cast(geoJsonFeature);
+
+  if (!schema.isValidSync(castedSign))
+    return invalidFeature(geoJsonFeature, 'Does not match cast schema');
+
+  return castedSign;
 };

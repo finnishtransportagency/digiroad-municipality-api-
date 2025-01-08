@@ -16,3 +16,6 @@ env.sh
 # database dumps
 *.dump
 *.sql
+
+# debugging files
+debugging

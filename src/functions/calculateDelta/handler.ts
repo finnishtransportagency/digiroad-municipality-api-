@@ -14,12 +14,7 @@ import {
   obstacleFeatureSchema,
   trafficSignFeatureSchema
 } from '@schemas/geoJsonSchema';
-import {
-  FeatureCollection,
-  InvalidFeature,
-  ValidFeature
-} from '@customTypes/featureTypes';
-import { invalidFeature } from '@libs/schema-tools';
+import { Feature, FeatureCollection, ValidFeature } from '@customTypes/featureTypes';
 
 interface FeatureCollectionResult {
   error: string | null;
@@ -51,18 +46,11 @@ const calculateDelta = async (event: S3Event) => {
   const updateFeatures: Array<ValidFeature> = updateObject.features.filter((f) =>
     validateFeatureAssetType(f, assetType)
   );
-  const invalidFeatures: Array<InvalidFeature> = updateObject.features
-    .filter((f) => !validateFeatureAssetType(f, assetType))
-    .map((feature) => invalidFeature(feature, 'Does not match trafficSignFeatureSchema'));
 
   const referenceFeatures: Array<ValidFeature> = referenceObject
     ? referenceObject.features.filter((f) => validateFeatureAssetType(f, assetType))
     : [];
   const referencesExist: boolean = referenceFeatures.length > 0;
-
-  const invalidInfrao = updateObject.invalidInfrao;
-  invalidInfrao.IDs.push(...invalidFeatures);
-  invalidInfrao.sum += invalidFeatures.length;
 
   const updatePayload: UpdatePayload = {
     Created: referencesExist ? [] : updateFeatures,
@@ -71,8 +59,7 @@ const calculateDelta = async (event: S3Event) => {
     metadata: {
       municipality,
       assetType
-    },
-    invalidInfrao
+    }
   };
   if (referencesExist)
     pushUpdatesToPayload(updatePayload, updateFeatures, referenceFeatures);
@@ -137,9 +124,9 @@ const reportUpdateObjectError = async (updateObjectKey: string) => {
 };
 
 const validateFeatureAssetType = (
-  feature: ValidFeature,
+  feature: Feature,
   assetType: AssetTypeKey
-): boolean => {
+): feature is ValidFeature => {
   switch (assetType) {
     case 'obstacles':
       return obstacleFeatureSchema.isValidSync(feature);

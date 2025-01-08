@@ -13,19 +13,14 @@ const updatePayloadSchema = object({
   metadata: object({
     municipality: string().oneOf(supportedMunicipalities).required(),
     assetType: string().oneOf(['obstacles', 'trafficSigns']).required()
-  }).required(),
-  invalidInfrao: object({
-    sum: number().required(),
-    IDs: array().of(invalidFeatureSchema.required()).required()
   }).required()
 }).required();
 
 const logsSchema = object({
-  Rejected: object({
-    Created: array().default([]).of(invalidFeatureSchema).required(),
-    Updated: array().default([]).of(invalidFeatureSchema).required(),
-    Deleted: array().default([]).of(invalidFeatureSchema).required()
-  }).required(),
+  RejectedByLocation: object({
+    sum: number().required(),
+    rejected: array().default([]).of(invalidFeatureSchema).required()
+  }),
   Accepted: object({
     Created: arrayOfMatchedFeature('metadata.assetType').required(),
     Updated: arrayOfMatchedFeature('metadata.assetType').required(),
@@ -34,10 +29,6 @@ const logsSchema = object({
   metadata: object({
     municipality: string().oneOf(supportedMunicipalities).required(),
     assetType: string().oneOf(['obstacles', 'trafficSigns']).required()
-  }).required(),
-  invalidInfrao: object({
-    sum: number().required(),
-    IDs: array().of(invalidFeatureSchema.required()).required()
   }).required()
 }).required();
 
