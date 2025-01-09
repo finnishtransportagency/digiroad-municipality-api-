@@ -1,4 +1,4 @@
-import { array, boolean, mixed, number, object, string } from 'yup';
+import { array, boolean, number, object, string } from 'yup';
 import {
   allowedAdditionalPanels,
   allowedSpeedLimits,
@@ -140,8 +140,7 @@ const invalidFeatureSchema = object({
   id: string().required(),
   properties: object({
     invalid: string().oneOf(['Invalid']).required(),
-    reason: string().required(),
-    feature: mixed((i): i is NonNullable<unknown> => true).required()
+    reason: string().required()
   }).required(),
   geometry: pointGeometrySchema.required()
 });

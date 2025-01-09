@@ -27,8 +27,8 @@ type FeatureCollection = Omit<InferType<typeof geoJsonSchema>, 'features'> & {
 };
 
 type InvalidFeature = Omit<InferType<typeof invalidFeatureSchema>, 'properties'> & {
-  properties: Omit<InferType<typeof invalidFeatureSchema>['properties'], 'feature'> & {
-    feature: unknown;
+  properties: InferType<typeof invalidFeatureSchema>['properties'] & {
+    [key: string]: unknown;
   };
 };
 

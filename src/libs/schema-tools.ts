@@ -35,7 +35,7 @@ export const invalidFeature = (feature: unknown, reason: string): InvalidFeature
     properties: {
       invalid: 'Invalid',
       reason,
-      feature
+      ...(typeof feature === 'object' ? feature : { feature })
     },
     geometry: isValidPointGeometry(featureGeometry)
       ? featureGeometry
