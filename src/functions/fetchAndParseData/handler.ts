@@ -14,7 +14,6 @@ import {
   fetchSize,
   offline,
   offlineApiKey,
-  stage,
   bbox,
   bucketName,
   helsinkiBbox,
@@ -46,7 +45,7 @@ const fetchAndParseData = async (event: unknown) => {
 
   const apiKey = offline
     ? offlineApiKey
-    : await getParameter(`/${serviceName}/${stage}/${event.municipality}/apiKey`);
+    : await getParameter(`/${serviceName}/${event.municipality}/apiKey`);
 
   const timeNow = now();
 

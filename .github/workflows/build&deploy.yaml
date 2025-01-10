@@ -4,16 +4,26 @@ on:
   push:
     branches:
       - development
+      - test
 
 permissions:
   id-token: write
   contents: read
 jobs:
   BuildAndDeploy:
-    name: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }} deploy
+    name: |-
+      ${{
+            github.ref_name == 'main' && 'production'
+        ||  github.ref_name == 'test' && 'test'
+        ||  github.ref_name == 'development' && 'development'
+      }} deploy
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
+    environment: |-
+      ${{
+            github.ref_name == 'main' && 'production'
+        ||  github.ref_name == 'test' && 'test'
+        ||  github.ref_name == 'development' && 'development'
+      }}
     strategy:
       matrix:
         node-version: [18.x]
