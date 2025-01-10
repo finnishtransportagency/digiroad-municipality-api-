@@ -19,7 +19,6 @@ interface ReportRejectedDeltaEvent {
   Body: {
     now: string;
     stage: string;
-    link: string;
     rejectsAmount: number;
     assetsAmount: number;
     deletesAmount: number;
@@ -36,26 +35,32 @@ const renderEmailContents = (
   assetsAmount: number,
   invalidInfraoSum: number,
   deletesAmount: number,
-  link: string,
   now: string
 ) => {
+  const logsLink = `https://s3.console.aws.amazon.com/s3/object/${bucketName}?region=eu-west-1&prefix=logs/${municipality}/${now}.json`;
+  const rejectedLink = `https://s3.console.aws.amazon.com/s3/object/${bucketName}?region=eu-west-1&prefix=logs/rejected/${municipality}/${assetType}/${now}.json`;
+  const invalidInfraoLink = `https://s3.console.aws.amazon.com/s3/object/${bucketName}?region=eu-west-1&prefix=invalidInfrao/${municipality}/${assetType}/${now}.json`;
   const html = `
     <h1>Kuntarajapinta: ${municipality}</h1>
     <br/>
     <p>Tietolajin tyyppi: ${assetType}</p>
     <p>${rejectsAmount}/${assetsAmount} kohdetta hylätty sijainnin takia. (Uudet sekä päivitetyt)</p>
+    <p>&emsp;<a href="${rejectedLink}">Linkki GeoJSON:iin S3:ssa</a></p>
     <p>${invalidInfraoSum} kohdetta hylätty kohteen ominaisuustietojen perusteella</p>
+    <p>&emsp;<a href="${invalidInfraoLink}">Linkki GeoJSON:iin S3:ssa</a></p>
     <p>${deletesAmount} kohdetta poistettu (mukaan lukien ennestään hylätyt kohteet)</p>
-    <p><a href="${link}">Tarkista lokit s3:sesta</a></p>
+    <p><a href="${logsLink}">Tarkista lokit s3:sesta</a></p>
     <p>Bucket: dr-kunta-${stage}-bucket</p>
     <p>Kansio/tiedosto: logs/${municipality}/${now}</p>
   `;
   const text = `Kuntarajapinta: ${municipality} \n
     Tietolajin tyyppi: ${assetType}\n
     ${rejectsAmount}/${assetsAmount} kohdetta hylätty sijainnin takia. (Uudet sekä päivitetyt)\n
+        Linkki GeoJSON:iin S3:ssa: ${rejectedLink}
     ${invalidInfraoSum} kohdetta hylätty kohteen ominaisuustietojen perusteella\n
+        Linkki GeoJSON:iin S3:ssa: ${invalidInfraoLink}
     ${deletesAmount} kohdetta poistettu (mukaan lukien ennestään hylätyt kohteet)\n
-    Tarkista lokit s3:sesta: ${link}\n
+    Tarkista lokit s3:sesta: ${logsLink}\n
     Bucket: dr-kunta-${stage}-bucket\n
     Kansio/tiedosto: logs/${municipality}/${now}
   `;
@@ -79,7 +84,6 @@ const sendEmail = async (event: ReportRejectedDeltaEvent, invalidInfraoSum: numb
     event.Body.assetsAmount,
     invalidInfraoSum,
     event.Body.deletesAmount,
-    event.Body.link,
     event.Body.now
   );
   const response = await transporter.sendMail({
@@ -114,7 +118,7 @@ const reportRejectedDelta = async (event: ReportRejectedDeltaEvent) => {
   rejected.features.push(...rejectedFeatures);
   await uploadToS3(
     bucketName,
-    `logs/rejected/${event.Municipality}/${event.Body.now}.json`,
+    `logs/rejected/${event.Municipality}/${event.Body.assetType}/${event.Body.now}.json`,
     JSON.stringify(rejected)
   );
 

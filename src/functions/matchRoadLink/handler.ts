@@ -176,8 +176,7 @@ const matchRoadLinks = async (event: S3KeyObject) => {
           assetsAmount: updatePayload.Created.length + updatePayload.Updated.length,
           deletesAmount: updatePayload.Deleted.length,
           now: fileName,
-          stage: stage,
-          link: `https://s3.console.aws.amazon.com/s3/object/${bucketName}?region=eu-west-1&prefix=logs/${municipality}/${fileName}.json`
+          stage: stage
         },
         S3Key: `logs/${municipality}/${fileName}.json`
       })
