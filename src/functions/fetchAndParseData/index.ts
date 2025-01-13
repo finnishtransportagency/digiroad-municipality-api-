@@ -1,10 +1,4 @@
-import {
-  awsaccountid,
-  bucketName,
-  fetchSize,
-  serviceName,
-  stage
-} from '@functions/config';
+import { awsaccountid, bucketName, fetchSize, serviceName } from '@functions/config';
 import { handlerPath } from '@libs/handler-resolver';
 import { ServerlessFunction } from 'serverless';
 
@@ -25,9 +19,7 @@ const fetchAndParseData: ServerlessFunction = {
     {
       Effect: 'Allow',
       Action: ['ssm:GetParameter', 'ssm:GetParameters'],
-      Resource: [
-        `arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/${serviceName}/${stage}/*`
-      ]
+      Resource: [`arn:aws:ssm:eu-west-1:${awsaccountid}:parameter/${serviceName}/*`]
     },
     {
       Effect: 'Allow',
