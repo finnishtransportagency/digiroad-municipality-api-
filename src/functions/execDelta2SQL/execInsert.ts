@@ -1,26 +1,34 @@
 import { MatchedFeature, ValidFeature } from '@customTypes/featureTypes';
 import {
-  additionalPanelQuery,
+  AdditionalPanelProperty,
+  ChoiceProperty,
+  NumberProperty,
+  SignProperty,
+  TextProperty
+} from '@customTypes/propertyTypes';
+import {
   checkExistingAssetQuery,
   expireQuery,
   insertAssetLinkQuery,
   insertAssetQuery,
-  insertAssetSingleChoiceValuesQuery,
-  insertLrmPositionQuery,
-  insertNumberQuery,
-  insertSingleChoiceQuery,
-  insertTextQuery
+  insertLrmPositionQuery
 } from '@libs/pg-tools';
 import { assetTypeIdMap } from '@schemas/dbIdMapping';
 import { expireResultSchema, insertAssetResultSchema } from '@schemas/dbSchemas';
 import { GeoJsonFeatureType } from '@schemas/geoJsonSchema';
-import { Client, QueryResult } from 'pg';
+import { Client } from 'pg';
 
 const execInsert = async (
   feature: MatchedFeature,
   municipality_code: number,
   dbmodifier: string,
-  client: Client
+  client: Client,
+  textProperties: Array<TextProperty>,
+  numberProperties: Array<NumberProperty>,
+  singleChoiceProperties: Array<ChoiceProperty>,
+  multipleChoiceProperties: Array<ChoiceProperty>,
+  additionalPanels: Array<AdditionalPanelProperty>,
+  trafficSignTypes: Array<SignProperty>
 ): Promise<void> => {
   const featureProperties = feature.properties;
   if (!featureProperties.DR_GEOMETRY) return;
@@ -82,138 +90,125 @@ const execInsert = async (
 
   await client.query(insertAssetLinkQuery(assetID, positionId));
 
-  const queries: Array<Promise<QueryResult>> = [];
-
   switch (featureProperties.TYPE) {
     case GeoJsonFeatureType.Obstacle:
-      queries.push(
-        client.query(
-          insertSingleChoiceQuery(
-            'esterakennelma',
-            featureProperties.EST_TYYPPI,
-            assetID,
-            dbmodifier
-          )
-        )
-      );
+      singleChoiceProperties.push({
+        publicId: 'esterakennelma',
+        enumeratedValue: featureProperties.EST_TYYPPI,
+        assetId: assetID
+      });
       break;
     case GeoJsonFeatureType.TrafficSign:
       if (featureProperties.ARVO) {
-        queries.push(
-          client.query(
-            insertTextQuery(
-              'trafficSigns_value',
-              assetID,
-              featureProperties.ARVO,
-              dbmodifier
-            )
-          )
-        );
+        textProperties.push({
+          publicId: 'trafficSigns_value',
+          assetId: assetID,
+          value: featureProperties.ARVO
+        });
       }
       if (featureProperties.TEKSTI) {
-        queries.push(
-          client.query(
-            insertTextQuery(
-              'main_sign_text',
-              assetID,
-              featureProperties.TEKSTI,
-              dbmodifier
-            )
-          )
-        );
+        textProperties.push({
+          publicId: 'main_sign_text',
+          assetId: assetID,
+          value: featureProperties.TEKSTI
+        });
       }
       if (featureProperties.LISATIETO) {
-        queries.push(
-          client.query(
-            insertTextQuery(
-              'trafficSigns_info',
-              assetID,
-              featureProperties.LISATIETO,
-              dbmodifier
-            )
-          )
-        );
+        textProperties.push({
+          publicId: 'trafficSigns_info',
+          assetId: assetID,
+          value: featureProperties.LISATIETO
+        });
       }
-      queries.push(
-        client.query(
-          insertSingleChoiceQuery(
-            'old_traffic_code',
-            0,
-            assetID,
-            dbmodifier,
-            undefined,
-            true
-          )
-        ),
-        client.query(
-          insertNumberQuery(
-            'terrain_coordinates_x',
-            assetID,
-            feature.geometry.coordinates[0]
-          )
-        ),
-        client.query(
-          insertNumberQuery(
-            'terrain_coordinates_y',
-            assetID,
-            feature.geometry.coordinates[1]
-          )
-        ),
-        client.query(
-          insertSingleChoiceQuery(
-            'trafficSigns_type',
-            featureProperties.LM_TYYPPI,
-            assetID,
-            dbmodifier,
-            1
-          )
-        )
-      );
+      multipleChoiceProperties.push({
+        publicId: 'old_traffic_code',
+        enumeratedValue: 0,
+        assetId: assetID
+      });
+      trafficSignTypes.push({
+        publicId: 'trafficSigns_type',
+        enumeratedValue: featureProperties.LM_TYYPPI,
+        assetId: assetID
+      });
+      numberProperties.push({
+        publicId: 'terrain_coordinates_x',
+        assetId: assetID,
+        value: feature.geometry.coordinates[0]
+      });
+      numberProperties.push({
+        publicId: 'terrain_coordinates_y',
+        assetId: assetID,
+        value: feature.geometry.coordinates[1]
+      });
       if (featureProperties.LISAKILVET.length > 0) {
-        queries.push(
-          ...featureProperties.LISAKILVET.slice(0, 5).map((panel, i: number) => {
-            return client.query(
-              additionalPanelQuery(
-                panel.LM_TYYPPI,
-                assetID,
-                i,
-                panel.ARVO,
-                panel.TEKSTI || undefined,
-                panel.KOKO || undefined,
-                panel.KALVON_TYYPPI || undefined,
-                panel.VARI || undefined
-              )
-            );
-          })
-        );
+        featureProperties.LISAKILVET.slice(0, 5).map((panel, i: number) => {
+          additionalPanels.push({
+            lmTyyppi: panel.LM_TYYPPI,
+            assetId: assetID,
+            position: i,
+            value: panel.ARVO,
+            text: panel.TEKSTI || undefined,
+            size: panel.KOKO || undefined,
+            filmType: panel.KALVON_TYYPPI || undefined,
+            color: panel.VARI || undefined
+          });
+        });
       }
-      queries.push(
-        client.query(
-          insertAssetSingleChoiceValuesQuery(
-            [
-              featureProperties.RAKENNE ?? 99,
-              featureProperties.KUNTO ?? 99,
-              featureProperties.KOKO ?? 99,
-              featureProperties.KALVON_TYYPPI ?? 99,
-              featureProperties.TILA ?? 3,
-              99,
-              99,
-              99,
-              99,
-              99
-            ],
-            assetID,
-            dbmodifier
-          )
-        )
-      );
-
+      singleChoiceProperties.push({
+        publicId: 'structure',
+        enumeratedValue: featureProperties.RAKENNE ?? 99,
+        assetId: assetID
+      });
+      singleChoiceProperties.push({
+        publicId: 'condition',
+        enumeratedValue: featureProperties.KUNTO ?? 99,
+        assetId: assetID
+      });
+      singleChoiceProperties.push({
+        publicId: 'size',
+        enumeratedValue: featureProperties.KOKO ?? 99,
+        assetId: assetID
+      });
+      singleChoiceProperties.push({
+        publicId: 'coating_type',
+        enumeratedValue: featureProperties.KALVON_TYYPPI ?? 99,
+        assetId: assetID
+      });
+      singleChoiceProperties.push({
+        publicId: 'life_cycle',
+        enumeratedValue: featureProperties.TILA ?? 3,
+        assetId: assetID
+      });
+      singleChoiceProperties.push({
+        publicId: 'lane_type',
+        enumeratedValue: 99,
+        assetId: assetID
+      });
+      singleChoiceProperties.push({
+        publicId: 'type_of_damage',
+        enumeratedValue: 99,
+        assetId: assetID
+      });
+      singleChoiceProperties.push({
+        publicId: 'urgency_of_repair',
+        enumeratedValue: 99,
+        assetId: assetID
+      });
+      singleChoiceProperties.push({
+        publicId: 'location_specifier',
+        enumeratedValue: 99,
+        assetId: assetID
+      });
+      singleChoiceProperties.push({
+        publicId: 'sign_material',
+        enumeratedValue: 99,
+        assetId: assetID
+      });
       break;
     default:
       console.warn(`ExecSQL: FeatureType not supported.`);
       break;
   }
-  await Promise.all(queries);
 };
 
 const returnBearing = (featureProperties: ValidFeature['properties']) => {
