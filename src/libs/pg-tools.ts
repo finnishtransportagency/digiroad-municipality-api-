@@ -518,7 +518,7 @@ export const insertAdditionalPanelsBatch = (
         nextval('PRIMARY_KEY_SEQ'),
         ap_property.id,
         rev.value,
-        value,
+        input_data.value,
         position,
         text,
         size,
