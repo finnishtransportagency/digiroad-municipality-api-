@@ -498,7 +498,8 @@ export const insertAdditionalPanelsBatch = (
         ),
       ranked_enumerated_values AS (
         SELECT
-          e.id ,
+          e.id,
+          e.value,
           e.property_id,
           e.name_fi,
           ROW_NUMBER() OVER (PARTITION BY e.name_fi ORDER BY e.id) AS rank
@@ -516,7 +517,7 @@ export const insertAdditionalPanelsBatch = (
         asset_id,
         nextval('PRIMARY_KEY_SEQ'),
         ap_property.id,
-        rev.id,
+        rev.value,
         value,
         position,
         text,
