@@ -9,6 +9,14 @@ import { municipalityCodeMap } from '@schemas/dbIdMapping';
 import { Client } from 'pg';
 import { QueryFunction } from '@customTypes/pgTypes';
 import execDelete from './execDelete';
+import {
+  AdditionalPanelProperty,
+  ChoiceProperty,
+  NumberProperty,
+  SignProperty,
+  TextProperty
+} from '@customTypes/propertyTypes';
+import execProperties from './execProperties';
 
 const execDelta2SQL = async (event: S3KeyObject) => {
   const s3Response = JSON.parse(await getFromS3(bucketName, event.key)) as unknown;
@@ -24,10 +32,30 @@ const execDelta2SQL = async (event: S3KeyObject) => {
   const municipalityCode = municipalityCodeMap[municipality];
   const dbmodifier = `municipality-api-${municipality}`;
 
-  const queryFunctions = delta.Created.concat(delta.Updated)
+  const features = delta.Created.concat(delta.Updated);
+
+  const textProperties: Array<TextProperty> = [];
+  const numberProperties: Array<NumberProperty> = [];
+  const singleChoiceProperties: Array<ChoiceProperty> = [];
+  const trafficSignTypes: Array<SignProperty> = [];
+  const multipleChoiceProperties: Array<ChoiceProperty> = [];
+  const additionalPanels: Array<AdditionalPanelProperty> = [];
+
+  const queryFunctions = features
     .map((feature): QueryFunction => {
       return async (client: Client) =>
-        await execInsert(feature, municipalityCode, dbmodifier, client);
+        await execInsert(
+          feature,
+          municipalityCode,
+          dbmodifier,
+          client,
+          textProperties,
+          numberProperties,
+          singleChoiceProperties,
+          multipleChoiceProperties,
+          additionalPanels,
+          trafficSignTypes
+        );
     })
     .concat(
       delta.Deleted.map((feature): QueryFunction => {
@@ -36,7 +64,20 @@ const execDelta2SQL = async (event: S3KeyObject) => {
       })
     );
 
-  await executeTransaction(queryFunctions, (e) => console.error(e));
+  const propertyFunctions: QueryFunction = async (client: Client) => {
+    await execProperties(
+      dbmodifier,
+      client,
+      textProperties,
+      numberProperties,
+      singleChoiceProperties,
+      multipleChoiceProperties,
+      additionalPanels,
+      trafficSignTypes
+    );
+  };
+
+  await executeTransaction(queryFunctions, [propertyFunctions], (e) => console.error(e));
 };
 
 export const main = middyfy(execDelta2SQL);

@@ -13,6 +13,13 @@ import { getParameter } from './ssm-tools';
 import { ValidFeature } from '@customTypes/featureTypes';
 import { allowedOnKapy } from '@schemas/trafficSignTypes';
 import { PostgresQuery, QueryFunction } from '@customTypes/pgTypes';
+import {
+  AdditionalPanelProperty,
+  ChoiceProperty,
+  NumberProperty,
+  SignProperty,
+  TextProperty
+} from '@customTypes/propertyTypes';
 
 export const getPostgresClient = async () => {
   return new Client({
@@ -43,6 +50,7 @@ export const executeSingleQuery = async (query: PostgresQuery) => {
 
 export const executeTransaction = async (
   queryFunctions: Array<QueryFunction>,
+  propertyFunctions: Array<QueryFunction>,
   errorHandler: (e: Error) => void // TODO: maybe return list of all responses ??
 ) => {
   const client = await getPostgresClient();
@@ -51,6 +59,9 @@ export const executeTransaction = async (
     await client.query('BEGIN');
     await Promise.all(
       queryFunctions.map(async (queryFunction) => await queryFunction(client))
+    );
+    await Promise.all(
+      propertyFunctions.map(async (queryFunction) => await queryFunction(client))
     );
     await client.query('COMMIT');
   } catch (e) {
@@ -276,244 +287,248 @@ export const insertAssetLinkQuery = (
   };
 };
 
-/**
- * Selects property corresponding to the name of property in the database. Inserts into number_property_value value from
- *
- * @param publicId the name of property in the database.
- * @param assetId Id of asset being modified, returned from insertAssetQuery
- * Inserts into number_property_value value from
- * @param value Value being inserted.
- *
- * @see getPropertySubquery
- *
- * Has previously been used to insert ground coordinates, which are found in feature.geometry.coordinates.
- */
-export const insertNumberQuery = (
-  publicId: 'terrain_coordinates_x' | 'terrain_coordinates_y',
-  assetId: number,
-  value: number
+export const insertNumberPropertiesBatch = (
+  numberProperties: Array<NumberProperty>
 ): PostgresQuery => {
+  const publicIds = numberProperties.map((p) => p.publicId);
+  const assetIds = numberProperties.map((p) => String(p.assetId));
+  const values = numberProperties.map((p) => String(p.value));
+
   return {
     text: `
-      WITH ${getPropertySubquery()}
-
-      INSERT INTO number_property_value (id, asset_id, property_id, value)
-      VALUES (nextval('PRIMARY_KEY_SEQ'),$2, (SELECT id FROM _property), $3)
-    `,
-    values: [publicId, String(assetId), String(value)]
-  };
-};
-
-/**
- * Inserts into text_property_value table the values corresponding to the result of getPropertyQuery.
- *
- * @see getPropertySubquery
- *
- * @param publicId the name of property in the database.
- * @param value Text being inserted.
- * @param assetId Id of asset being modified, returned from insertAssetQuery
- * @param dbmodifier "municipality-api-{name of municipality}"
- */
-export const insertTextQuery = (
-  publicId: 'trafficSigns_value' | 'main_sign_text' | 'trafficSigns_info',
-  assetId: number,
-  value: string | number | undefined,
-  dbmodifier: string
-): PostgresQuery => {
-  return {
-    text: `
-      WITH ${getPropertySubquery()}
-
-      INSERT INTO text_property_value (id, asset_id, property_id, value_fi, created_date, created_by)
-      VALUES (nextval('PRIMARY_KEY_SEQ'),$2, (SELECT id FROM _property), $3 ,CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', $4)
-    `,
-    values: [publicId, String(assetId), String(value ?? '') || null, dbmodifier]
-  };
-};
-
-/**
- * Selects property id corresponding to the name of property in the database and
- * enumerated value id corresponding to the value of single choice value.
- * Inserts into single_choice_value the chosen value for asset being processed.
- *
- * @param publicId The name of property in the database
- * @param enumeratedValue value of single choice value
- * @param assetId Id of asset being modified, returned from insertAssetQuery
- * @param dbmodifier "municipality-api-{name of municipality}"
- */
-export const insertSingleChoiceQuery = (
-  publicId:
-    | 'trafficSigns_type'
-    | 'structure'
-    | 'condition'
-    | 'size'
-    | 'esterakennelma'
-    | 'coating_type'
-    | 'lane_type'
-    | 'life_cycle'
-    | 'type_of_damage'
-    | 'urgency_of_repair'
-    | 'location_specifier'
-    | 'sign_material'
-    | 'old_traffic_code',
-  enumeratedValue: number | string | undefined,
-  assetId: number,
-  dbmodifier: string,
-  limit?: number,
-  multiple = false
-): PostgresQuery => {
-  if (
-    publicId === 'trafficSigns_type' &&
-    (!enumeratedValue || typeof enumeratedValue !== 'string')
-  ) {
-    throw new Error(`Traffic sign (${assetId}) missing enumerated value.`);
-  }
-  return {
-    text: `
-      WITH
-        ${getPropertySubquery()},
-        _enumerated_value AS (
-          SELECT enumerated_value.id
-          FROM enumerated_value, _property
-          WHERE property_id = _property.id AND ${
-            publicId === 'trafficSigns_type' ? 'name_fi' : 'value'
-          }=($2)
-          ${limit ? `LIMIT ${limit}` : ''}
-        )
-      INSERT INTO ${
-        multiple ? 'multiple' : 'single'
-      }_choice_value (asset_id, enumerated_value_id, property_id, modified_date, modified_by${
-      multiple ? ', id' : ''
-    })
-      VALUES ($3, (SELECT id FROM _enumerated_value), (SELECT id FROM _property), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', $4${
-        multiple ? ", nextval('PRIMARY_KEY_SEQ')" : ''
-      })
-    `,
-    values: [publicId, String(enumeratedValue ?? 99), String(assetId), dbmodifier] // 99 = 'ei tiedossa' for all properties except trafficSigns_type
-  };
-};
-
-export const insertAssetSingleChoiceValuesQuery = (
-  enumValues: [
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number
-  ],
-  assetID: number,
-  dbmodifier: string
-) => {
-  return {
-    text: `
-        WITH input_data AS (
-          SELECT 
-            UNNEST(ARRAY[
-              'structure',
-              'condition',
-              'size',
-              'coating_type',
-              'life_cycle',
-              'lane_type',
-              'type_of_damage',
-              'urgency_of_repair',
-              'location_specifier',
-              'sign_material'
-            ]) AS public_id,
-            UNNEST(ARRAY[${enumValues.toString()}]) AS value
-        ),
-        cte_properties AS (
-          SELECT 
-            i.public_id,
-            p.id AS property_id,
-            i.value
-          FROM input_data i
-          JOIN property p ON p.public_id = i.public_id
-        ),
-        cte_enumerated_values AS (
-          SELECT 
-            p.property_id,
-            ev.id AS enumerated_value_id
-          FROM cte_properties p
-          JOIN enumerated_value ev 
-            ON ev.property_id = p.property_id AND ev.value = p.value
-        ),
-        cte_combined AS (
-          SELECT 
-            p.property_id,
-            ${assetID} AS asset_id,
-            ev.enumerated_value_id,
-            CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki' AS modified_date,
-            $1 AS modified_by
-          FROM cte_properties p
-          JOIN cte_enumerated_values ev ON ev.property_id = p.property_id
-        )
-        INSERT INTO single_choice_value (property_id, asset_id, enumerated_value_id, modified_date, modified_by)
+      WITH input_data AS (
         SELECT 
-          property_id, 
-          asset_id, 
-          enumerated_value_id, 
-          modified_date, 
-          modified_by
-        FROM cte_combined;
-        `,
-    values: [dbmodifier]
+          UNNEST($1::text[]) AS public_id,
+          UNNEST($2::int[]) AS asset_id,
+          UNNEST($3::float8[]) AS value
+      )
+      INSERT INTO number_property_value (
+        id, asset_id, property_id, value
+      )
+      SELECT 
+        nextval('PRIMARY_KEY_SEQ'), 
+        asset_id, 
+        p.id, 
+        value
+      FROM input_data
+      JOIN property p ON p.public_id = input_data.public_id;
+    `,
+    values: [publicIds, assetIds, values]
   };
 };
 
-/**
- * Selects property ids for additional panels and trafficsign types as well as enumerated value values
- * for trafficsign types. Inserts values into additional_panel for asset being processed.
- *
- * @param lmTyyppi Traffic sign type. Found in "LM_TYYPPI".
- * @param assetId Id of asset being modified, returned from insertAssetQuery
- * @param position Position of additional panel from up to down. Range 1-5.
- * @param value Value being inserted. Found in field "ARVO".
- * @param text Text being inserted. Found in field "TEKSTI".
- * @param size Size of panel. Found in field "KOKO".
- * @param filmType Type of film of panel. Found in field "KALVON_TYYPPI".
- * @param color Color of panel. Found in field "VARI".
- */
-export const additionalPanelQuery = (
-  lmTyyppi: string,
-  assetId: number,
-  position: number,
-  value?: number,
-  text?: string,
-  size?: number,
-  filmType?: number,
-  color?: number
+export const insertTextPropertiesBatch = (
+  textProperties: Array<TextProperty>,
+  dbmodifier: string
 ): PostgresQuery => {
+  const publicIds = textProperties.map((p) => p.publicId);
+  const assetIds = textProperties.map((p) => String(p.assetId));
+  const values = textProperties.map((p) => String(p.value));
+
   return {
     text: `
-      WITH ${getPropertySubquery()},
-        ${getPropertySubquery('ap_property', 2)},  _enumerated_value AS (
-        SELECT enumerated_value.value
-        FROM enumerated_value, _property
-        WHERE property_id = _property.id AND name_fi = ($3)
-        LIMIT 1
+      WITH input_data AS (
+        SELECT 
+          UNNEST($1::text[]) AS public_id,
+          UNNEST($2::int[]) AS asset_id,
+          UNNEST($3::text[]) AS value
       )
-
-      INSERT INTO additional_panel (asset_id, id, property_id, additional_sign_type, additional_sign_value, form_position, additional_sign_text, additional_sign_size, additional_sign_coating_type, additional_sign_panel_color)
-      VALUES ($4, nextval('PRIMARY_KEY_SEQ'), (SELECT id FROM ap_property), (SELECT value FROM _enumerated_value), $5,$6,$7,$8,$9, $10)
+      INSERT INTO text_property_value (
+        id, asset_id, property_id, value_fi, created_date, created_by
+      )
+      SELECT 
+        nextval('PRIMARY_KEY_SEQ'), 
+        asset_id, 
+        p.id, 
+        value, 
+        CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', 
+        '${dbmodifier}'
+      FROM input_data
+      JOIN property p ON p.public_id = input_data.public_id;
     `,
-    values: [
-      'trafficSigns_type',
-      'additional_panel',
-      lmTyyppi,
-      String(assetId),
-      String(value ?? '') || null,
-      String(position + 1),
-      String(text ?? '') || null,
-      String(size ?? 99),
-      String(filmType ?? 99),
-      String(color ?? 99)
-    ]
+    values: [publicIds, assetIds, values]
+  };
+};
+
+export const insertSingleChoicePropertiesBatch = (
+  singleChoiceProperties: Array<ChoiceProperty>,
+  dbmodifier: string
+): PostgresQuery => {
+  const publicIds = singleChoiceProperties.map((p) => p.publicId);
+  const assetIds = singleChoiceProperties.map((p) => String(p.assetId));
+  const enumeratedValues = singleChoiceProperties.map((p) =>
+    String(p.enumeratedValue ?? 99)
+  );
+
+  return {
+    text: `
+      WITH input_data AS (
+        SELECT 
+          UNNEST($1::text[]) AS public_id,
+          UNNEST($2::int[]) AS asset_id,
+          UNNEST($3::int[]) AS enumerated_value
+      )
+      INSERT INTO single_choice_value (
+        asset_id, enumerated_value_id, property_id, modified_date, modified_by
+      )
+      SELECT 
+        asset_id,
+        ev.id,
+        p.id AS property_id,
+        CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', 
+        '${dbmodifier}'
+      FROM input_data
+      JOIN property p ON p.public_id = input_data.public_id
+      JOIN enumerated_value ev on ev.property_id = p.id AND ev.value = input_data.enumerated_value;
+    `,
+    values: [publicIds, assetIds, enumeratedValues]
+  };
+};
+
+export const insertSignTypesBatch = (
+  trafficSignTypes: Array<SignProperty>,
+  dbmodifier: string
+): PostgresQuery => {
+  const publicIds = trafficSignTypes.map((p) => p.publicId);
+  const assetIds = trafficSignTypes.map((p) => String(p.assetId));
+  const enumeratedValues = trafficSignTypes.map((p) => String(p.enumeratedValue ?? 99));
+
+  return {
+    text: `
+      WITH input_data AS (
+        SELECT 
+          UNNEST($1::text[]) AS public_id,
+          UNNEST($2::int[]) AS asset_id,
+          UNNEST($3::text[]) AS enumerated_value
+      ),
+      ranked_enumerated_values AS (
+        SELECT 
+          e.id,
+          e.property_id,
+          e.name_fi,
+          ROW_NUMBER() OVER (PARTITION BY e.name_fi ORDER BY e.id) AS rank
+        FROM enumerated_value e)
+      INSERT INTO single_choice_value (
+        asset_id, enumerated_value_id, property_id, modified_date, modified_by
+      )
+      SELECT 
+        asset_id,
+        rev.id,
+        p.id,
+        CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki',
+        '${dbmodifier}'
+      FROM input_data
+      JOIN property p ON p.public_id = input_data.public_id
+      JOIN ranked_enumerated_values rev 
+        ON rev.property_id = p.id
+        AND rev.name_fi = input_data.enumerated_value
+        AND rev.rank = 1;
+    `,
+    values: [publicIds, assetIds, enumeratedValues]
+  };
+};
+
+export const insertMultipleChoicePropertiesBatch = (
+  multipleChoiceProperties: Array<ChoiceProperty>,
+  dbmodifier: string
+): PostgresQuery => {
+  const publicIds = multipleChoiceProperties.map((p) => p.publicId);
+  const assetIds = multipleChoiceProperties.map((p) => String(p.assetId));
+  const enumeratedValues = multipleChoiceProperties.map((p) =>
+    String(p.enumeratedValue ?? 0)
+  );
+
+  return {
+    text: `
+      WITH input_data AS (
+        SELECT 
+          UNNEST($1::text[]) AS public_id,
+          UNNEST($2::int[]) AS asset_id,
+          UNNEST($3::int[]) AS enumerated_value
+      )
+      INSERT INTO multiple_choice_value (
+        asset_id, enumerated_value_id, property_id, modified_date, modified_by, id
+      )
+      SELECT 
+        asset_id,
+        ev.id,
+        p.id,
+        CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', 
+        '${dbmodifier}',
+        nextval('PRIMARY_KEY_SEQ')
+      FROM input_data
+      JOIN property p ON p.public_id = input_data.public_id
+      JOIN enumerated_value ev on ev.property_id = p.id AND ev.value = input_data.enumerated_value;
+    `,
+    values: [publicIds, assetIds, enumeratedValues]
+  };
+};
+
+export const insertAdditionalPanelsBatch = (
+  additionalPanels: Array<AdditionalPanelProperty>
+): PostgresQuery => {
+  const lmTyyppis = additionalPanels.map((p) => String(p.lmTyyppi));
+  const assetIds = additionalPanels.map((p) => String(p.assetId));
+  const positions = additionalPanels.map((p) => String(p.position));
+  const values = additionalPanels.map((p) => (p.value != null ? String(p.value) : null));
+  const texts = additionalPanels.map((p) => (p.text != null ? String(p.text) : null));
+  const sizes = additionalPanels.map((p) => (p.size != null ? String(p.size) : null));
+  const filmTypes = additionalPanels.map((p) =>
+    p.filmType != null ? String(p.filmType) : null
+  );
+  const colors = additionalPanels.map((p) => (p.color != null ? String(p.color) : null));
+
+  return {
+    text: `
+      WITH input_data AS (
+        SELECT
+          UNNEST($1::text[]) AS lmTyyppi,
+          UNNEST($2::int[]) AS asset_id,
+          UNNEST($3::int[]) AS position,
+          UNNEST($4::text[]) AS value,
+          UNNEST($5::text[]) AS text,
+          UNNEST($6::int[]) AS size,
+          UNNEST($7::int[]) AS filmType,
+          UNNEST($8::int[]) AS color
+      ),
+      _property AS (
+        SELECT id
+          FROM property
+          WHERE public_id='trafficSigns_type'
+        ),
+      ranked_enumerated_values AS (
+        SELECT
+          e.id ,
+          e.property_id,
+          e.name_fi,
+          ROW_NUMBER() OVER (PARTITION BY e.name_fi ORDER BY e.id) AS rank
+        FROM enumerated_value e, _property
+        WHERE e.property_id = _property.id),
+      ap_property AS (
+        SELECT id
+          FROM property
+          WHERE public_id='additional_panel'
+        )
+      INSERT INTO additional_panel (
+        asset_id, id, property_id, additional_sign_type, additional_sign_value, form_position, additional_sign_text, additional_sign_size, additional_sign_coating_type, additional_sign_panel_color
+      )
+      SELECT
+        asset_id,
+        nextval('PRIMARY_KEY_SEQ'),
+        ap_property.id,
+        rev.id,
+        value,
+        position,
+        text,
+        size,
+        filmType,
+        color
+      FROM input_data
+      JOIN ranked_enumerated_values rev on rev.name_fi = input_data.lmTyyppi
+      JOIN (SELECT id FROM ap_property LIMIT 1) ap_property ON TRUE
+;
+    `,
+    values: [lmTyyppis, assetIds, positions, values, texts, sizes, filmTypes, colors]
   };
 };
 
