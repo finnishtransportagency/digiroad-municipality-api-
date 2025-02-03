@@ -12,7 +12,7 @@ import { ServerlessFunction } from 'serverless';
 const matchRoadLink: ServerlessFunction = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   maximumRetryAttempts: 0,
-  timeout: 300,
+  timeout: 900,
   environment: {
     MAX_OFFSET_SIGNS: String(MAX_OFFSET_SIGNS),
     MAX_OFFSET_OBSTACLES: String(MAX_OFFSET_OBSTACLES)

@@ -472,11 +472,11 @@ export const insertAdditionalPanelsBatch = (
   const positions = additionalPanels.map((p) => String(p.position));
   const values = additionalPanels.map((p) => (p.value != null ? String(p.value) : null));
   const texts = additionalPanels.map((p) => (p.text != null ? String(p.text) : null));
-  const sizes = additionalPanels.map((p) => (p.size != null ? String(p.size) : null));
+  const sizes = additionalPanels.map((p) => (p.size != null ? String(p.size) : '99'));
   const filmTypes = additionalPanels.map((p) =>
-    p.filmType != null ? String(p.filmType) : null
+    p.filmType != null ? String(p.filmType) : '99'
   );
-  const colors = additionalPanels.map((p) => (p.color != null ? String(p.color) : null));
+  const colors = additionalPanels.map((p) => (p.color != null ? String(p.color) : '99'));
 
   return {
     text: `
@@ -518,7 +518,7 @@ export const insertAdditionalPanelsBatch = (
         nextval('PRIMARY_KEY_SEQ'),
         ap_property.id,
         rev.value,
-        value,
+        input_data.value,
         position,
         text,
         size,

@@ -10,7 +10,7 @@ import { ServerlessFunction } from 'serverless';
 const getNearbyLinks: ServerlessFunction = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   maximumRetryAttempts: 0,
-  timeout: 300,
+  timeout: 900,
   memorySize: 2048,
   ephemeralStorageSize: 1024,
   vpc: {
