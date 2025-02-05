@@ -43,9 +43,22 @@ const infraoObstacleSchema = object({
 }).required();
 
 const mapSignCode = (fullCode: string) => {
+  if (!fullCode) return 'INVALID_CODE';
   const splitType = fullCode.trim().split(' '); // e.g. ['A10'] or ['141.a', 'Töyssyjä']
   const codeNumber = splitType[0];
-  if (Object.keys(trafficSignRules).includes(codeNumber)) return codeNumber;
+  const match = codeNumber.match(/^([A-I]\d+)(?:\.(\d+))?/);
+  if (match) {
+    const baseCode = match[1]; // "E4"
+    const firstSubNumber = match[2]; // "1", or undefined if no sub-number exists
+
+    if (firstSubNumber) {
+      const fullCodeKey = `${baseCode}.${firstSubNumber}`; // "E4.1"
+      if (Object.keys(trafficSignRules).includes(fullCodeKey)) {
+        return fullCodeKey; // Return "E4.1" if it exists in trafficSignRules
+      }
+    }
+    if (Object.keys(trafficSignRules).includes(baseCode)) return baseCode;
+  }
   const pointSplit = fullCode.trim().split(/[^a-zA-Z0-9]+/);
   const mapping = oldTrafficSignMapping[pointSplit[0]];
   if (!mapping) return 'INVALID_CODE';
@@ -137,37 +150,10 @@ const helsinkiTrafficSignMapSchema = object({
     .default('INVALID_CODE')
     .when('code', {
       is: 'INVALID_CODE',
-      then: (schema) =>
-        schema
-          .transform((value: string) => {
-            if (!value) return 'INVALID_CODE';
-            const splitType = value
-              .trim()
-              .match(/(^[A-I]\d{1,2}(\.\d{1,2})?)|(^[1-9]\d{0,3}$)/);
-            if (!splitType) return 'INVALID_CODE';
-            const code = splitType[0];
-            if (Object.keys(trafficSignRules).includes(code)) return code;
-            const mapping = oldTrafficSignMapping[code];
-            if (!mapping) return 'INVALID_CODE';
-            return mapping.code.default ?? 'INVALID_CODE';
-          })
-          .required(),
+      then: (schema) => schema.transform(mapSignCode).required(),
       otherwise: (schema) => schema.notRequired()
     }),
-  code: string()
-    .transform((value: string) => {
-      if (!value) return 'INVALID_CODE';
-      const splitType = value
-        .trim()
-        .match(/(^[A-I]\d{1,2}(\.\d{1,2})?)|(^[1-9]\d{0,3}$)/);
-      if (!splitType) return 'INVALID_CODE';
-      const code = splitType[0];
-      if (Object.keys(trafficSignRules).includes(code)) return code;
-      const mapping = oldTrafficSignMapping[code];
-      if (!mapping) return 'INVALID_CODE';
-      return mapping.code.default ?? 'INVALID_CODE';
-    })
-    .required()
+  code: string().transform(mapSignCode).required()
 }).required();
 
 const helsinkiAdditionalPanelSchema = helsinkiCommonValuesSchema.shape({
