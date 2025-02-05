@@ -525,7 +525,7 @@ export const insertAdditionalPanelsBatch = (
         filmType,
         color
       FROM input_data
-      JOIN ranked_enumerated_values rev on rev.name_fi = input_data.lmTyyppi
+      JOIN ranked_enumerated_values rev ON rev.name_fi = input_data.lmTyyppi AND rev.rank = 1
       JOIN (SELECT id FROM ap_property LIMIT 1) ap_property ON TRUE
 ;
     `,
