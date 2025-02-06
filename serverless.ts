@@ -71,7 +71,7 @@ const serverlessConfiguration: ServerlessConfiguration = {
       minify: false,
       sourcemap: true,
       exclude: ['aws-sdk'],
-      target: 'node18',
+      target: 'node20',
       define: { 'require.resolve': undefined },
       platform: 'node',
       concurrency: 10
@@ -90,7 +90,7 @@ const serverlessConfiguration: ServerlessConfiguration = {
   },
   provider: {
     name: 'aws',
-    runtime: offline ? 'nodejs16.x' : 'nodejs18.x',
+    runtime: 'nodejs20.x',
     stage: stage,
     environment: {
       OFFLINE: String(offline),
