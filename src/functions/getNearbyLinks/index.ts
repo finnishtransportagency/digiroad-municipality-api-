@@ -51,6 +51,11 @@ const getNearbyLinks: ServerlessFunction = {
       Effect: 'Allow',
       Action: ['s3:PutObject', 's3:PutObjectAcl', 's3:PutObjectTagging'],
       Resource: [`arn:aws:s3:::${bucketName}/getNearbyLinks/*`]
+    },
+    {
+      Effect: 'Allow',
+      Action: ['s3:DeleteObject'],
+      Resource: [`arn:aws:s3:::${bucketName}/geojson/*`]
     }
   ]
 };

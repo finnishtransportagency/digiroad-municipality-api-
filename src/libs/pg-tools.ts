@@ -51,26 +51,41 @@ export const executeSingleQuery = async (query: PostgresQuery) => {
 export const executeTransaction = async (
   queryFunctions: Array<QueryFunction>,
   propertyFunctions: Array<QueryFunction>,
-  errorHandler: (e: Error) => void // TODO: maybe return list of all responses ??
+  errorHandler: (e: Error) => void
 ) => {
   const client = await getPostgresClient();
   await client.connect();
+
   try {
     await client.query('BEGIN');
-    await Promise.all(
-      queryFunctions.map(async (queryFunction) => await queryFunction(client))
-    );
-    await Promise.all(
-      propertyFunctions.map(async (queryFunction) => await queryFunction(client))
-    );
+
+    for (const queryFunction of queryFunctions) {
+      await queryFunction(client);
+    }
+
+    for (const propertyFunction of propertyFunctions) {
+      await propertyFunction(client);
+    }
+
     await client.query('COMMIT');
   } catch (e) {
-    console.error('Database rolling back!');
-    await client.query('ROLLBACK');
-    if (!(e instanceof Error)) throw e;
-    errorHandler(e);
+    console.error('Transaction failed, rolling back changes...');
+    try {
+      await client.query('ROLLBACK');
+      console.error('Rollback successful.');
+    } catch (rollbackError) {
+      console.error(`Rollback failed: ${(rollbackError as Error).message}`);
+    }
+
+    if (e instanceof Error) {
+      console.error(`Database error: ${e.message}`);
+      errorHandler(e);
+    } else {
+      console.error('Unknown database error occurred');
+    }
+  } finally {
+    await client.end();
   }
-  await client.end();
 };
 
 /**

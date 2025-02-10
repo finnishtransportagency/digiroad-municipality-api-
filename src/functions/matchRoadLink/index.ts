@@ -43,6 +43,11 @@ const matchRoadLink: ServerlessFunction = {
         `arn:aws:s3:::${bucketName}/logs/*`,
         `arn:aws:s3:::${bucketName}/getNearbyLinksRequestPayload/*`
       ]
+    },
+    {
+      Effect: 'Allow',
+      Action: ['s3:DeleteObject'],
+      Resource: [`arn:aws:s3:::${bucketName}/geojson/*`]
     }
   ]
 };

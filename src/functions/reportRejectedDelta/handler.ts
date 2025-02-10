@@ -37,7 +37,7 @@ const renderEmailContents = (
   deletesAmount: number,
   now: string
 ) => {
-  const logsLink = `https://s3.console.aws.amazon.com/s3/object/${bucketName}?region=eu-west-1&prefix=logs/${municipality}/${now}.json`;
+  const logsLink = `https://s3.console.aws.amazon.com/s3/object/${bucketName}?region=eu-west-1&prefix=logs/${municipality}/${assetType}/${now}.json`;
   const rejectedLink = `https://s3.console.aws.amazon.com/s3/object/${bucketName}?region=eu-west-1&prefix=logs/rejected/${municipality}/${assetType}/${now}.json`;
   const invalidInfraoLink = `https://s3.console.aws.amazon.com/s3/object/${bucketName}?region=eu-west-1&prefix=invalidInfrao/${municipality}/${assetType}/${now}.json`;
   const html = `

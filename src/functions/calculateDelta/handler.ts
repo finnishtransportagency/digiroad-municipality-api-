@@ -26,57 +26,75 @@ const calculateDelta = async (event: S3Event) => {
    * @example geojson/espoo/obstacles/2024-07-11T13:55:21.json
    */
   const updateObjectKey: string = event.Records[0].s3.object.key;
-  const municipality = updateObjectKey.split('/')[1];
-  if (!isSupportedMunicipality(municipality)) throw new Error('Invalid municipality');
-  const assetType: string = updateObjectKey.split('/')[2];
-  if (!isAssetTypeKey(assetType)) throw new Error('Invalid assetType');
 
-  const updateObject: FeatureCollection = geoJsonSchema.cast(
-    JSON.parse(await getFromS3(bucketName, updateObjectKey))
-  );
-  if (!updateObject) {
-    await reportUpdateObjectError(updateObjectKey);
-    throw new Error(`Error while retrieving update object: ${updateObjectKey}`);
-  }
+  try {
+    const municipality = updateObjectKey.split('/')[1];
+    if (!isSupportedMunicipality(municipality)) throw new Error('Invalid municipality');
+    const assetType: string = updateObjectKey.split('/')[2];
+    if (!isAssetTypeKey(assetType)) throw new Error('Invalid assetType');
 
-  const referenceObject: FeatureCollection | null = (
-    await getFeatureCollection(municipality, assetType, 1)
-  ).object;
-
-  const updateFeatures: Array<ValidFeature> = updateObject.features.filter((f) =>
-    validateFeatureAssetType(f, assetType)
-  );
-
-  const referenceFeatures: Array<ValidFeature> = referenceObject
-    ? referenceObject.features.filter((f) => validateFeatureAssetType(f, assetType))
-    : [];
-  const referencesExist: boolean = referenceFeatures.length > 0;
-
-  const updatePayload: UpdatePayload = {
-    Created: referencesExist ? [] : updateFeatures,
-    Updated: [],
-    Deleted: [],
-    metadata: {
-      municipality,
-      assetType
+    const updateObject: FeatureCollection = geoJsonSchema.cast(
+      JSON.parse(await getFromS3(bucketName, updateObjectKey))
+    );
+    if (!updateObject) {
+      await reportUpdateObjectError(updateObjectKey);
+      throw new Error(`Error while retrieving update object: ${updateObjectKey}`);
     }
-  };
-  if (referencesExist)
-    pushUpdatesToPayload(updatePayload, updateFeatures, referenceFeatures);
 
-  const fileName = updateObjectKey.split('/')[3].split('.')[0];
-  await uploadToS3(
-    bucketName,
-    `calculateDelta/${municipality}/${fileName}.json`,
-    JSON.stringify(updatePayload)
-  );
-  await invokeLambda(
-    'matchRoadLink',
-    'Event',
-    Buffer.from(
-      JSON.stringify({ key: `calculateDelta/${municipality}/${fileName}.json` })
-    )
-  );
+    const referenceObject: FeatureCollection | null = (
+      await getFeatureCollection(municipality, assetType, 1)
+    ).object;
+
+    const updateFeatures: Array<ValidFeature> = updateObject.features.filter((f) =>
+      validateFeatureAssetType(f, assetType)
+    );
+
+    const referenceFeatures: Array<ValidFeature> = referenceObject
+      ? referenceObject.features.filter((f) => validateFeatureAssetType(f, assetType))
+      : [];
+    const referencesExist: boolean = referenceFeatures.length > 0;
+
+    const updatePayload: UpdatePayload = {
+      Created: referencesExist ? [] : updateFeatures,
+      Updated: [],
+      Deleted: [],
+      metadata: {
+        municipality,
+        assetType
+      }
+    };
+    if (referencesExist)
+      pushUpdatesToPayload(updatePayload, updateFeatures, referenceFeatures);
+
+    const fileName = updateObjectKey.split('/')[3].split('.')[0];
+    await uploadToS3(
+      bucketName,
+      `calculateDelta/${municipality}/${assetType}/${fileName}.json`,
+      JSON.stringify(updatePayload)
+    );
+    await invokeLambda(
+      'matchRoadLink',
+      'Event',
+      Buffer.from(
+        JSON.stringify({
+          key: `calculateDelta/${municipality}/${assetType}/${fileName}.json`
+        })
+      )
+    );
+  } catch (error) {
+    console.error(`Error in calculateDelta: ${(error as Error).message}`);
+
+    try {
+      await deleteFromS3(bucketName, updateObjectKey);
+      console.log(`Deleted ${updateObjectKey} due to calculateDelta failure.`);
+    } catch (deleteError) {
+      console.error(
+        `Failed to delete ${updateObjectKey}: ${(deleteError as Error).message}`
+      );
+    }
+
+    throw error;
+  }
 };
 
 const getFeatureCollection = async (
