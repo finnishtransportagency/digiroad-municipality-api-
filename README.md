@@ -1,58 +1,60 @@
 # Digiroad Municipality API
 
-Municipality API is an API that municipalities can use to automate the maintenance of some assets in Digiroad. 
+Digiroad Municipality API fetches data from municipalities' APIs and parses the data to Digiroad.
 
 This project is done using the [Serverless framework](https://www.serverless.com/).
 
 For detailed instructions, please refer to the [documentation](https://www.serverless.com/framework/docs/providers/aws/).
 
-### Installation/deployment instructions
+## Local development instructions
 
-- Run `npm i` to install the project dependencies
-- Run `sls package --stage <stage>` to create a package that contains the Lambda zip files as well as cloudformation templates
-- Run cloudformation-template-create-stack in AWS cloudformation if it is the first deployment
-- Upload packaged files into the created deployment s3 bucket. The path of the uploaded files should be `serverless/DRKunta/<stage>/<timestamp>`. The exact path can be found in the cloudformation-template-update-stack file, with the key "s3Key"
-- Run cloudformation-template-update-stack in AWS cloudformation
+### Prerequisites
 
-### Usage
+- [Node.js v20 & npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) installed
+- [serverless framework v3](https://www.npmjs.com/package/serverless) installed globally
 
-Creating or deleting schedules requires an API-key.
+### Installation and running
 
-### Project structure
+- More detailed instructions in [Confluence](https://extranet.vayla.fi/wiki/pages/viewpage.action?pageId=207002949).
+- Install local Digiroad 2 database. Instructions found [Here](https://github.com/finnishtransportagency/digiroad2).
+  - Dump available in `testFiles`
+  - Copy data from the following production tables to local: - enumerated_value, property, kgv_roadlink and functional_class
+<details>
+  <summary>Provide the following environment variables in `.env`-file and remember to replace values between `<` and `>` with your own values</summary>
 
-The project code base is mainly located within the `src` folder. This folder is divided in:
+  ```sh
+  OFFLINE=true
+  PGHOST='localhost'
+  PGPORT='5432'
+  PGDATABASE=<database-name>
+  PGUSER=<database-username>
+  PGPASSWORD_SSM_KEY=<database-password>
+  APIKEY=''
+  STAGE_NAME='dev'
+  DR_SECURITY_GROUP_ID=''
+  DR_SUBNET_ID_1=''
+  DR_SUBNET_ID_2=''
+  SECURITY_GROUP_ID=''
+  SUBNET_ID_1=''
+  SUBNET_ID_2=''
+  BBOX=<your-bounding-box-in-epsg:3067> # Bounding box for fetching data from Infra-O API
+  AWS_ACCOUNT_ID=''
+  AWS_CLOUDFORMATION_ROLE=''
+  ADMINISTRATOR=''
+  ```
 
-- `functions` - containing code base and configuration for your lambda functions
-- `libs` - containing shared code base between your lambdas
+</details>
+<br/>
 
-```
-.
-├── src
-│   ├── functions               # Lambda configuration and source code folder
-│   │   ├── exampleFunction
-│   │   │   ├── handler.ts      # `exampleFunction` lambda source code
-│   │   │   ├── index.ts        # `exampleFunction` lambda Serverless configuration
-│   │   │
-│   │   └── index.ts            # Import/export of all lambda configurations
-│   │
-│   └── libs                    # Lambda shared code
-│       └── apiGateway.ts       # API Gateway specific helpers
-│       └── handlerResolver.ts  # Sharable library for resolving lambda handlers
-│       └── lambda.ts           # Lambda middleware
-│
-├── package.json
-├── serverless.ts               # Serverless service file
-├── tsconfig.json               # Typescript compiler configuration
-├── tsconfig.paths.json         # Typescript paths
-└── webpack.config.js           # Webpack configuration
-```
+- Run `npm i` to install the project dependencies.
+- Run local database in one terminal.
+- Run `npm start` in another terminal to start the api.
+- In a third terminal you can now run commands found in `package.json`.
 
-### 3rd party libraries
+### Deployment
 
-- [json-schema-to-ts](https://github.com/ThomasAribart/json-schema-to-ts) - uses JSON-Schema definitions used by API Gateway for HTTP request validation to statically generate TypeScript types in your lambda's handler code base
-- [middy](https://github.com/middyjs/middy) - middleware engine for Node.Js lambda. This template uses [http-json-body-parser](https://github.com/middyjs/middy/tree/master/packages/http-json-body-parser) to convert API Gateway `event.body` property, originally passed as a stringified JSON, to its corresponding parsed object
-- [@serverless/typescript](https://github.com/serverless/typescript) - provides up-to-date TypeScript definitions for your `serverless.ts` service file
+Deployment is automated with GitHub actions. Pushing into `development` updates development, `test` updates QA and `main` updates production.
 
-### Advanced usage
+### Automation
 
-Any tsconfig.json can be used, but if you do, set the environment variable `TS_NODE_CONFIG` for building the application, eg `TS_NODE_CONFIG=./tsconfig.app.json npx serverless webpack`
+Automated fetches can be set up via [Amazon EventBridge Scheduler](https://docs.aws.amazon.com/scheduler/latest/UserGuide/what-is-scheduler.html).

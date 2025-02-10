@@ -13,10 +13,6 @@ buckets
 env.sh
 .env
 
-# database dumps
-*.dump
-*.sql
-
 # debugging files
 debugging
 .git-old
