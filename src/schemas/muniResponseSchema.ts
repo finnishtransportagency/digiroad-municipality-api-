@@ -59,7 +59,7 @@ const mapSignCode = (fullCode: string) => {
     }
     if (Object.keys(trafficSignRules).includes(baseCode)) return baseCode;
   }
-  const pointSplit = fullCode.trim().split(/[^a-zA-Z0-9]+/);
+  const pointSplit = fullCode.trim().split(/[^0-9]+/);
   const mapping = oldTrafficSignMapping[pointSplit[0]];
   if (!mapping) return 'INVALID_CODE';
   if (mapping.hasSubCode) return mapping.code[pointSplit[1]] ?? mapping.code.default;
