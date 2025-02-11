@@ -67,7 +67,7 @@ export default (
    * Extracting additional panel text and values from txt field.
    */
   const textMatch = castedFeature.txt
-    ? castedFeature.txt.match(/text:([^;]*)/)
+    ? castedFeature.txt.match(/text:([^;]*(?:;[^a-z]*?)?)(?:;|$)/i)
     : undefined;
   const text = textMatch ? textMatch[1].trim() : undefined;
   const txt = isAdditionalPanel ? text : castedFeature.txt;
