@@ -187,7 +187,8 @@ const matchRoadLinks = async (event: S3KeyObject) => {
       )
     );
   } catch (error) {
-    console.error(`Error in matchRoadLink: ${(error as Error).message}`);
+    if (!(error instanceof Error)) throw error;
+    console.error(`Error in matchRoadLink: ${error.message}`);
 
     const deleteKey = `geojson/${event.key.split('/')[1]}/${event.key.split('/')[2]}/${
       event.key.split('/')[3]
@@ -197,7 +198,8 @@ const matchRoadLinks = async (event: S3KeyObject) => {
       await deleteFromS3(bucketName, deleteKey);
       console.log(`Deleted ${deleteKey} due to matchRoadLink failure.`);
     } catch (deleteError) {
-      console.error(`Failed to delete ${deleteKey}: ${(deleteError as Error).message}`);
+      if (!(deleteError instanceof Error)) throw deleteError;
+      console.error(`Failed to delete ${deleteKey}: ${deleteError.message}`);
     }
 
     throw error;

@@ -66,7 +66,8 @@ const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
 
     return { key: S3ObjectKey };
   } catch (error) {
-    console.error(`Error in getNearbyLinks: ${(error as Error).message}`);
+    if (!(error instanceof Error)) throw error;
+    console.error(`Error in getNearbyLinks: ${error.message}`);
 
     const deleteKey = `geojson/${event.key.split('/')[1]}/${event.key.split('/')[2]}/${
       event.key.split('/')[3]
@@ -76,7 +77,8 @@ const getNearbyLinks = async (event: S3KeyObject): Promise<S3KeyObject> => {
       await deleteFromS3(bucketName, deleteKey);
       console.log(`Deleted ${deleteKey} due to getNearbyLinks failure.`);
     } catch (deleteError) {
-      console.error(`Failed to delete ${deleteKey}: ${(deleteError as Error).message}`);
+      if (!(deleteError instanceof Error)) throw deleteError;
+      console.error(`Failed to delete ${deleteKey}: ${deleteError.message}`);
     }
 
     throw error;

@@ -74,7 +74,8 @@ export const executeTransaction = async (
       await client.query('ROLLBACK');
       console.error('Rollback successful.');
     } catch (rollbackError) {
-      console.error(`Rollback failed: ${(rollbackError as Error).message}`);
+      if (!(rollbackError instanceof Error)) throw rollbackError;
+      console.error(`Rollback failed: ${rollbackError.message}`);
     }
 
     if (e instanceof Error) {

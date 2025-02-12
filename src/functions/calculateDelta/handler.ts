@@ -82,15 +82,15 @@ const calculateDelta = async (event: S3Event) => {
       )
     );
   } catch (error) {
-    console.error(`Error in calculateDelta: ${(error as Error).message}`);
+    if (!(error instanceof Error)) throw error;
+    console.error(`Error in calculateDelta: ${error.message}`);
 
     try {
       await deleteFromS3(bucketName, updateObjectKey);
       console.log(`Deleted ${updateObjectKey} due to calculateDelta failure.`);
     } catch (deleteError) {
-      console.error(
-        `Failed to delete ${updateObjectKey}: ${(deleteError as Error).message}`
-      );
+      if (!(deleteError instanceof Error)) throw deleteError;
+      console.error(`Failed to delete ${updateObjectKey}: ${deleteError.message}`);
     }
 
     throw error;

@@ -84,18 +84,17 @@ const execDelta2SQL = async (event: S3KeyObject) => {
           event.key.split('/')[2]
         }/${event.key.split('/')[3]}`;
 
-        try {
-          void deleteFromS3(bucketName, deleteKey);
-          console.log(`Deleted ${deleteKey} due to execDelta2SQL failure.`);
-        } catch (deleteError) {
-          console.error(
-            `Failed to delete ${deleteKey}: ${(deleteError as Error).message}`
-          );
-        }
+        deleteFromS3(bucketName, deleteKey)
+          .then(() => console.log(`Deleted ${deleteKey} due to execDelta2SQL failure.`))
+          .catch((deleteError) => {
+            if (!(deleteError instanceof Error)) throw deleteError;
+            console.error(`Failed to delete ${deleteKey}: ${deleteError.message}`);
+          });
       }
     );
   } catch (error) {
-    console.error(`Fatal error in execDelta2SQL: ${(error as Error).message}`);
+    if (!(error instanceof Error)) throw error;
+    console.error(`Fatal error in execDelta2SQL: ${error.message}`);
     const deleteKey = `geojson/${event.key.split('/')[1]}/${event.key.split('/')[2]}/${
       event.key.split('/')[3]
     }`;
@@ -104,7 +103,8 @@ const execDelta2SQL = async (event: S3KeyObject) => {
       await deleteFromS3(bucketName, deleteKey);
       console.log(`Deleted ${deleteKey} due to execDelta2SQL failure.`);
     } catch (deleteError) {
-      console.error(`Failed to delete ${deleteKey}: ${(deleteError as Error).message}`);
+      if (!(deleteError instanceof Error)) throw deleteError;
+      console.error(`Failed to delete ${deleteKey}: ${deleteError.message}`);
     }
   }
 };
