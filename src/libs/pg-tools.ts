@@ -194,7 +194,7 @@ export const checkExistingAssetQuery = (
     text: `
       SELECT id
       FROM asset
-      WHERE external_ids=($1) AND municipality_code=($2) AND asset_type_id=($3) AND valid_to IS NULL
+      WHERE external_id=($1) AND municipality_code=($2) AND asset_type_id=($3) AND valid_to IS NULL
     `,
     values: [externalAssetId, String(municipalityCode), String(assetTypeId)]
   };
@@ -245,7 +245,7 @@ export const insertAssetQuery = (
   const text = `
       INSERT INTO asset (id, ${
         isUpdate ? 'modified_date, modified_by' : 'created_date, created_by'
-      }, geometry, bearing, asset_type_id, municipality_code, external_ids${
+      }, geometry, bearing, asset_type_id, municipality_code, external_id${
     isUpdate ? ', created_by, created_date' : ''
   })
       VALUES (nextval('PRIMARY_KEY_SEQ'), CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', $1, ST_GeomFromText(($2),3067), $3, $4, $5, $6${
@@ -575,7 +575,7 @@ export const expireQuery = (
     text: `
       UPDATE asset
       SET VALID_TO=CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki', MODIFIED_BY=($1),modified_date=CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Helsinki'
-      WHERE external_ids=($2) AND municipality_code=($3) AND asset_type_id =($4) AND valid_to IS NULL
+      WHERE external_id=($2) AND municipality_code=($3) AND asset_type_id =($4) AND valid_to IS NULL
       ${end}
     `,
     values: [dbmodifier, externalAssetId, String(municipalityCode), String(assetTypeId)]
