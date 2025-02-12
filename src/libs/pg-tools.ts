@@ -48,6 +48,13 @@ export const executeSingleQuery = async (query: PostgresQuery) => {
   return response;
 };
 
+/**
+ * Initializes a connection to the database, executes queries, commits and closes the connection.
+ * Rolls back execution in case of an error.
+ * @param queryFunctions List of queries to be executed.
+ * @param propertyFunctions Another list of queries to be executed.
+ * @param errorHandler Function to be executed in case of an error.
+ */
 export const executeTransaction = async (
   queryFunctions: Array<QueryFunction>,
   propertyFunctions: Array<QueryFunction>,
@@ -88,21 +95,6 @@ export const executeTransaction = async (
     await client.end();
   }
 };
-
-/**
- * Selects id from property corresponding to given public_id.
- *
- * @param subqueryName Name of psql CTE. Default: _property
- * @param parameterIndex Index of public_id in values array. Default: 1
- */
-export const getPropertySubquery = (
-  subqueryName = '_property',
-  parameterIndex = 1
-) => `${subqueryName} AS (
-          SELECT id
-          FROM property
-          WHERE public_id=($${parameterIndex})
-        )`;
 
 /**
  * Fetches roadlinks with admin class not 1 (checks for overwrites in administrative_class table) from municipality in question
@@ -303,6 +295,11 @@ export const insertAssetLinkQuery = (
   };
 };
 
+/**
+ * Inserts all number properties in one query. Used for terrain coordinates.
+ * @param numberProperties List of number properties to be inserted.
+ * @returns Batch insert query to number_property_value
+ */
 export const insertNumberPropertiesBatch = (
   numberProperties: Array<NumberProperty>
 ): PostgresQuery => {
@@ -333,6 +330,12 @@ export const insertNumberPropertiesBatch = (
   };
 };
 
+/**
+ * Inserts all text properties in one query. Used for ARVO, TEKSTI and LISATIETO
+ * @param textProperties Array of text properties to be inserted.
+ * @param dbmodifier Name of modifier. E.g. "municipality-api-espoo".
+ * @returns Batch insert query to text_property_value
+ */
 export const insertTextPropertiesBatch = (
   textProperties: Array<TextProperty>,
   dbmodifier: string
@@ -366,6 +369,12 @@ export const insertTextPropertiesBatch = (
   };
 };
 
+/**
+ * Inserts all single choice values in one query. Used for numerous properties.
+ * @param singleChoiceProperties Array of single choice values to be inserted.
+ * @param dbmodifier Name of modifier. E.g. "municipality-api-espoo".
+ * @returns Batch insert query to single_choice_value
+ */
 export const insertSingleChoicePropertiesBatch = (
   singleChoiceProperties: Array<ChoiceProperty>,
   dbmodifier: string
@@ -401,6 +410,12 @@ export const insertSingleChoicePropertiesBatch = (
   };
 };
 
+/**
+ * Insert all traffic sign types in one query.
+ * @param trafficSignTypes Array of traffic sign types to be inserted.
+ * @param dbmodifier Name of modifier. E.g. "municipality-api-espoo".
+ * @returns Batch insert query of traffic sign types to text_property_value
+ */
 export const insertSignTypesBatch = (
   trafficSignTypes: Array<SignProperty>,
   dbmodifier: string
@@ -444,6 +459,12 @@ export const insertSignTypesBatch = (
   };
 };
 
+/**
+ * Inserts all multiple choice values in query. Used for old traffic code
+ * @param multipleChoiceProperties Array of multiple choice values to be inserted.
+ * @param dbmodifier Name of modifier. E.g. "municipality-api-espoo".
+ * @returns Batch insert query to multiple_choice_value
+ */
 export const insertMultipleChoicePropertiesBatch = (
   multipleChoiceProperties: Array<ChoiceProperty>,
   dbmodifier: string
@@ -480,6 +501,11 @@ export const insertMultipleChoicePropertiesBatch = (
   };
 };
 
+/**
+ * Inserts all additional panels in one query.
+ * @param additionalPanels Array of additional panels to be inserted.
+ * @returns Batch insert query to additional_panel
+ */
 export const insertAdditionalPanelsBatch = (
   additionalPanels: Array<AdditionalPanelProperty>
 ): PostgresQuery => {
